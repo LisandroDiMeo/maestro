@@ -15,6 +15,7 @@ import maestro.cli.util.PrintUtils
 import maestro.cli.view.ErrorViewUtils
 import maestro.cli.view.TestSuiteStatusView
 import maestro.cli.view.TestSuiteStatusView.TestSuiteViewModel
+import maestro.orchestra.MaestroCommand
 import maestro.orchestra.Orchestra
 import maestro.orchestra.util.Env.withEnv
 import maestro.orchestra.workspace.WorkspaceExecutionPlanner

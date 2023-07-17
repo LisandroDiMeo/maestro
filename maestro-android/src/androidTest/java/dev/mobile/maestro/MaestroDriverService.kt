@@ -10,6 +10,7 @@ import android.location.Location
 import android.location.LocationManager
 import android.location.LocationProvider
 import android.os.Build
+import android.os.Debug
 import android.os.Handler
 import android.os.Looper
 import android.os.SystemClock
@@ -108,6 +109,7 @@ class Service(
         request: MaestroAndroid.LaunchAppRequest,
         responseObserver: StreamObserver<MaestroAndroid.LaunchAppResponse>
     ) {
+//        Debug.waitForDebugger()
         val context = InstrumentationRegistry.getInstrumentation().targetContext
 
         val intent = context.packageManager.getLaunchIntentForPackage(request.packageName)

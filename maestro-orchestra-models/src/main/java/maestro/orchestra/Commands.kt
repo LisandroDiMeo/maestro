@@ -20,6 +20,7 @@
 package maestro.orchestra
 
 import maestro.KeyCode
+import maestro.Maestro
 import maestro.Point
 import maestro.ScrollDirection
 import maestro.SwipeDirection
@@ -35,6 +36,16 @@ sealed interface Command {
 
     fun visible(): Boolean = true
 
+    fun visit(maestro: MaestroCommandHost)
+
+}
+
+class MaestroCommandHost {
+    fun accept(maestroCommand: MaestroCommand) {
+        maestroCommand.asCommand()?.visit(this)
+    }
+
+    fun swipe(swipeCommand: SwipeCommand){}
 }
 
 sealed interface CompositeCommand : Command {
@@ -52,6 +63,10 @@ data class SwipeCommand(
     val endRelative: String? = null,
     val duration: Long = DEFAULT_DURATION_IN_MILLIS
 ) : Command {
+
+    override fun visit(maestro: MaestroCommandHost) {
+        maestro.swipe(this)
+    }
 
     override fun description(): String {
         return when {

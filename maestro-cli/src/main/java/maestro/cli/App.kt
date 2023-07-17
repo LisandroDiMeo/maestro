@@ -22,6 +22,7 @@ package maestro.cli
 import maestro.cli.command.BugReportCommand
 import maestro.cli.command.CloudCommand
 import maestro.cli.command.DownloadSamplesCommand
+import maestro.cli.command.GenerateCommand
 import maestro.cli.command.LoginCommand
 import maestro.cli.command.LogoutCommand
 import maestro.cli.command.PrintHierarchyCommand
@@ -62,7 +63,8 @@ import kotlin.system.exitProcess
         NetworkCommand::class,
         BugReportCommand::class,
         StudioCommand::class,
-        MockServerCommand::class
+        MockServerCommand::class,
+        GenerateCommand::class
     ]
 )
 class App {

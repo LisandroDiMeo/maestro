@@ -1,0 +1,4 @@
+appId: com.apple.MobileAddressBook
+---
+- launchApp
+- tapOn: "John Appleseed"

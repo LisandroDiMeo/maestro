@@ -1,0 +1,4 @@
+appId: com.samsung.android.app.contacts
+---
+- launchApp
+- tapOn: "Nombre Usuario"
