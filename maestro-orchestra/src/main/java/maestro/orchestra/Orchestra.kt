@@ -34,6 +34,8 @@ import maestro.orchestra.error.UnicodeNotSupportedError
 import maestro.orchestra.filter.FilterWithDescription
 import maestro.orchestra.filter.TraitFilters
 import maestro.orchestra.geo.Traveller
+import maestro.orchestra.runcycle.FlowFileRunCycle
+import maestro.orchestra.runcycle.RunCycle
 import maestro.orchestra.util.Env.evaluateScripts
 import maestro.orchestra.yaml.YamlCommandReader
 import maestro.toSwipeDirection
@@ -50,6 +52,7 @@ class Orchestra(
     private val lookupTimeoutMs: Long = 17000L,
     private val optionalLookupTimeoutMs: Long = 7000L,
     private val networkProxy: NetworkProxy = NetworkProxy(port = 8085),
+    private val runCycle: FlowFileRunCycle,
     private val onFlowStart: (List<MaestroCommand>) -> Unit = {},
     private val onCommandStart: (Int, MaestroCommand) -> Unit = { _, _ -> },
     private val onCommandComplete: (Int, MaestroCommand) -> Unit = { _, _ -> },
@@ -89,7 +92,7 @@ class Orchestra(
             maestro.pushAppState(state.appId, state.file)
         }
 
-        onFlowStart(commands)
+        runCycle.onFlowStart(commands)
         return executeCommands(commands, config)
     }
 
@@ -129,7 +132,7 @@ class Orchestra(
 
         commands
             .forEachIndexed { index, command ->
-                onCommandStart(index, command)
+                runCycle.onCommandStart(index, command)
 
                 jsEngine.onLogMessage { msg ->
                     val metadata = getMetadata(command)
@@ -148,13 +151,13 @@ class Orchestra(
 
                 try {
                     executeCommand(evaluatedCommand, config)
-                    onCommandComplete(index, command)
+                    runCycle.onCommandComplete(index, command)
                 } catch (ignored: CommandSkipped) {
                     // Swallow exception
-                    onCommandSkipped(index, command)
+                    runCycle.onCommandSkipped(index, command)
                 } catch (e: Throwable) {
 
-                    when (onCommandFailed(index, command, e)) {
+                    when (runCycle.onCommandFailed(index, command, e)) {
                         ErrorResolution.FAIL -> return false
                         ErrorResolution.CONTINUE -> {
                             // Do nothing
@@ -412,7 +415,7 @@ class Orchestra(
 
     private fun updateMetadata(rawCommand: MaestroCommand, metadata: CommandMetadata) {
         rawCommandToMetadata[rawCommand] = metadata
-        onCommandMetadataUpdate(rawCommand, metadata)
+        runCycle.onCommandMetadataUpdate(rawCommand, metadata)
     }
 
     private fun getMetadata(rawCommand: MaestroCommand) = rawCommandToMetadata.getOrPut(rawCommand) {
@@ -420,7 +423,7 @@ class Orchestra(
     }
 
     private fun resetCommand(command: MaestroCommand) {
-        onCommandReset(command)
+        runCycle.onCommandReset(command)
 
         (command.asCommand() as? CompositeCommand)?.let {
             it.subCommands().forEach { command ->
@@ -512,7 +515,7 @@ class Orchestra(
         return try {
             commands
                 .mapIndexed { index, command ->
-                    onCommandStart(index, command)
+                    runCycle.onCommandStart(index, command)
 
                     val evaluatedCommand = command.evaluateScripts(jsEngine)
                     val metadata = getMetadata(command)
@@ -524,14 +527,14 @@ class Orchestra(
                     return@mapIndexed try {
                         executeCommand(evaluatedCommand, config)
                             .also {
-                                onCommandComplete(index, command)
+                                runCycle.onCommandComplete(index, command)
                             }
                     } catch (ignored: CommandSkipped) {
                         // Swallow exception
-                        onCommandSkipped(index, command)
+                        runCycle.onCommandSkipped(index, command)
                         false
                     } catch (e: Throwable) {
-                        when (onCommandFailed(index, command, e)) {
+                        when (runCycle.onCommandFailed(index, command, e)) {
                             ErrorResolution.FAIL -> throw e
                             ErrorResolution.CONTINUE -> {
                                 // Do nothing

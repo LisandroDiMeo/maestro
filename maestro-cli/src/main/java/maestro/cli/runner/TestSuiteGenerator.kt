@@ -4,14 +4,20 @@ import maestro.DeviceInfo
 import maestro.Maestro
 import maestro.TreeNode
 import maestro.cli.device.Device
+import maestro.cli.model.FlowStatus
 import maestro.cli.report.TestSuiteReporter
 import maestro.generation.TestGenerator
 import maestro.js.JsEngine
 import maestro.networkproxy.NetworkProxy
 import maestro.orchestra.ElementSelector
 import maestro.orchestra.MaestroCommand
+import maestro.orchestra.MaestroConfig
+import maestro.orchestra.MaestroInitFlow
 import maestro.orchestra.Orchestra
+import maestro.orchestra.OrchestraAppState
 import maestro.orchestra.TapOnElementCommand
+import maestro.orchestra.runcycle.RunCycle
+import maestro.orchestra.yaml.YamlCommandReader
 import org.slf4j.LoggerFactory
 import java.io.File
 
@@ -96,20 +102,10 @@ class TestGenerationOrchestra(
     }
 }
 
-
-
-interface RunCycle {
-    fun onCommandStart(commandId: Int, command: MaestroCommand)
-    fun onCommandComplete(commandId: Int, command: MaestroCommand)
-    fun onCommandFailed(commandId: Int, command: MaestroCommand, error: Throwable): Orchestra.ErrorResolution
-    fun onCommandSkipped(commandId: Int, command: MaestroCommand)
-    fun onCommandReset(command: MaestroCommand)
-    fun onCommandMetadataUpdate(command: MaestroCommand, metadata: Orchestra.CommandMetadata)
+interface Orchestrator {
+    fun orchestrate(): FlowStatus
 }
 
-interface FlowFileRunCycle: RunCycle {
-    fun onFlowStart(commands: List<MaestroCommand>)
-}
 
 interface NodePickerStrategy {
     @kotlin.jvm.Throws(UnableToPickNode::class)

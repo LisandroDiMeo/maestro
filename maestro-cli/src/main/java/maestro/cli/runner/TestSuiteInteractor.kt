@@ -17,6 +17,7 @@ import maestro.cli.view.TestSuiteStatusView
 import maestro.cli.view.TestSuiteStatusView.TestSuiteViewModel
 import maestro.orchestra.MaestroCommand
 import maestro.orchestra.Orchestra
+import maestro.orchestra.runcycle.FlowFileRunCycle
 import maestro.orchestra.util.Env.withEnv
 import maestro.orchestra.workspace.WorkspaceExecutionPlanner
 import maestro.orchestra.yaml.YamlCommandReader
@@ -178,6 +179,12 @@ class TestSuiteInteractor(
 
                 val config = YamlCommandReader.getConfig(commands)
 
+                val testSuiteInteractorCycle = TestSuiteInteractorCycle(
+                    logger,
+                    debug,
+                    ::takeDebugScreenshot
+                )
+
                 val orchestra = Orchestra(
                     maestro = maestro,
                     onCommandStart = { _, command ->
@@ -218,6 +225,7 @@ class TestSuiteInteractor(
                             it.status = CommandStatus.PENDING
                         }
                     },
+                    runCycle = testSuiteInteractorCycle
                 )
 
                 config?.name?.let {
@@ -259,3 +267,54 @@ class TestSuiteInteractor(
     }
 
 }
+
+
+class TestSuiteInteractorCycle(
+    private val logger: org.slf4j.Logger,
+    private val debug: FlowDebugMetadata,
+    private val onScreenshot: (CommandStatus) -> Unit
+) : FlowFileRunCycle() {
+    override fun onCommandStart(commandId: Int, command: MaestroCommand) {
+        logger.info("${command.description()} RUNNING")
+        debug.commands[command] = CommandDebugMetadata(
+            timestamp = System.currentTimeMillis(),
+            status = CommandStatus.RUNNING
+        )
+    }
+
+    override fun onCommandComplete(commandId: Int, command: MaestroCommand) {
+        logger.info("${command.description()} COMPLETED")
+        debug.commands[command]?.let {
+            it.status = CommandStatus.COMPLETED
+            it.calculateDuration()
+        }
+    }
+
+    override fun onCommandFailed(commandId: Int, command: MaestroCommand, error: Throwable): Orchestra.ErrorResolution {
+        logger.info("${command.description()} FAILED")
+        if (error is MaestroException) debug.exception = error
+        debug.commands[command]?.let {
+            it.status = CommandStatus.FAILED
+            it.calculateDuration()
+            it.error = error
+        }
+
+        onScreenshot(CommandStatus.FAILED)
+        return Orchestra.ErrorResolution.FAIL
+    }
+
+    override fun onCommandSkipped(commandId: Int, command: MaestroCommand) {
+        logger.info("${command.description()} SKIPPED")
+        debug.commands[command]?.let {
+            it.status = CommandStatus.SKIPPED
+        }
+    }
+
+    override fun onCommandReset(command: MaestroCommand) {
+        logger.info("${command.description()} PENDING")
+        debug.commands[command]?.let {
+            it.status = CommandStatus.PENDING
+        }
+    }
+}
+

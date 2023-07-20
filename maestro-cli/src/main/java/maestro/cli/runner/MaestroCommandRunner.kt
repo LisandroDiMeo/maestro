@@ -32,7 +32,9 @@ import maestro.orchestra.CompositeCommand
 import maestro.orchestra.MaestroCommand
 import maestro.orchestra.Orchestra
 import maestro.orchestra.OrchestraAppState
+import maestro.orchestra.runcycle.FlowFileRunCycle
 import maestro.orchestra.yaml.YamlCommandReader
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.util.IdentityHashMap
@@ -207,3 +209,78 @@ object MaestroCommandRunner {
     )
 }
 
+class MaestroCommandRunnerCycle(
+    private val logger: Logger,
+    private val refreshUi: () -> Unit,
+    private val onScreenshot: (CommandStatus) -> Unit,
+    private val flowDebugMetadata: FlowDebugMetadata,
+    private val commandStatuses: IdentityHashMap<MaestroCommand, CommandStatus>,
+    private val commandMetadata: IdentityHashMap<MaestroCommand, Orchestra.CommandMetadata>
+) : FlowFileRunCycle() {
+    override fun onCommandStart(commandId: Int, command: MaestroCommand) {
+        logger.info("${command.description()} RUNNING")
+        commandStatuses[command] = CommandStatus.RUNNING
+        flowDebugMetadata.commands[command] = CommandDebugMetadata(
+            timestamp = System.currentTimeMillis(),
+            status = CommandStatus.RUNNING
+        )
+
+        refreshUi()
+    }
+
+    override fun onCommandComplete(commandId: Int, command: MaestroCommand) {
+        logger.info("${command.description()} COMPLETED")
+        commandStatuses[command] = CommandStatus.COMPLETED
+        flowDebugMetadata.commands[command]?.let {
+            it.status = CommandStatus.COMPLETED
+            it.calculateDuration()
+        }
+        refreshUi()
+    }
+
+    override fun onCommandFailed(commandId: Int, command: MaestroCommand, error: Throwable): Orchestra.ErrorResolution {
+        flowDebugMetadata.commands[command]?.let {
+            it.status = CommandStatus.FAILED
+            it.calculateDuration()
+            it.error = error
+        }
+
+        onScreenshot(CommandStatus.FAILED)
+
+        if (error !is MaestroException) {
+            throw error
+        } else {
+            flowDebugMetadata.exception = error
+        }
+
+        logger.info("${command.description()} FAILED")
+        commandStatuses[command] = CommandStatus.FAILED
+        refreshUi()
+
+        return Orchestra.ErrorResolution.FAIL
+    }
+
+    override fun onCommandSkipped(commandId: Int, command: MaestroCommand) {
+        logger.info("${command.description()} SKIPPED")
+        commandStatuses[command] = CommandStatus.SKIPPED
+        flowDebugMetadata.commands[command]?.let {
+            it.status = CommandStatus.SKIPPED
+        }
+        refreshUi()
+    }
+
+    override fun onCommandReset(command: MaestroCommand) {
+        logger.info("${command.description()} PENDING")
+        commandStatuses[command] = CommandStatus.PENDING
+        flowDebugMetadata.commands[command]?.let {
+            it.status = CommandStatus.PENDING
+        }
+        refreshUi()
+    }
+
+    override fun onCommandMetadataUpdate(command: MaestroCommand, metadata: Orchestra.CommandMetadata) {
+        logger.info("${command.description()} metadata $metadata")
+        commandMetadata[command] = metadata
+        refreshUi()
+    }
+}
