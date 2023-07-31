@@ -6,21 +6,18 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.ApplicationCall
 import io.ktor.server.application.call
-import io.ktor.server.request.receiveStream
 import io.ktor.server.response.respond
 import io.ktor.server.response.respondText
 import io.ktor.server.routing.Routing
 import io.ktor.server.routing.delete
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import maestro.Maestro
 import maestro.orchestra.MaestroCommand
 import maestro.orchestra.Orchestra
+import maestro.orchestra.runcycle.FlowFileRunCycle
 import maestro.orchestra.yaml.YamlCommandReader
 import maestro.orchestra.yaml.YamlFluentCommand
-import java.io.IOException
 import java.nio.file.Paths
 import java.util.UUID
 import kotlin.concurrent.thread
@@ -137,12 +134,14 @@ object ReplService {
                         runEntries(maestro, request.ids)
                     }
                 }
+
                 request.yaml != null -> {
                     val newEntries = createEntries(request.yaml)
                     thread {
                         runEntries(maestro, newEntries.map { it.id })
                     }
                 }
+
                 else -> {
                     call.respond(HttpStatusCode.BadRequest, "Must specify key \"ids\" or \"yaml\"")
                 }
@@ -162,7 +161,9 @@ object ReplService {
         routing.post("/api/repl/command/format") {
             val request = call.parseBody<FormatCommandsRequest>()
             val entries = state.getEntriesById(request.ids)
-            val inferredAppId = entries.firstNotNullOfOrNull { e -> e.commands.firstNotNullOfOrNull { c -> c.launchAppCommand?.appId } } ?: "<your-app-id>"
+            val inferredAppId =
+                entries.firstNotNullOfOrNull { e -> e.commands.firstNotNullOfOrNull { c -> c.launchAppCommand?.appId } }
+                    ?: "<your-app-id>"
             val commandsString = entries.joinToString("") { if (it.yaml.endsWith("\n")) it.yaml else "${it.yaml}\n" }
             val formattedFlow = FormattedFlow("appId: $inferredAppId", commandsString)
             val response = jacksonObjectMapper().writeValueAsString(formattedFlow)
@@ -216,9 +217,23 @@ object ReplService {
 
     private fun executeCommands(maestro: Maestro, commands: List<MaestroCommand>): Throwable? {
         var failure: Throwable? = null
-        val result = Orchestra(maestro, onCommandFailed = { _, _, throwable ->
-            failure = throwable
-            Orchestra.ErrorResolution.FAIL
+        val result = Orchestra(maestro, runCycle = object : FlowFileRunCycle() {
+            override fun onCommandFailed(
+                commandId: Int,
+                command: MaestroCommand,
+                error: Throwable
+            ): Orchestra.ErrorResolution {
+                failure = error
+                return Orchestra.ErrorResolution.FAIL
+            }
+
+            override fun onCommandStart(commandId: Int, command: MaestroCommand) {}
+
+            override fun onCommandComplete(commandId: Int, command: MaestroCommand) {}
+
+            override fun onCommandSkipped(commandId: Int, command: MaestroCommand) {}
+
+            override fun onCommandReset(command: MaestroCommand) {}
         }).executeCommands(commands)
         return if (result) null else (failure ?: RuntimeException("Command execution failed"))
     }

@@ -3,12 +3,12 @@ package maestro.debuglog
 import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.LoggerContext
 import ch.qos.logback.classic.encoder.PatternLayoutEncoder
+import ch.qos.logback.classic.joran.JoranConfigurator
 import ch.qos.logback.classic.spi.ILoggingEvent
 import ch.qos.logback.core.FileAppender
 import ch.qos.logback.core.status.NopStatusListener
-import maestro.Driver
 import org.slf4j.LoggerFactory
-import java.util.Properties
+import java.io.File
 
 object LogConfig {
     private const val LOG_PATTERN = "[%-5level] %logger{36} - %msg%n"
@@ -59,5 +59,27 @@ object LogConfig {
         }
 
         loggerContext.getLogger("ROOT").addAppender(fileAppender)
+    }
+
+    fun switchLogbackConfiguration(
+        configurationFilePath: String
+    ) {
+        val loggerContext = LoggerFactory.getILoggerFactory() as LoggerContext
+        loggerContext.reset()
+
+        val configurator = JoranConfigurator()
+        configurator.context = loggerContext
+
+        try {
+            configurator.doConfigure(File(configurationFilePath))
+        } catch (e: Exception) {
+            // Handle any potential configuration errors
+            println("FILE NOT FOUND ${e.message}")
+            e.printStackTrace()
+        }
+    }
+
+    object Filter {
+
     }
 }

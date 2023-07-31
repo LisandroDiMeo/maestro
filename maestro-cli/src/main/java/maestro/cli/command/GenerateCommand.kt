@@ -6,9 +6,7 @@ import maestro.cli.report.ReportFormat
 import maestro.cli.report.ReporterFactory
 import maestro.cli.runner.TestSuiteGenerator
 import maestro.cli.session.MaestroSessionManager
-import maestro.generation.TestGenerator
 import picocli.CommandLine
-import java.io.File
 import java.util.concurrent.Callable
 
 @CommandLine.Command(

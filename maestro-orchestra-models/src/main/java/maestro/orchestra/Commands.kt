@@ -36,13 +36,13 @@ sealed interface Command {
 
     fun visible(): Boolean = true
 
-    fun visit(maestro: MaestroCommandHost)
+    // fun visit(maestro: MaestroCommandHost)
 
 }
 
 class MaestroCommandHost {
     fun accept(maestroCommand: MaestroCommand) {
-        maestroCommand.asCommand()?.visit(this)
+        // maestroCommand.asCommand()?.visit(this)
     }
 
     fun swipe(swipeCommand: SwipeCommand){}
@@ -63,10 +63,6 @@ data class SwipeCommand(
     val endRelative: String? = null,
     val duration: Long = DEFAULT_DURATION_IN_MILLIS
 ) : Command {
-
-    override fun visit(maestro: MaestroCommandHost) {
-        maestro.swipe(this)
-    }
 
     override fun description(): String {
         return when {

@@ -128,6 +128,7 @@ class TestCommand : Callable<Int> {
             val device = session.device
 
             if (flowFile.isDirectory || format != ReportFormat.NOOP) {
+                // Run a test suite (multiple flow files, with no specific order)
                 if (continuous) {
                     throw CommandLine.ParameterException(
                         commandSpec.commandLine(),
@@ -159,6 +160,7 @@ class TestCommand : Callable<Int> {
                     1
                 }
             } else {
+                // Run a continuous or single test.
                 if (continuous) {
                     TestRunner.runContinuous(maestro, device, flowFile, env)
                 } else {

@@ -1,4 +1,4 @@
-appId: com.samsung.android.app.contacts
+appId: com.google.android.contacts
 ---
 - launchApp
 - tapOn: "Nombre Usuario"

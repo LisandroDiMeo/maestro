@@ -35,7 +35,6 @@ import maestro.orchestra.filter.FilterWithDescription
 import maestro.orchestra.filter.TraitFilters
 import maestro.orchestra.geo.Traveller
 import maestro.orchestra.runcycle.FlowFileRunCycle
-import maestro.orchestra.runcycle.RunCycle
 import maestro.orchestra.util.Env.evaluateScripts
 import maestro.orchestra.yaml.YamlCommandReader
 import maestro.toSwipeDirection
@@ -53,13 +52,6 @@ class Orchestra(
     private val optionalLookupTimeoutMs: Long = 7000L,
     private val networkProxy: NetworkProxy = NetworkProxy(port = 8085),
     private val runCycle: FlowFileRunCycle,
-    private val onFlowStart: (List<MaestroCommand>) -> Unit = {},
-    private val onCommandStart: (Int, MaestroCommand) -> Unit = { _, _ -> },
-    private val onCommandComplete: (Int, MaestroCommand) -> Unit = { _, _ -> },
-    private val onCommandFailed: (Int, MaestroCommand, Throwable) -> ErrorResolution = { _, _, e -> throw e },
-    private val onCommandSkipped: (Int, MaestroCommand) -> Unit = { _, _ -> },
-    private val onCommandReset: (MaestroCommand) -> Unit = {},
-    private val onCommandMetadataUpdate: (MaestroCommand, CommandMetadata) -> Unit = { _, _ -> },
     private val jsEngine: JsEngine = JsEngine(),
 ) {
 
