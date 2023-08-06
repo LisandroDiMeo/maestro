@@ -7,7 +7,6 @@ import maestro.orchestra.MaestroCommand
 import maestro.orchestra.Orchestra
 import maestro.orchestra.runcycle.FlowFileRunCycle
 import org.slf4j.Logger
-import picocli.CommandLine
 
 class TestSuiteInteractorCycle(
     private val logger: Logger,

@@ -46,6 +46,7 @@ class TestGenerationOrchestra(
 
     private var timeMsOfLastInteraction = System.currentTimeMillis()
     private var deviceInfo: DeviceInfo? = null
+    private val commandsGenerated = mutableListOf<MaestroCommand>()
 
     private val rawCommandToMetadata = mutableMapOf<MaestroCommand, Orchestra.CommandMetadata>()
 
@@ -54,29 +55,48 @@ class TestGenerationOrchestra(
     fun startGeneration() {
         jsEngine.init()
         openApplication()
+        // TODO's:
+        //         - Filtrar vistas que no sean desambiguables
+        //         - Probar en iOS implementación actual.
+        //         - Agregar finalización de generación cuando deja la app (configurable con un
+        //         setting).
+        //         - Mejorar waits activos, y ver de chequear cuando queda IDLE la UI
+        //         - Agregar parametro classname (y otros) tanto para Android Node y iOS node. <-
+        //         ayuda a ver que tipo de acciones hay para cada elemento
         for (currentIteration in 1..maxIterations) {
+            runBlocking {
+                delay(500L)
+            }
             val hierarchy = maestro.viewHierarchy()
             val command = commandSelectionStrategy.pickFrom(hierarchy.root)
+            commandsGenerated.add(command)
             runCycle.onCommandStart(currentIteration, command)
             try {
                 deviceInfo = maestro.deviceInfo()
                 executeCommand(command)
+                runCycle.onCommandComplete(currentIteration, command)
             } catch (e: Throwable) {
                 when (runCycle.onCommandFailed(currentIteration, command, e)) {
-                    Orchestra.ErrorResolution.FAIL -> return
-                    Orchestra.ErrorResolution.CONTINUE -> { /*skip*/
+                    Orchestra.ErrorResolution.FAIL -> {
+                        commandsGenerated.removeLast()
+                    }
+                    Orchestra.ErrorResolution.CONTINUE -> {
+                        commandsGenerated.removeLast()
                     }
                 }
             }
         }
+
     }
+
+    fun generatedCommands(): List<MaestroCommand> = commandsGenerated.toList()
 
     private fun openApplication() {
         val launchAppCommand = LaunchAppCommand(
             appId = packageName,
             clearState = false,
             clearKeychain = null,
-            stopApp = false,
+            stopApp = true,
         )
         val maestroCommand = MaestroCommand(launchAppCommand = launchAppCommand)
         runCycle.onCommandStart(0, maestroCommand)
@@ -136,7 +156,6 @@ class TestGenerationOrchestra(
 
     private fun inputTextRandomCommand(command: InputRandomCommand): Boolean {
         inputTextCommand(InputTextCommand(text = command.genRandomString()))
-
         return true
     }
 

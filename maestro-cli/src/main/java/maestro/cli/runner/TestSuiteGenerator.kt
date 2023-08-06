@@ -1,5 +1,9 @@
 package maestro.cli.runner
 
+import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
+import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator
 import maestro.Maestro
 import maestro.cli.device.Device
 import maestro.cli.report.TestSuiteReporter
@@ -9,7 +13,12 @@ import maestro.debuglog.LogConfig
 import maestro.orchestra.MaestroCommand
 import maestro.orchestra.Orchestra
 import maestro.orchestra.runcycle.RunCycle
+import maestro.orchestra.yaml.YamlElementSelector
+import maestro.orchestra.yaml.YamlFluentCommand
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.io.File
+import java.io.FileOutputStream
 
 class TestSuiteGenerator(
     private val maestro: Maestro,
@@ -17,20 +26,63 @@ class TestSuiteGenerator(
     private val reporter: TestSuiteReporter,
     private val packageName: String,
 ) {
+
+    private val logger = LoggerFactory.getLogger(TestSuiteGenerator::class.java)
+
+    init {
+        LogConfig.switchLogbackConfiguration(
+            "/Users/lisandrodimeo/"
+                + "Documents/Me/maestro/"
+                + "maestro-cli/src/main/"
+                + "resources/logback-generative.xml"
+        )
+    }
+
+    data class ConfigHeader(val appId: String)
+
     fun generate() {
-        TestGenerationOrchestra(
+        val testGenerator = TestGenerationOrchestra(
             maestro = maestro,
             packageName = packageName,
-            runCycle = TestSuiteGeneratorCycle(),
+            runCycle = TestSuiteGeneratorCycle(logger),
             commandSelectionStrategy = AndroidCommandSelection()
-        ).startGeneration()
+        )
+        testGenerator.startGeneration()
+        generateFlowFile(testGenerator.generatedCommands())
+    }
+
+    private fun generateFlowFile(commands: List<MaestroCommand>) {
+        logger.info("Brewing up Flow File ☕️...")
+        val yamlCommands = commands.map { YamlFluentCommand.fromCommand(it) }
+        val config = ConfigHeader(packageName)
+        val flowFileMapper = ObjectMapper(YAMLFactory())
+        val configHeaderMapper =
+            ObjectMapper(YAMLFactory().disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER))
+        flowFileMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL)
+        val tempGeneratedFlowFile = File("temp-generated-flow.yaml")
+        flowFileMapper.writeValue(tempGeneratedFlowFile, yamlCommands)
+        val configFile = File("config.yaml")
+        configHeaderMapper.writeValue(configFile, config)
+        val generatedFlowFile = File("generated-flow.yaml")
+        FileOutputStream(generatedFlowFile, true).use { output ->
+            configFile
+                .forEachBlock { buffer, bytesRead -> output.write(buffer, 0, bytesRead) }
+            tempGeneratedFlowFile
+                .forEachBlock { buffer, bytesRead ->
+                    output.write(
+                        buffer,
+                        0,
+                        bytesRead
+                    )
+                }
+        }
+        tempGeneratedFlowFile.delete()
+        configFile.delete()
     }
 
 }
 
-class TestSuiteGeneratorCycle : RunCycle {
-
-    private val logger = LoggerFactory.getLogger(TestSuiteGenerator::class.java)
+class TestSuiteGeneratorCycle(private val logger: Logger) : RunCycle() {
 
     init {
         LogConfig.switchLogbackConfiguration(

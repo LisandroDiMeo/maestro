@@ -1,13 +1,18 @@
 package maestro.cli.runner.gen.commandselection
 
 import maestro.TreeNode
+import maestro.drivers.AndroidDriver
+import maestro.orchestra.Command
 import maestro.orchestra.ElementSelector
 import maestro.orchestra.MaestroCommand
 import maestro.orchestra.TapOnElementCommand
+import kotlin.reflect.KClass
 
 interface CommandSelectionStrategy {
     @kotlin.jvm.Throws(UnableToPickCommand::class)
     fun pickFrom(root: TreeNode): MaestroCommand
+
+    fun commandsFor(node: TreeNode, selector: ElementSelector): List<MaestroCommand>
 
     private object UnableToPickCommand : Exception()
 }
@@ -25,33 +30,12 @@ class AndroidCommandSelection : CommandSelectionStrategy {
         }.random()
     }
 
-    private fun disambiguateNode(treeNode: TreeNode, root: TreeNode): ElementSelector {
-        val textRegex = treeNode.attributes["text"]
-        val resourceId = treeNode.attributes["resource-id"]
-        val directAncestor = root.aggregate().map {
-            val x = it.children.filter { child -> child == treeNode }
-            x
-        }
-        val flatDirectAncestors = directAncestor.flatten()
-        val ancestor = flatDirectAncestors.randomOrNull()
-        return ElementSelector(
-            textRegex = textRegex,
-            idRegex = resourceId,
-            focused = treeNode.focused,
-            enabled = treeNode.enabled,
-            checked = treeNode.checked,
-            selected = treeNode.selected,
-            below = ElementSelector(
-                textRegex = (ancestor?.attributes?.get("text") ?: ""),
-                idRegex = (ancestor?.attributes?.get("resource-id") ?: ""),
-                focused = ancestor?.focused,
-                enabled = ancestor?.enabled,
-                checked = ancestor?.checked,
-                selected = ancestor?.selected
-            )
-
-        )
+    override fun commandsFor(node: TreeNode, selector: ElementSelector): List<MaestroCommand> {
+        val commands = mutableListOf<Command>()
+        if(node.clickable == true) commands.add(TapOnElementCommand(selector))
+        return commands.map { MaestroCommand(it) }
     }
+
 }
 
 interface ViewDisambiguator {
@@ -67,31 +51,31 @@ class SimpleAndroidViewDisambiguator(private val root: TreeNode) : ViewDisambigu
 
     override fun disambiguate(root: TreeNode, view: TreeNode): ElementSelector {
         // First, we disambiguate with some trivial checks
-        var elementSelector: ElementSelector? = null
-        var idRegex = ""
-        var textRegex = ""
-        var belowSelector: ElementSelector? = null
-        view.attributes["resource-id"]?.let { resourceId ->
-            if (idIsUnique(resourceId))
-                elementSelector = ElementSelector(idRegex = resourceId)
-            idRegex = resourceId
+        val idRegex = view.attributes["resource-id"]
+        idRegex?.let { if (idIsUnique(it)) return ElementSelector(idRegex = it) }
+        val textRegex = view.attributes["text"]
+        textRegex?.let {
+            if (hasUniqueTextContent(it)) return ElementSelector(
+                textRegex = it,
+                idRegex = idRegex
+            )
         }
-        view.attributes["text"]?.let { text ->
-            if (hasUniqueTextContent(text))
-                elementSelector = ElementSelector(textRegex = text)
-            textRegex = text
+        val belowSelector: ElementSelector? = if (view == root) null else disambiguate(
+            root,
+            directAncestor(view)!!
+        )
+        belowSelector?.let {
+            return ElementSelector(
+                idRegex = idRegex,
+                textRegex = textRegex,
+                below = belowSelector,
+            )
         }
-//        if (view != root) {
-//            directAncestor(view)?.let {
-//                belowSelector = disambiguate(root, it)
-//            }
-//        }
-        return if (elementSelector == null) ElementSelector(idRegex = idRegex, textRegex = textRegex) else
-            elementSelector!!
+        return ElementSelector() // No selector
     }
 
     private fun directAncestor(view: TreeNode): TreeNode? {
-        return flattenTree.filter { view in it.children }.firstOrNull()
+        return flattenTree.firstOrNull { view in it.children }
     }
 
     private fun idIsUnique(id: String): Boolean {

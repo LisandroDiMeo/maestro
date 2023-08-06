@@ -6,7 +6,7 @@ import maestro.orchestra.Orchestra
 import java.util.IdentityHashMap
 import java.util.logging.Logger
 
-abstract class FlowFileRunCycle: RunCycle {
+abstract class FlowFileRunCycle: RunCycle() {
     open fun onFlowStart(commands: List<MaestroCommand>) {}
 
     open fun onCommandMetadataUpdate(command: MaestroCommand, metadata: Orchestra.CommandMetadata){}

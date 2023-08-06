@@ -226,14 +226,6 @@ object ReplService {
                 failure = error
                 return Orchestra.ErrorResolution.FAIL
             }
-
-            override fun onCommandStart(commandId: Int, command: MaestroCommand) {}
-
-            override fun onCommandComplete(commandId: Int, command: MaestroCommand) {}
-
-            override fun onCommandSkipped(commandId: Int, command: MaestroCommand) {}
-
-            override fun onCommandReset(command: MaestroCommand) {}
         }).executeCommands(commands)
         return if (result) null else (failure ?: RuntimeException("Command execution failed"))
     }
