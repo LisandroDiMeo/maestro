@@ -245,6 +245,7 @@ class IOSDriver(
         attributes["enabled"] = xcUiElement.enabled.toString()
         attributes["focused"] = xcUiElement.hasFocus.toString()
         attributes["selected"] = xcUiElement.selected.toString()
+        attributes["elementType"] = xcUiElement.elementType.toString()
 
         val checked = xcUiElement.elementType in CHECKABLE_ELEMENTS && xcUiElement.value == "1"
         attributes["checked"] = checked.toString()
@@ -264,6 +265,7 @@ class IOSDriver(
             focused = xcUiElement.hasFocus,
             selected = xcUiElement.selected,
             checked = checked,
+            clickable = xcUiElement.isClickable()
         )
     }
 

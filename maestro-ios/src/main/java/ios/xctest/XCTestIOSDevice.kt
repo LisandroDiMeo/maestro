@@ -68,7 +68,8 @@ class XCTestIOSDevice(
                 it.body.use { body ->
                     if (it.isSuccessful) {
                         val xcUiElement = body?.let { response ->
-                            mapper.readValue(String(response.bytes()), XCUIElement::class.java)
+                            val responseString = String(response.bytes())
+                            mapper.readValue(responseString, XCUIElement::class.java)
                         } ?: error("View Hierarchy not available, response body is null")
                         Ok(xcUiElement)
                     } else {

@@ -58,6 +58,26 @@ object Filters {
         return  { nodes -> nodes.filter { it.clickable == false } }
     }
 
+    fun classMatches(classNameRegex: String): ElementFilter {
+        return { nodes ->
+            nodes.filter {
+                it.attributes["className"]?.let { className ->
+                    className == classNameRegex
+                } ?: false
+            }
+        }
+    }
+
+    fun packageMatches(packageNameRegex: String): ElementFilter {
+        return { nodes ->
+            nodes.filter {
+                it.attributes["packageName"]?.let { packageName ->
+                    packageName == packageNameRegex
+                } ?: false
+            }
+        }
+    }
+
     fun textMatches(regex: Regex): ElementFilter {
         return { nodes ->
             val textMatches = nodes.filter {

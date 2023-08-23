@@ -39,6 +39,8 @@ data class ElementSelector(
     val selected: Boolean? = null,
     val checked: Boolean? = null,
     val focused: Boolean? = null,
+    val classNameRegex: String? = null,
+    val packageNameRegex: String? = null
 ) {
 
     data class SizeSelector(
@@ -114,6 +116,14 @@ data class ElementSelector(
 
         index?.let {
             descriptions.add("Index: ${it.toDoubleOrNull()?.toInt() ?: it}")
+        }
+
+        classNameRegex?.let {
+            descriptions.add("Class Name: $it")
+        }
+
+        packageNameRegex?.let {
+            descriptions.add("Package Name: $it")
         }
 
         val combined = descriptions.joinToString(", ")

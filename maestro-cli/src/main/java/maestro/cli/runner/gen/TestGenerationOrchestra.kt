@@ -9,7 +9,7 @@ import maestro.Filters.asFilter
 import maestro.FindElementResult
 import maestro.Maestro
 import maestro.MaestroException
-import maestro.cli.runner.gen.commandselection.CommandSelectionStrategy
+import maestro.cli.runner.gen.hierarchyanalyzer.HierarchyAnalyzer
 import maestro.js.JsEngine
 import maestro.networkproxy.NetworkProxy
 import maestro.orchestra.BackPressCommand
@@ -39,7 +39,7 @@ class TestGenerationOrchestra(
     private val optionalLookupTimeoutMs: Long = 7000L,
     private val networkProxy: NetworkProxy = NetworkProxy(port = 8085),
     private val runCycle: RunCycle,
-    private val commandSelectionStrategy: CommandSelectionStrategy,
+    private val hierarchyAnalyzer: HierarchyAnalyzer,
     private val jsEngine: JsEngine = JsEngine()
 ) {
     private var copiedText: String? = null
@@ -56,20 +56,19 @@ class TestGenerationOrchestra(
         jsEngine.init()
         openApplication()
         // TODO's:
-        //         - Filtrar vistas que no sean desambiguables
         //         - Probar en iOS implementación actual.
         //         - Agregar finalización de generación cuando deja la app (configurable con un
         //         setting).
         //         - Mejorar waits activos, y ver de chequear cuando queda IDLE la UI
-        //         - Agregar parametro classname (y otros) tanto para Android Node y iOS node. <-
-        //         ayuda a ver que tipo de acciones hay para cada elemento
+        //         - Agregar parametro classname para iOS node.
         for (currentIteration in 1..maxIterations) {
             runBlocking {
                 delay(500L)
             }
             val hierarchy = maestro.viewHierarchy()
-            val command = commandSelectionStrategy.pickFrom(hierarchy.root)
+            val command = hierarchyAnalyzer.fetchCommandFrom(hierarchy)
             commandsGenerated.add(command)
+
             runCycle.onCommandStart(currentIteration, command)
             try {
                 deviceInfo = maestro.deviceInfo()
@@ -99,6 +98,7 @@ class TestGenerationOrchestra(
             stopApp = true,
         )
         val maestroCommand = MaestroCommand(launchAppCommand = launchAppCommand)
+        commandsGenerated.add(maestroCommand)
         runCycle.onCommandStart(0, maestroCommand)
         launchAppCommand(launchAppCommand)
         // TODO: Why I Need to wait the app to settle ?
@@ -281,6 +281,22 @@ class TestGenerationOrchestra(
                 descriptions += "Id matching regex: $it"
                 filters += Filters.deepestMatchingElement(
                     Filters.idMatches(it.toRegexSafe(Orchestra.REGEX_OPTIONS))
+                )
+            }
+
+        selector.classNameRegex
+            ?.let {
+                descriptions += "Class Name matching regex: $it"
+                filters += Filters.deepestMatchingElement(
+                    Filters.classMatches(it)
+                )
+            }
+
+        selector.packageNameRegex
+            ?.let {
+                descriptions += "Package Name matching regex: $it"
+                filters += Filters.deepestMatchingElement(
+                    Filters.packageMatches(it)
                 )
             }
 

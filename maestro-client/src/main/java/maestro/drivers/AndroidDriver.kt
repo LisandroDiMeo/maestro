@@ -659,6 +659,14 @@ class AndroidDriver(
                 attributesBuilder["accessibilityText"] = node.getAttribute("content-desc")
             }
 
+            if (node.hasAttribute("class")) {
+                attributesBuilder["className"] = node.getAttribute("class")
+            }
+
+            if (node.hasAttribute("package")) {
+                attributesBuilder["packageName"] = node.getAttribute("package")
+            }
+
             if (node.hasAttribute("hintText")) {
                 attributesBuilder["hintText"] = node.getAttribute("hintText")
             }

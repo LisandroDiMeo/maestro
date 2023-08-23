@@ -58,7 +58,6 @@ import maestro.orchestra.WaitForAnimationToEndCommand
 import maestro.orchestra.error.InvalidFlowFile
 import maestro.orchestra.error.SyntaxError
 import maestro.orchestra.util.Env.withEnv
-import org.yaml.snakeyaml.Yaml
 import java.nio.file.Path
 import kotlin.io.path.exists
 import kotlin.io.path.isDirectory
@@ -533,14 +532,20 @@ data class YamlFluentCommand(
     }
 
     private fun toElementSelector(selectorUnion: YamlElementSelectorUnion): ElementSelector {
-        return if (selectorUnion is StringElementSelector) {
-            ElementSelector(
-                textRegex = selectorUnion.value,
-            )
-        } else if (selectorUnion is YamlElementSelector) {
-            toElementSelector(selectorUnion)
-        } else {
-            throw IllegalStateException("Unknown selector type: $selectorUnion")
+        return when (selectorUnion) {
+            is StringElementSelector -> {
+                ElementSelector(
+                    textRegex = selectorUnion.value,
+                )
+            }
+
+            is YamlElementSelector -> {
+                toElementSelector(selectorUnion)
+            }
+
+            else -> {
+                throw IllegalStateException("Unknown selector type: $selectorUnion")
+            }
         }
     }
 
@@ -565,6 +570,7 @@ data class YamlFluentCommand(
             rightOf = selector.rightOf?.let { toElementSelector(it) },
             containsChild = selector.containsChild?.let { toElementSelector(it) },
             containsDescendants = selector.containsDescendants?.map { toElementSelector(it) },
+            optional = selector.optional ?: false,
             traits = selector.traits
                 ?.split(" ")
                 ?.map { ElementTrait.valueOf(it.replace('-', '_').uppercase()) },
@@ -573,7 +579,8 @@ data class YamlFluentCommand(
             selected = selector.selected,
             checked = selector.checked,
             focused = selector.focused,
-            optional = selector.optional ?: false,
+            classNameRegex = selector.className,
+            packageNameRegex = selector.packageName
         )
     }
 
