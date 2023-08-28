@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import maestro.Maestro
 import maestro.cli.device.Device
 import maestro.cli.device.Platform
@@ -13,6 +15,7 @@ import maestro.cli.runner.gen.hierarchyanalyzer.AndroidHierarchyAnalyzer
 import maestro.cli.runner.gen.commandselection.RandomCommandSelection
 import maestro.cli.runner.gen.hierarchyanalyzer.IOSHierarchyAnalyzer
 import maestro.cli.runner.gen.viewdisambiguator.SimpleAndroidViewDisambiguator
+import maestro.cli.runner.gen.viewdisambiguator.SimpleIosViewDisambiguator
 import maestro.debuglog.LogConfig
 import maestro.orchestra.MaestroCommand
 import maestro.orchestra.Orchestra
@@ -28,6 +31,8 @@ class TestSuiteGenerator(
     private val device: Device? = null,
     private val reporter: TestSuiteReporter,
     private val packageName: String,
+    private val testSuiteSize: Int,
+    private val testSize: Int
 ) {
 
     private val logger = LoggerFactory.getLogger(TestSuiteGenerator::class.java)
@@ -48,12 +53,12 @@ class TestSuiteGenerator(
         val analyzer = when(device?.platform) {
             Platform.ANDROID -> AndroidHierarchyAnalyzer(
                 strategy,
-                SimpleAndroidViewDisambiguator(maestro.viewHierarchy().root),
+                SimpleAndroidViewDisambiguator(),
                 maestro.deviceInfo()
             )
             Platform.IOS -> IOSHierarchyAnalyzer(
                 strategy,
-                SimpleAndroidViewDisambiguator(maestro.viewHierarchy().root),
+                SimpleIosViewDisambiguator(),
                 maestro.deviceInfo()
             )
             else -> null
@@ -63,16 +68,19 @@ class TestSuiteGenerator(
                 maestro = maestro,
                 packageName = packageName,
                 runCycle = TestSuiteGeneratorCycle(logger),
-                hierarchyAnalyzer = it
+                hierarchyAnalyzer = it,
+                testSize = testSize
             )
-            testGenerator.startGeneration()
-            generateFlowFile(testGenerator.generatedCommands())
+            for(testId in 1..testSuiteSize) {
+                testGenerator.startGeneration()
+                generateFlowFile(testGenerator.generatedCommands(), testId)
+            }
         }
     }
 
 
-    private fun generateFlowFile(commands: List<MaestroCommand>) {
-        logger.info("Brewing up Flow File ☕️...")
+    private fun generateFlowFile(commands: List<MaestroCommand>, id: Int = 0) {
+        logger.info("Brewing up Flow File $id ☕️...")
         val yamlCommands = commands.map { YamlFluentCommand.fromCommand(it) }
         val config = ConfigHeader(packageName)
         val flowFileMapper = ObjectMapper(YAMLFactory())
@@ -83,7 +91,7 @@ class TestSuiteGenerator(
         flowFileMapper.writeValue(tempGeneratedFlowFile, yamlCommands)
         val configFile = File("config.yaml")
         configHeaderMapper.writeValue(configFile, config)
-        val generatedFlowFile = File("generated-flow.yaml")
+        val generatedFlowFile = File("generated-flows/generated-flow-$id.yaml")
         FileOutputStream(generatedFlowFile, true).use { output ->
             configFile
                 .forEachBlock { buffer, bytesRead -> output.write(buffer, 0, bytesRead) }

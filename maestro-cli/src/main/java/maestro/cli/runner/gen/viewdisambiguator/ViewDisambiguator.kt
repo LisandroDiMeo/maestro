@@ -10,7 +10,7 @@ interface ViewDisambiguator {
      * It's recommended that after view is disambiguated, check with [properlyDisambiguated]
      * if it satisfy that criteria.
      */
-    fun disambiguate(root: TreeNode, view: TreeNode): ElementSelector
+    fun disambiguate(root: TreeNode, view: TreeNode, flattenNodes: List<TreeNode>): ElementSelector
 
     fun properlyDisambiguated(selector: ElementSelector): Boolean
 

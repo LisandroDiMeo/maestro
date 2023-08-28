@@ -25,6 +25,12 @@ class GenerateCommand : Callable<Int> {
     @CommandLine.Parameters
     private lateinit var packageName: String
 
+    @CommandLine.Option(names = ["-s", "--suiteSize"], hidden = true)
+    private var suiteSize: Int = 1
+
+    @CommandLine.Option(names = ["-t", "--testSize"], hidden = true)
+    private var testSize: Int = 20
+
     override fun call(): Int {
         val deviceId = parent?.deviceId
         return MaestroSessionManager.newSession(parent?.host, parent?.port, deviceId) { session ->
@@ -34,7 +40,9 @@ class GenerateCommand : Callable<Int> {
                 maestro = maestro,
                 device = device,
                 reporter = ReporterFactory.buildReporter(ReportFormat.JUNIT, "GeneratedSuite"),
-                packageName
+                packageName = packageName,
+                testSize = testSize,
+                testSuiteSize = suiteSize
             ).generate()
             1
         }

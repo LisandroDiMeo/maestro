@@ -40,7 +40,8 @@ class TestGenerationOrchestra(
     private val networkProxy: NetworkProxy = NetworkProxy(port = 8085),
     private val runCycle: RunCycle,
     private val hierarchyAnalyzer: HierarchyAnalyzer,
-    private val jsEngine: JsEngine = JsEngine()
+    private val jsEngine: JsEngine = JsEngine(),
+    private val testSize: Int = 5
 ) {
     private var copiedText: String? = null
 
@@ -50,10 +51,9 @@ class TestGenerationOrchestra(
 
     private val rawCommandToMetadata = mutableMapOf<MaestroCommand, Orchestra.CommandMetadata>()
 
-    private val maxIterations = 20
-
     fun startGeneration() {
         jsEngine.init()
+        commandsGenerated.clear()
         openApplication()
         // TODO's:
         //         - Probar en iOS implementación actual.
@@ -61,7 +61,7 @@ class TestGenerationOrchestra(
         //         setting).
         //         - Mejorar waits activos, y ver de chequear cuando queda IDLE la UI
         //         - Agregar parametro classname para iOS node.
-        for (currentIteration in 1..maxIterations) {
+        for (currentIteration in 1..testSize) {
             runBlocking {
                 delay(500L)
             }
@@ -93,7 +93,7 @@ class TestGenerationOrchestra(
     private fun openApplication() {
         val launchAppCommand = LaunchAppCommand(
             appId = packageName,
-            clearState = false,
+            clearState = true,
             clearKeychain = null,
             stopApp = true,
         )

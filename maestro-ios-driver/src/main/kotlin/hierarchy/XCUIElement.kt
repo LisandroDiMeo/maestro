@@ -68,7 +68,7 @@ class XCUIElementDeserializer : JsonDeserializer<XCUIElement>() {
     companion object {
         private const val ELEMENT_TYPE_PROPERTY = "elementType"
         val ELEMENT_TYPES = mapOf(
-            "1" to "activityIndicator",
+            "36" to "activityIndicator",
             "7" to "alert",
             "0" to "any",
             "2" to "application",

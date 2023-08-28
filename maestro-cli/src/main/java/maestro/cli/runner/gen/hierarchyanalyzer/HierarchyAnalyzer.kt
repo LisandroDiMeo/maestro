@@ -26,7 +26,7 @@ abstract class HierarchyAnalyzer(
         val visibleNodes = flattenNodes.filter { hierarchy.isVisible(it) }
 
         val availableWidgets = visibleNodes
-            .map { it to viewDisambiguator.disambiguate(root, it) }
+            .map { it to viewDisambiguator.disambiguate(root, it, flattenNodes) }
             .filter {
                 viewDisambiguator.properlyDisambiguated(it.second)
             }
