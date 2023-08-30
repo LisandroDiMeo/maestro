@@ -31,6 +31,9 @@ class GenerateCommand : Callable<Int> {
     @CommandLine.Option(names = ["-t", "--testSize"], hidden = true)
     private var testSize: Int = 20
 
+    @CommandLine.Option(names = ["-e", "--endIfAppLeft"], hidden = true)
+    private var endTestIfOutsideApp: Boolean = false
+
     override fun call(): Int {
         val deviceId = parent?.deviceId
         return MaestroSessionManager.newSession(parent?.host, parent?.port, deviceId) { session ->
@@ -42,7 +45,8 @@ class GenerateCommand : Callable<Int> {
                 reporter = ReporterFactory.buildReporter(ReportFormat.JUNIT, "GeneratedSuite"),
                 packageName = packageName,
                 testSize = testSize,
-                testSuiteSize = suiteSize
+                testSuiteSize = suiteSize,
+                endTestIfOutsideApp = endTestIfOutsideApp
             ).generate()
             1
         }

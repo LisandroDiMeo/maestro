@@ -1,7 +1,6 @@
 package maestro.cli.runner.gen.hierarchyanalyzer
 
 import hierarchy.XCUIElementDeserializer.Companion.ELEMENT_TYPES
-import maestro.DeviceInfo
 import maestro.TreeNode
 import maestro.ViewHierarchy
 import maestro.cli.runner.gen.commandselection.CommandSelectionStrategy
@@ -13,9 +12,8 @@ import maestro.orchestra.TapOnElementCommand
 
 class IOSHierarchyAnalyzer(
     private val selectionStrategy: CommandSelectionStrategy,
-    private val viewDisambiguator: ViewDisambiguator,
-    private val deviceInfo: DeviceInfo
-) : HierarchyAnalyzer(viewDisambiguator, deviceInfo) {
+    private val viewDisambiguator: ViewDisambiguator
+) : HierarchyAnalyzer(viewDisambiguator) {
     override fun fetchCommandFrom(hierarchy: ViewHierarchy): MaestroCommand {
         val availableWidgets = extractWidgets(hierarchy)
         val commands = mutableListOf<Command>()
@@ -36,6 +34,10 @@ class IOSHierarchyAnalyzer(
                 viewDisambiguator.properlyDisambiguated(it.second)
             }
             return availableWidgets
+    }
+
+    override fun isOutsideApp(hierarchy: ViewHierarchy, packageName: String): Boolean {
+        return false
     }
 
     private fun shouldBeIgnored(elementType: String): Boolean = when (elementType) {

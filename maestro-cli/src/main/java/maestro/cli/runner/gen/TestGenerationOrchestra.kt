@@ -9,6 +9,7 @@ import maestro.Filters.asFilter
 import maestro.FindElementResult
 import maestro.Maestro
 import maestro.MaestroException
+import maestro.ViewHierarchy
 import maestro.cli.runner.gen.hierarchyanalyzer.HierarchyAnalyzer
 import maestro.js.JsEngine
 import maestro.networkproxy.NetworkProxy
@@ -41,7 +42,8 @@ class TestGenerationOrchestra(
     private val runCycle: RunCycle,
     private val hierarchyAnalyzer: HierarchyAnalyzer,
     private val jsEngine: JsEngine = JsEngine(),
-    private val testSize: Int = 5
+    private val testSize: Int = 5,
+    private val endTestIfOutsideApp: Boolean = false
 ) {
     private var copiedText: String? = null
 
@@ -56,16 +58,13 @@ class TestGenerationOrchestra(
         commandsGenerated.clear()
         openApplication()
         // TODO's:
-        //         - Probar en iOS implementación actual.
-        //         - Agregar finalización de generación cuando deja la app (configurable con un
-        //         setting).
-        //         - Mejorar waits activos, y ver de chequear cuando queda IDLE la UI
-        //         - Agregar parametro classname para iOS node.
+        //  Mejorar waits activos, y ver de chequear cuando queda IDLE la UI
         for (currentIteration in 1..testSize) {
             runBlocking {
                 delay(500L)
             }
             val hierarchy = maestro.viewHierarchy()
+            if (endTestIfOutsideApp && isOutsideApp(hierarchy)) return
             val command = hierarchyAnalyzer.fetchCommandFrom(hierarchy)
             commandsGenerated.add(command)
 
@@ -87,6 +86,9 @@ class TestGenerationOrchestra(
         }
 
     }
+
+    private fun isOutsideApp(hierarchy: ViewHierarchy) =
+        hierarchyAnalyzer.isOutsideApp(hierarchy, packageName)
 
     fun generatedCommands(): List<MaestroCommand> = commandsGenerated.toList()
 

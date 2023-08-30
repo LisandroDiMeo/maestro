@@ -11,7 +11,7 @@ abstract class RunCycle {
         command: MaestroCommand,
         error: Throwable
     ): Orchestra.ErrorResolution {
-        return Orchestra.ErrorResolution.FAIL
+        throw error
     }
 
     open fun onCommandSkipped(commandId: Int, command: MaestroCommand) {}

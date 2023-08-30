@@ -46,32 +46,20 @@ class SimpleAndroidViewDisambiguator : ViewDisambiguator {
                 packageNameRegex = it
             )
         }
-        val belowSelector: ElementSelector? = if (view == root) null else disambiguate(
-            root,
-            directAncestor(view, flattenNodes)!!,
-            flattenNodes
-        )
-        belowSelector?.let {
-            return ElementSelector(
-                textRegex = if (textRegex.isNullOrEmpty()) accessibilityTextRegex else textRegex,
-                idRegex = idRegex,
-                below = belowSelector,
-            )
+        if (view.children.isNotEmpty()) {
+            val childMatchers = view.children.map { disambiguate(root, it, flattenNodes) }
+            childMatchers.firstOrNull { it != ElementSelector() }?.let {
+                return ElementSelector(containsChild = it)
+            }
+        } else {
+            return ElementSelector()
         }
+
         return ElementSelector(classNameRegex = null) // No selector
     }
 
     override fun properlyDisambiguated(selector: ElementSelector): Boolean {
-        var belowSelectors = 0
-        val belowSelectorsThreshold = 3
-        while (selector.below != null && belowSelectors < belowSelectorsThreshold) {
-            selector.below?.let { belowSelectors++ }
-        }
-        return belowSelectors < belowSelectorsThreshold
-    }
-
-    private fun directAncestor(view: TreeNode, flattenTree: List<TreeNode>): TreeNode? {
-        return flattenTree.firstOrNull { view in it.children }
+        return true // the fuck?
     }
 
     private fun attributeIsUnique(value: String, attribute: String, flattenTree: List<TreeNode>): Boolean {

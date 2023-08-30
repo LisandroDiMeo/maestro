@@ -1,11 +1,8 @@
 package maestro.cli.runner.gen.hierarchyanalyzer
 
-import maestro.DeviceInfo
 import maestro.ViewHierarchy
 import maestro.cli.runner.gen.commandselection.CommandSelectionStrategy
-import maestro.cli.runner.gen.viewdisambiguator.SimpleAndroidViewDisambiguator
 import maestro.cli.runner.gen.viewdisambiguator.ViewDisambiguator
-import maestro.filterOutOfBounds
 import maestro.orchestra.BackPressCommand
 import maestro.orchestra.Command
 import maestro.orchestra.EraseTextCommand
@@ -18,16 +15,9 @@ import maestro.orchestra.TapOnElementCommand
 class AndroidHierarchyAnalyzer(
     private val selectionStrategy: CommandSelectionStrategy,
     private val viewDisambiguator: ViewDisambiguator,
-    val device: DeviceInfo
-) : HierarchyAnalyzer(viewDisambiguator, device) {
+) : HierarchyAnalyzer(viewDisambiguator) {
     override fun fetchCommandFrom(hierarchy: ViewHierarchy): MaestroCommand {
-        val root = hierarchy.root
-        val allNodes = hierarchy.aggregate()
-        val filtered = root.filterOutOfBounds(
-            width = device.widthGrid,
-            height = device.heightGrid
-        )
-        val flattenNodes = filtered?.aggregate() ?: emptyList()
+        val flattenNodes = hierarchy.aggregate()
         val availableWidgets = extractWidgets(hierarchy)
 
         // Generate indirect commands (BackPress, InputText, Go to recent tasks)
@@ -43,20 +33,34 @@ class AndroidHierarchyAnalyzer(
             commands.add(EraseTextCommand(null)) // Maybe replace with rand?
         }
         commands.add(BackPressCommand())
-        if (allNodes.size != flattenNodes.size) commands.add(ScrollCommand())
+        flattenNodes.any {
+            it.attributes["className"]
+                ?.lowercase()
+                ?.contains("scroll") == true
+        }.let {
+            if (it) commands.add(ScrollCommand())
+        }
 
         // Generate Tap commands
         availableWidgets.forEach { (node, selector) ->
-            node.clickable?.let {
-                node.attributes["resource-id"]?.let {
-                    if(ignoredResources.all { res -> !it.contains(res) })
+            node.clickable?.let { isClickable ->
+                if (isClickable) {
+                    val resourceAndPackage =
+                        node.attributes["resource-id"] + "-" + node.attributes["packageName"]
+                    if (ignoredResources.all { res -> !resourceAndPackage.contains(res) })
                         commands.add(TapOnElementCommand(selector))
-                } ?: commands.add(TapOnElementCommand(selector))
+                }
             }
         }
 
         return selectionStrategy.pickFrom(commands.map { MaestroCommand(it) })
 
+    }
+
+    override fun isOutsideApp(hierarchy: ViewHierarchy, packageName: String): Boolean {
+        return hierarchy
+            .aggregate()
+            .any { it.attributes["packageName"] == packageName }
     }
 
     companion object {

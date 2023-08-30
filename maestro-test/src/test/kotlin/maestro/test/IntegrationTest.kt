@@ -13,6 +13,8 @@ import maestro.orchestra.MaestroConfig
 import maestro.orchestra.MaestroInitFlow
 import maestro.orchestra.Orchestra
 import maestro.orchestra.error.UnicodeNotSupportedError
+import maestro.orchestra.runcycle.FlowFileRunCycle
+import maestro.orchestra.runcycle.RunCycle
 import maestro.orchestra.util.Env.withEnv
 import maestro.orchestra.yaml.YamlCommandReader
 import maestro.test.drivers.FakeDriver
@@ -2711,6 +2713,7 @@ class IntegrationTest {
         maestro,
         lookupTimeoutMs = 0L,
         optionalLookupTimeoutMs = 0L,
+        runCycle = object : FlowFileRunCycle() {}
     )
 
     private fun orchestra(
@@ -2720,7 +2723,14 @@ class IntegrationTest {
         maestro,
         lookupTimeoutMs = 0L,
         optionalLookupTimeoutMs = 0L,
-        onCommandMetadataUpdate = onCommandMetadataUpdate,
+        runCycle = object : FlowFileRunCycle() {
+            override fun onCommandMetadataUpdate(
+                command: MaestroCommand,
+                metadata: Orchestra.CommandMetadata
+            ) {
+                onCommandMetadataUpdate(command, metadata)
+            }
+        }
     )
 
     private fun orchestra(
@@ -2730,7 +2740,15 @@ class IntegrationTest {
         maestro,
         lookupTimeoutMs = 0L,
         optionalLookupTimeoutMs = 0L,
-        onCommandFailed = onCommandFailed,
+        runCycle = object : FlowFileRunCycle() {
+            override fun onCommandFailed(
+                commandId: Int,
+                command: MaestroCommand,
+                error: Throwable
+            ): Orchestra.ErrorResolution {
+                return onCommandFailed(commandId, command, error)
+            }
+        }
     )
 
     private fun driver(builder: FakeLayoutElement.() -> Unit): FakeDriver {

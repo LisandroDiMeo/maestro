@@ -4,13 +4,12 @@ import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
 import maestro.Maestro
 import maestro.cli.device.Device
 import maestro.cli.device.Platform
 import maestro.cli.report.TestSuiteReporter
 import maestro.cli.runner.gen.TestGenerationOrchestra
+import maestro.cli.runner.gen.commandselection.PriorityCommandSelection
 import maestro.cli.runner.gen.hierarchyanalyzer.AndroidHierarchyAnalyzer
 import maestro.cli.runner.gen.commandselection.RandomCommandSelection
 import maestro.cli.runner.gen.hierarchyanalyzer.IOSHierarchyAnalyzer
@@ -32,7 +31,8 @@ class TestSuiteGenerator(
     private val reporter: TestSuiteReporter,
     private val packageName: String,
     private val testSuiteSize: Int,
-    private val testSize: Int
+    private val testSize: Int,
+    private val endTestIfOutsideApp: Boolean = false
 ) {
 
     private val logger = LoggerFactory.getLogger(TestSuiteGenerator::class.java)
@@ -49,17 +49,15 @@ class TestSuiteGenerator(
     data class ConfigHeader(val appId: String)
 
     fun generate() {
-        val strategy = RandomCommandSelection()
+        val strategy = PriorityCommandSelection()
         val analyzer = when(device?.platform) {
             Platform.ANDROID -> AndroidHierarchyAnalyzer(
                 strategy,
-                SimpleAndroidViewDisambiguator(),
-                maestro.deviceInfo()
+                SimpleAndroidViewDisambiguator()
             )
             Platform.IOS -> IOSHierarchyAnalyzer(
                 strategy,
-                SimpleIosViewDisambiguator(),
-                maestro.deviceInfo()
+                SimpleIosViewDisambiguator()
             )
             else -> null
         }
@@ -69,7 +67,8 @@ class TestSuiteGenerator(
                 packageName = packageName,
                 runCycle = TestSuiteGeneratorCycle(logger),
                 hierarchyAnalyzer = it,
-                testSize = testSize
+                testSize = testSize,
+                endTestIfOutsideApp = endTestIfOutsideApp
             )
             for(testId in 1..testSuiteSize) {
                 testGenerator.startGeneration()
