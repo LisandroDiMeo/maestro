@@ -33,22 +33,13 @@ class SimpleIosViewDisambiguator: ViewDisambiguator {
         )
     }
 
-    private fun directAncestor(view: TreeNode, flattenTree: List<TreeNode>): TreeNode? {
-        return flattenTree.firstOrNull { view in it.children }
-    }
-
     override fun properlyDisambiguated(selector: ElementSelector): Boolean {
         if (
             selector.textRegex.isNullOrEmpty()
             && selector.idRegex.isNullOrEmpty()
             && selector.below == null
         ) return false
-        var belowSelectors = 0
-        val belowSelectorsThreshold = 3
-        while (selector.below != null && belowSelectors < belowSelectorsThreshold) {
-            selector.below?.let { belowSelectors++ }
-        }
-        return belowSelectors < belowSelectorsThreshold
+        return true
     }
 
     private fun attributeIsUnique(value: String, attribute: String, flattenTree: List<TreeNode>):

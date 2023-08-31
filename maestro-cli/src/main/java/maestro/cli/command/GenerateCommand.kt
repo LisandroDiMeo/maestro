@@ -31,7 +31,7 @@ class GenerateCommand : Callable<Int> {
     @CommandLine.Option(names = ["-t", "--testSize"], hidden = true)
     private var testSize: Int = 20
 
-    @CommandLine.Option(names = ["-e", "--endIfAppLeft"], hidden = true)
+    @CommandLine.Option(names = ["--endIfAppLeft"], hidden = true)
     private var endTestIfOutsideApp: Boolean = false
 
     override fun call(): Int {

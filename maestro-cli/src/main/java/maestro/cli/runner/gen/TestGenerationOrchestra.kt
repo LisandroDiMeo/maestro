@@ -64,7 +64,7 @@ class TestGenerationOrchestra(
                 delay(500L)
             }
             val hierarchy = maestro.viewHierarchy()
-            if (endTestIfOutsideApp && isOutsideApp(hierarchy)) return
+            if (endTestIfOutsideApp && isOutsideApp(hierarchy) && currentIteration > 1) return
             val command = hierarchyAnalyzer.fetchCommandFrom(hierarchy)
             commandsGenerated.add(command)
 

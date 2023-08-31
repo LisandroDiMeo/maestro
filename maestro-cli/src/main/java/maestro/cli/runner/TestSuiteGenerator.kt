@@ -49,7 +49,7 @@ class TestSuiteGenerator(
     data class ConfigHeader(val appId: String)
 
     fun generate() {
-        val strategy = PriorityCommandSelection()
+        val strategy = RandomCommandSelection()
         val analyzer = when(device?.platform) {
             Platform.ANDROID -> AndroidHierarchyAnalyzer(
                 strategy,

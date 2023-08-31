@@ -46,7 +46,9 @@ data class XCUIElementNode(
             "map",
             "keyboard",
             "datePicker",
-            "pickerWheel"
+            "pickerWheel",
+            "cell",
+            "staticText"
             -> true
             else -> false
         }

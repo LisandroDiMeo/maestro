@@ -30,7 +30,7 @@ class AndroidHierarchyAnalyzer(
         if (isKeyboardOpen) {
             commands.add(InputRandomCommand())
             commands.add(HideKeyboardCommand())
-            commands.add(EraseTextCommand(null)) // Maybe replace with rand?
+            commands.add(EraseTextCommand(null))
         }
         commands.add(BackPressCommand())
         flattenNodes.any {
