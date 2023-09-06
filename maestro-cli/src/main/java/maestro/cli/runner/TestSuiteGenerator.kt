@@ -7,14 +7,13 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator
 import maestro.Maestro
 import maestro.cli.device.Device
 import maestro.cli.device.Platform
-import maestro.cli.report.TestSuiteReporter
 import maestro.cli.runner.gen.TestGenerationOrchestra
-import maestro.cli.runner.gen.commandselection.PriorityCommandSelection
+import maestro.cli.runner.gen.commandselection.CommandSelectionStrategy
 import maestro.cli.runner.gen.hierarchyanalyzer.AndroidHierarchyAnalyzer
 import maestro.cli.runner.gen.commandselection.RandomCommandSelection
 import maestro.cli.runner.gen.hierarchyanalyzer.IOSHierarchyAnalyzer
-import maestro.cli.runner.gen.viewdisambiguator.SimpleAndroidViewDisambiguator
-import maestro.cli.runner.gen.viewdisambiguator.SimpleIosViewDisambiguator
+import maestro.cli.runner.gen.viewdisambiguator.AndroidViewDisambiguator
+import maestro.cli.runner.gen.viewdisambiguator.IosViewDisambiguator
 import maestro.debuglog.LogConfig
 import maestro.orchestra.MaestroCommand
 import maestro.orchestra.Orchestra
@@ -28,11 +27,11 @@ import java.io.FileOutputStream
 class TestSuiteGenerator(
     private val maestro: Maestro,
     private val device: Device? = null,
-    private val reporter: TestSuiteReporter,
     private val packageName: String,
     private val testSuiteSize: Int,
     private val testSize: Int,
-    private val endTestIfOutsideApp: Boolean = false
+    private val endTestIfOutsideApp: Boolean = false,
+    private val strategy: String,
 ) {
 
     private val logger = LoggerFactory.getLogger(TestSuiteGenerator::class.java)
@@ -49,15 +48,15 @@ class TestSuiteGenerator(
     data class ConfigHeader(val appId: String)
 
     fun generate() {
-        val strategy = RandomCommandSelection()
+        val strategy = CommandSelectionStrategy.strategyFor(strategy)
         val analyzer = when(device?.platform) {
             Platform.ANDROID -> AndroidHierarchyAnalyzer(
                 strategy,
-                SimpleAndroidViewDisambiguator()
+                AndroidViewDisambiguator()
             )
             Platform.IOS -> IOSHierarchyAnalyzer(
                 strategy,
-                SimpleIosViewDisambiguator()
+                IosViewDisambiguator()
             )
             else -> null
         }

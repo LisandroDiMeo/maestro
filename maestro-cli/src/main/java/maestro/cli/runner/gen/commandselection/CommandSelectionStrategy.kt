@@ -7,4 +7,13 @@ interface CommandSelectionStrategy {
     fun pickFrom(availableCommands: List<MaestroCommand>): MaestroCommand
 
     object UnableToPickCommand : Exception()
+
+    companion object {
+        fun strategyFor(strategy: String): CommandSelectionStrategy {
+            return when(strategy.lowercase()) {
+                "random" -> RandomCommandSelection()
+                else -> RandomCommandSelection()
+            }
+        }
+    }
 }

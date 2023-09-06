@@ -5,18 +5,24 @@ import maestro.TreeNode
 import maestro.ViewHierarchy
 import maestro.cli.runner.gen.commandselection.CommandSelectionStrategy
 import maestro.cli.runner.gen.viewdisambiguator.ViewDisambiguator
+import maestro.orchestra.BackPressCommand
 import maestro.orchestra.Command
 import maestro.orchestra.ElementSelector
 import maestro.orchestra.MaestroCommand
 import maestro.orchestra.TapOnElementCommand
 
 class IOSHierarchyAnalyzer(
-    private val selectionStrategy: CommandSelectionStrategy,
-    private val viewDisambiguator: ViewDisambiguator
+    private val selectionStrategy: CommandSelectionStrategy, private val viewDisambiguator: ViewDisambiguator
 ) : HierarchyAnalyzer(viewDisambiguator) {
     override fun fetchCommandFrom(hierarchy: ViewHierarchy): MaestroCommand {
-        val availableWidgets = extractWidgets(hierarchy)
+        val flattenNodes = hierarchy.aggregate()
+        val availableWidgets = extractWidgets(hierarchy, flattenNodes)
         val commands = mutableListOf<Command>()
+        commands.addAll(keyboardOpenCommandsIfOpen(flattenNodes))
+        commands.add(BackPressCommand())
+        scrollCommandIfScrollable(flattenNodes)?.let { commands.add(it) }
+
+        // Generate Tap commands
         availableWidgets.forEach { (node, selector) ->
             node.clickable?.let {
                 commands.add(TapOnElementCommand(selector))
@@ -25,18 +31,20 @@ class IOSHierarchyAnalyzer(
         return selectionStrategy.pickFrom(commands.map { MaestroCommand(it) })
     }
 
-    override fun extractWidgets(hierarchy: ViewHierarchy): List<Pair<TreeNode, ElementSelector>> {
-        val flattenNodes = hierarchy.aggregate()
+    override fun isScrollable(nodes: List<TreeNode>): Boolean = false
+
+    override fun isKeyboardOpen(nodes: List<TreeNode>): Boolean =
+        nodes.any { ELEMENT_TYPES[it.attributes["elementType"]] == "key" }
+
+    override fun extractWidgets(
+        hierarchy: ViewHierarchy, flattenNodes: List<TreeNode>
+    ): List<Pair<TreeNode, ElementSelector>> {
 
         val bannedChildren = flattenNodes.first { treeNode ->
-            val childrenAttributes =
-                treeNode.children
-                    .map { attrs -> attrs.attributes.values.toString() }
-                    .toString()
-            val isStatusBar =
-                childrenAttributes.contains(batteryIndicatorRegex) &&
-                    (childrenAttributes.contains(absoluteHourIndicatorRegex) ||
-                        childrenAttributes.contains(relativeHourIndicatorRegex))
+            val childrenAttributes = treeNode.children.map { attrs -> attrs.attributes.values.toString() }.toString()
+            val isStatusBar = childrenAttributes.contains(batteryIndicatorRegex) && (childrenAttributes.contains(
+                absoluteHourIndicatorRegex
+            ) || childrenAttributes.contains(relativeHourIndicatorRegex))
             isStatusBar
         }.children
 

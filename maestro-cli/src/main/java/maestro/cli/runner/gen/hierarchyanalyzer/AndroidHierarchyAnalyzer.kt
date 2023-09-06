@@ -1,13 +1,11 @@
 package maestro.cli.runner.gen.hierarchyanalyzer
 
+import maestro.TreeNode
 import maestro.ViewHierarchy
 import maestro.cli.runner.gen.commandselection.CommandSelectionStrategy
 import maestro.cli.runner.gen.viewdisambiguator.ViewDisambiguator
 import maestro.orchestra.BackPressCommand
 import maestro.orchestra.Command
-import maestro.orchestra.EraseTextCommand
-import maestro.orchestra.HideKeyboardCommand
-import maestro.orchestra.InputRandomCommand
 import maestro.orchestra.MaestroCommand
 import maestro.orchestra.ScrollCommand
 import maestro.orchestra.TapOnElementCommand
@@ -18,28 +16,11 @@ class AndroidHierarchyAnalyzer(
 ) : HierarchyAnalyzer(viewDisambiguator) {
     override fun fetchCommandFrom(hierarchy: ViewHierarchy): MaestroCommand {
         val flattenNodes = hierarchy.aggregate()
-        val availableWidgets = extractWidgets(hierarchy)
-
-        // Generate indirect commands (BackPress, InputText, Go to recent tasks)
-
+        val availableWidgets = extractWidgets(hierarchy, flattenNodes)
         val commands = mutableListOf<Command>()
-        val isKeyboardOpen = flattenNodes.any {
-            val resourceId = it.attributes["resource-id"] ?: ""
-            resourceId.contains("com.google.android.inputmethod.latin")
-        }
-        if (isKeyboardOpen) {
-            commands.add(InputRandomCommand())
-            commands.add(HideKeyboardCommand())
-            commands.add(EraseTextCommand(null))
-        }
+        commands.addAll(keyboardOpenCommandsIfOpen(flattenNodes))
         commands.add(BackPressCommand())
-        flattenNodes.any {
-            it.attributes["className"]
-                ?.lowercase()
-                ?.contains("scroll") == true
-        }.let {
-            if (it) commands.add(ScrollCommand())
-        }
+        scrollCommandIfScrollable(flattenNodes)?.let { commands.add(it) }
 
         // Generate Tap commands
         availableWidgets.forEach { (node, selector) ->
@@ -52,9 +33,25 @@ class AndroidHierarchyAnalyzer(
                 }
             }
         }
-
         return selectionStrategy.pickFrom(commands.map { MaestroCommand(it) })
+    }
 
+    override fun isScrollable(nodes: List<TreeNode>): Boolean {
+        nodes.any {
+            it.attributes["className"]
+                ?.lowercase()
+                ?.contains("scroll") == true
+        }.let {
+            if (it) return true
+        }
+        return false
+    }
+
+    override fun isKeyboardOpen(nodes: List<TreeNode>): Boolean {
+        return nodes.any {
+            val resourceId = it.attributes["resource-id"] ?: ""
+            resourceId.contains("com.google.android.inputmethod.latin")
+        }
     }
 
     override fun isOutsideApp(hierarchy: ViewHierarchy, packageName: String): Boolean {

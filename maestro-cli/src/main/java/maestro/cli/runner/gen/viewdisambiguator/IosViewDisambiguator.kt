@@ -3,10 +3,11 @@ package maestro.cli.runner.gen.viewdisambiguator
 import maestro.TreeNode
 import maestro.orchestra.ElementSelector
 
-class SimpleIosViewDisambiguator: ViewDisambiguator {
+class IosViewDisambiguator: ViewDisambiguator() {
 
     override fun disambiguate(root: TreeNode, view: TreeNode, flattenNodes: List<TreeNode>):
         ElementSelector {
+        // First, we disambiguate with some trivial checks
         val idRegex = view.attributes["resource-id"]
         idRegex?.let {
             if (attributeIsUnique(it, "resource-id", flattenNodes)) return ElementSelector(
@@ -27,26 +28,21 @@ class SimpleIosViewDisambiguator: ViewDisambiguator {
                 idRegex = idRegex
             )
         }
-        return ElementSelector(
-            textRegex = if (textRegex.isNullOrEmpty()) accessibilityTextRegex else textRegex,
-            idRegex = idRegex,
-        )
+        if (view.children.isNotEmpty()) {
+            val childMatchers = view.children.map { disambiguate(root, it, flattenNodes) }
+            childMatchers.firstOrNull { it != ElementSelector() }?.let {
+                return ElementSelector(containsChild = it)
+            }
+        } else {
+            return ElementSelector()
+        }
+        return ElementSelector(classNameRegex = null) // No selector
     }
 
     override fun properlyDisambiguated(selector: ElementSelector): Boolean {
-        if (
-            selector.textRegex.isNullOrEmpty()
-            && selector.idRegex.isNullOrEmpty()
-            && selector.below == null
-        ) return false
-        return true
+        return !selector.idRegex.isNullOrEmpty() ||
+            !selector.textRegex.isNullOrEmpty() ||
+            selector.containsChild != null
     }
 
-    private fun attributeIsUnique(value: String, attribute: String, flattenTree: List<TreeNode>):
-        Boolean {
-        flattenTree.filter {
-            val otherValue = it.attributes[attribute]
-            (otherValue ?: "") == value
-        }.also { return it.size == 1 }
-    }
 }

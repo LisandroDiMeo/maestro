@@ -2,8 +2,6 @@ package maestro.cli.command
 
 import maestro.cli.App
 import maestro.cli.DisableAnsiMixin
-import maestro.cli.report.ReportFormat
-import maestro.cli.report.ReporterFactory
 import maestro.cli.runner.TestSuiteGenerator
 import maestro.cli.session.MaestroSessionManager
 import picocli.CommandLine
@@ -31,6 +29,9 @@ class GenerateCommand : Callable<Int> {
     @CommandLine.Option(names = ["-t", "--testSize"], hidden = true)
     private var testSize: Int = 20
 
+    @CommandLine.Option(names = ["--strategy"], hidden = true)
+    private var strategy: String = "Random"
+
     @CommandLine.Option(names = ["--endIfAppLeft"], hidden = true)
     private var endTestIfOutsideApp: Boolean = false
 
@@ -42,11 +43,11 @@ class GenerateCommand : Callable<Int> {
             TestSuiteGenerator(
                 maestro = maestro,
                 device = device,
-                reporter = ReporterFactory.buildReporter(ReportFormat.JUNIT, "GeneratedSuite"),
                 packageName = packageName,
-                testSize = testSize,
                 testSuiteSize = suiteSize,
-                endTestIfOutsideApp = endTestIfOutsideApp
+                testSize = testSize,
+                endTestIfOutsideApp = endTestIfOutsideApp,
+                strategy = strategy
             ).generate()
             1
         }

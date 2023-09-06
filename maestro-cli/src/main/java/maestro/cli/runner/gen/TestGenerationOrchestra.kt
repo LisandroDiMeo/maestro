@@ -35,10 +35,7 @@ import java.io.File
 class TestGenerationOrchestra(
     private val maestro: Maestro,
     private val packageName: String = "",
-    private val screenshotsDir: File? = null,
     private val lookupTimeoutMs: Long = 17000L,
-    private val optionalLookupTimeoutMs: Long = 7000L,
-    private val networkProxy: NetworkProxy = NetworkProxy(port = 8085),
     private val runCycle: RunCycle,
     private val hierarchyAnalyzer: HierarchyAnalyzer,
     private val jsEngine: JsEngine = JsEngine(),
@@ -51,14 +48,11 @@ class TestGenerationOrchestra(
     private var deviceInfo: DeviceInfo? = null
     private val commandsGenerated = mutableListOf<MaestroCommand>()
 
-    private val rawCommandToMetadata = mutableMapOf<MaestroCommand, Orchestra.CommandMetadata>()
-
     fun startGeneration() {
         jsEngine.init()
         commandsGenerated.clear()
         openApplication()
-        // TODO's:
-        //  Mejorar waits activos, y ver de chequear cuando queda IDLE la UI
+        // TODO's: improve active waits
         for (currentIteration in 1..testSize) {
             runBlocking {
                 delay(500L)

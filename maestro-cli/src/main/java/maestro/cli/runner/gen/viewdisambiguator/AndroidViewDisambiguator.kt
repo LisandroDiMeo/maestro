@@ -3,7 +3,7 @@ package maestro.cli.runner.gen.viewdisambiguator
 import maestro.TreeNode
 import maestro.orchestra.ElementSelector
 
-class SimpleAndroidViewDisambiguator : ViewDisambiguator {
+class AndroidViewDisambiguator : ViewDisambiguator() {
 
     override fun disambiguate(root: TreeNode, view: TreeNode, flattenNodes: List<TreeNode>):
         ElementSelector {
@@ -17,21 +17,21 @@ class SimpleAndroidViewDisambiguator : ViewDisambiguator {
         }
         val textRegex = view.attributes["text"]
         textRegex?.let {
-            if (attributeIsUnique(it, "text",flattenNodes)) return ElementSelector(
+            if (attributeIsUnique(it, "text", flattenNodes)) return ElementSelector(
                 textRegex = it,
                 idRegex = idRegex,
             )
         }
         val accessibilityTextRegex = view.attributes["accessibilityText"]
         accessibilityTextRegex?.let {
-            if (attributeIsUnique(it, "accessibilityText",flattenNodes)) return ElementSelector(
+            if (attributeIsUnique(it, "accessibilityText", flattenNodes)) return ElementSelector(
                 textRegex = it,
                 idRegex = idRegex
             )
         }
         val classNameRegex = view.attributes["className"]
         classNameRegex?.let {
-            if (attributeIsUnique(it, "className",flattenNodes)) return ElementSelector(
+            if (attributeIsUnique(it, "className", flattenNodes)) return ElementSelector(
                 textRegex = if (textRegex.isNullOrEmpty()) accessibilityTextRegex else textRegex,
                 idRegex = idRegex,
                 classNameRegex = it
@@ -66,24 +66,5 @@ class SimpleAndroidViewDisambiguator : ViewDisambiguator {
             selector.containsChild != null
     }
 
-    private fun attributeIsUnique(value: String, attribute: String, flattenTree: List<TreeNode>): Boolean {
-        flattenTree.filter {
-            val otherValue = it.attributes[attribute]
-            (otherValue ?: "") == value
-        }.also { return it.size == 1 }
-    }
-
 }
 
-interface Rule
-
-abstract class UniqueElementRule<T, K>(private val extract: (T) -> K): Rule {
-    open fun evaluateOverList(key: String, element: T, others: List<T>): Boolean {
-        val value = extract(element)
-        others.filter { other ->
-            val otherValue = extract(other)
-            otherValue == value
-        }.also { return it.size == 1 }
-    }
-
-}
