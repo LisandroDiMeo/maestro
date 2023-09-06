@@ -28,27 +28,25 @@ class IOSHierarchyAnalyzer(
     override fun extractWidgets(hierarchy: ViewHierarchy): List<Pair<TreeNode, ElementSelector>> {
         val flattenNodes = hierarchy.aggregate()
 
-        val bannedChildren = flattenNodes.first {
+        val bannedChildren = flattenNodes.first { treeNode ->
             val childrenAttributes =
-                it.children
+                treeNode.children
                     .map { attrs -> attrs.attributes.values.toString() }
                     .toString()
             val isStatusBar =
-                childrenAttributes.contains(batteryIndicatorRegex) && (childrenAttributes.contains(
-                    absoluteHourIndicatorRegex
-                ) || childrenAttributes.contains(relativeHourIndicatorRegex))
+                childrenAttributes.contains(batteryIndicatorRegex) &&
+                    (childrenAttributes.contains(absoluteHourIndicatorRegex) ||
+                        childrenAttributes.contains(relativeHourIndicatorRegex))
             isStatusBar
         }.children
 
-        val availableWidgets = flattenNodes.filter {
-                !shouldBeIgnored(
-                    ELEMENT_TYPES[it.attributes["elementType"]] ?: "any"
-                ) || it in bannedChildren
-            }
-            .map { it to viewDisambiguator.disambiguate(hierarchy.root, it, flattenNodes) }
-            .filter {
-                viewDisambiguator.properlyDisambiguated(it.second)
-            }
+        val availableWidgets = flattenNodes.filter { treeNode ->
+            !shouldBeIgnored(
+                ELEMENT_TYPES[treeNode.attributes["elementType"]] ?: "any"
+            ) || treeNode in bannedChildren
+        }.map { it to viewDisambiguator.disambiguate(hierarchy.root, it, flattenNodes) }.filter {
+            viewDisambiguator.properlyDisambiguated(it.second)
+        }
         return availableWidgets
     }
 
@@ -64,8 +62,7 @@ class IOSHierarchyAnalyzer(
 
     companion object {
         private val batteryIndicatorRegex = Regex("(100|[0-9]{1,2})% battery power")
-        private val relativeHourIndicatorRegex =
-            Regex("((1[0-2]|[1-9]):([0-5][0-9]) ([AaPp][Mm]))")
+        private val relativeHourIndicatorRegex = Regex("((1[0-2]|[1-9]):([0-5][0-9]) ([AaPp][Mm]))")
         private val absoluteHourIndicatorRegex = Regex("([0-1][0-9]|2[0-3]):([0-5][0-9])")
     }
 

@@ -59,13 +59,30 @@ class SimpleAndroidViewDisambiguator : ViewDisambiguator {
     }
 
     override fun properlyDisambiguated(selector: ElementSelector): Boolean {
-        return true // the fuck?
+        return !selector.idRegex.isNullOrEmpty() ||
+            !selector.textRegex.isNullOrEmpty() ||
+            !selector.packageNameRegex.isNullOrEmpty() ||
+            !selector.classNameRegex.isNullOrEmpty() ||
+            selector.containsChild != null
     }
 
     private fun attributeIsUnique(value: String, attribute: String, flattenTree: List<TreeNode>): Boolean {
         flattenTree.filter {
             val otherValue = it.attributes[attribute]
             (otherValue ?: "") == value
+        }.also { return it.size == 1 }
+    }
+
+}
+
+interface Rule
+
+abstract class UniqueElementRule<T, K>(private val extract: (T) -> K): Rule {
+    open fun evaluateOverList(key: String, element: T, others: List<T>): Boolean {
+        val value = extract(element)
+        others.filter { other ->
+            val otherValue = extract(other)
+            otherValue == value
         }.also { return it.size == 1 }
     }
 
