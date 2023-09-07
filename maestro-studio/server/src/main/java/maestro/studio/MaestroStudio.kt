@@ -41,6 +41,8 @@ object MaestroStudio {
                 if (maestro != null) {
                     DeviceScreenService.routes(this, maestro)
                     ReplService.routes(this, maestro)
+                    InsightService.routes(this)
+                    AuthService.routes(this)
                 }
                 MockService.routes(this, MockInteractor())
                 singlePageApplication {

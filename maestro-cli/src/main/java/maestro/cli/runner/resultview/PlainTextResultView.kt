@@ -2,6 +2,8 @@ package maestro.cli.runner.resultview
 
 import maestro.cli.runner.CommandState
 import maestro.cli.runner.CommandStatus
+import maestro.utils.Insight
+import maestro.utils.chunkStringByWordCount
 
 class PlainTextResultView: ResultView {
 
@@ -50,8 +52,15 @@ class PlainTextResultView: ResultView {
                 println("  > Init Flow")
             }
 
-
             renderCommandsPlainText(state.initCommands)
+        }
+
+        if (state.onFlowStartCommands.isNotEmpty()) {
+            if (shouldPrintStep()) {
+                println("  > On Flow Start")
+            }
+
+            renderCommandsPlainText(state.onFlowStartCommands)
         }
 
         if (shouldPrintStep()) {
@@ -59,6 +68,14 @@ class PlainTextResultView: ResultView {
         }
 
         renderCommandsPlainText(state.commands)
+
+        if (state.onFlowCompleteCommands.isNotEmpty()) {
+            if (shouldPrintStep()) {
+                println("  > On Flow Complete")
+            }
+
+            renderCommandsPlainText(state.onFlowCompleteCommands)
+        }
     }
 
     private fun renderCommandsPlainText(commands: List<CommandState>, indent: Int = 0) {
@@ -77,7 +94,21 @@ class PlainTextResultView: ResultView {
                 println("  ".repeat(indent) + "${c?.description()}...")
             }
 
+            if (command.subOnStartCommands != null) {
+                if (shouldPrintStep()) {
+                    println("  > On Flow Start")
+                }
+                renderCommandsPlainText(command.subOnStartCommands, indent = indent + 1)
+            }
+
             renderCommandsPlainText(command.subCommands, indent = indent + 1)
+
+            if (command.subOnCompleteCommands != null) {
+                if (shouldPrintStep()) {
+                    println("  > On Flow Complete")
+                }
+                renderCommandsPlainText(command.subOnCompleteCommands, indent = indent + 1)
+            }
 
             if (shouldPrintStep()) {
                 println("  ".repeat(indent) + "${c?.description()}... " + status(command.status))
@@ -92,15 +123,28 @@ class PlainTextResultView: ResultView {
                     if (shouldPrintStep()) {
                         print("  ".repeat(indent) + "${c?.description()}...")
                     }
-                    registerStep()
                 }
 
                 CommandStatus.COMPLETED, CommandStatus.FAILED, CommandStatus.SKIPPED -> {
                     registerStep()
                     if (shouldPrintStep()) {
                         println(" " + status(command.status))
+                        renderInsight(command.insight, indent + 1)
                     }
                 }
+            }
+        }
+    }
+
+    private fun renderInsight(insight: Insight, indent: Int) {
+        if (insight.level != Insight.Level.NONE) {
+            println("\n")
+            val level = insight.level.toString().lowercase().replaceFirstChar(Char::uppercase)
+            print(" ".repeat(indent) + level + ":")
+            insight.message.chunkStringByWordCount(12).forEach { chunkedMessage ->
+                print(" ".repeat(indent))
+                print(chunkedMessage)
+                print("\n")
             }
         }
     }

@@ -30,6 +30,10 @@ class RouteHandlerFactory {
             return DeviceInfoHandler()
         case .setPermissions:
             return SetPermissionsHandler()
+        case .viewHierarchy:
+            return ViewHierarchyHandler()
+        case .status:
+            return StatusHandler()
         }
     }
 }

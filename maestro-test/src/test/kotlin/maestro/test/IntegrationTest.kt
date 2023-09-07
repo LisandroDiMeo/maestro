@@ -28,6 +28,7 @@ import org.junit.jupiter.api.assertThrows
 import java.awt.Color
 import java.io.File
 import java.nio.file.Paths
+import maestro.orchestra.error.SyntaxError
 
 class IntegrationTest {
 
@@ -41,6 +42,7 @@ class IntegrationTest {
     @AfterEach
     internal fun tearDown() {
         File("screenshot.png").delete()
+        File("recording.mp4").delete()
     }
 
     @Test
@@ -552,19 +554,9 @@ class IntegrationTest {
                 MaestroCommand(
                     ApplyConfigurationCommand(
                         config = MaestroConfig(
-                            appId = "com.example.app",
-                            initFlow = MaestroInitFlow(
-                                appId = "com.example.app",
-                                commands = listOf(
-                                    MaestroCommand(
-                                        LaunchAppCommand(
-                                            appId = "com.example.app"
-                                        )
-                                    )
-                                ),
-                            )
+                            appId = "com.example.app"
                         )
-                    ),
+                    )
                 ),
                 MaestroCommand(
                     LaunchAppCommand(
@@ -613,71 +605,53 @@ class IntegrationTest {
 
     @Test
     fun `Case 023 - runFlow with initFlow`() {
-        // Given
-        val commands = readCommands("024_init_flow_init_state")
-        val initFlow = YamlCommandReader.getConfig(commands)!!.initFlow!!
+        assertThrows<SyntaxError> {
+            val commands = readCommands("024_init_flow_init_state")
+            val initFlow = YamlCommandReader.getConfig(commands)!!.initFlow!!
 
-        val driver = driver {
-            element {
-                text = "Hello"
-                bounds = Bounds(0, 0, 100, 100)
+            val driver = driver {
+                element {
+                    text = "Hello"
+                    bounds = Bounds(0, 0, 100, 100)
+                }
+            }
+            driver.addInstalledApp("com.example.app")
+
+            val otherDriver = driver {
+                element {
+                    text = "Hello"
+                    bounds = Bounds(0, 0, 100, 100)
+                }
+            }
+            otherDriver.addInstalledApp("com.example.app")
+            val state = Maestro(driver).use {
+                orchestra(it).runInitFlow(initFlow)
+            }!!
+            Maestro(otherDriver).use {
+                orchestra(it).runFlow(commands, state)
             }
         }
-        driver.addInstalledApp("com.example.app")
-
-        val otherDriver = driver {
-            element {
-                text = "Hello"
-                bounds = Bounds(0, 0, 100, 100)
-            }
-        }
-        otherDriver.addInstalledApp("com.example.app")
-
-        // When
-        val state = Maestro(driver).use {
-            orchestra(it).runInitFlow(initFlow)
-        }!!
-
-        Maestro(otherDriver).use {
-            orchestra(it).runFlow(commands, state)
-        }
-
-        // Then
-        // No test failure
-        otherDriver.assertPushedAppState(
-            listOf(
-                Event.LaunchApp("com.example.app"),
-            )
-        )
-        otherDriver.assertHasEvent(Event.Tap(Point(50, 50)))
     }
 
     @Test
     fun `Case 024 - runFlow with initState`() {
-        // Given
-        val commands = readCommands("023_init_flow")
+        assertThrows<SyntaxError> {
+            // Given
+            val commands = readCommands("023_init_flow")
 
-        val driver = driver {
-            element {
-                text = "Hello"
-                bounds = Bounds(0, 0, 100, 100)
+            val driver = driver {
+                element {
+                    text = "Hello"
+                    bounds = Bounds(0, 0, 100, 100)
+                }
+            }
+            driver.addInstalledApp("com.example.app")
+
+            // When
+            Maestro(driver).use {
+                orchestra(it).runFlow(commands)
             }
         }
-        driver.addInstalledApp("com.example.app")
-
-        // When
-        Maestro(driver).use {
-            orchestra(it).runFlow(commands)
-        }
-
-        // Then
-        // No test failure
-        driver.assertPushedAppState(
-            listOf(
-                Event.LaunchApp("com.example.app"),
-            )
-        )
-        driver.assertHasEvent(Event.Tap(Point(50, 50)))
     }
 
     @Test
@@ -2702,6 +2676,292 @@ class IntegrationTest {
         // Then
         assertThat(receivedLogs).containsExactly(
             "Log from runScript",
+        ).inOrder()
+    }
+
+    @Test
+    fun `Case 099 - Screen recording`() {
+        // Given
+        val commands = readCommands("099_screen_recording")
+
+        val driver = driver {
+        }
+
+        // When
+        Maestro(driver).use {
+            orchestra(it).runFlow(commands)
+        }
+
+        // Then
+        // No test failure
+        driver.assertEvents(
+            listOf(
+                Event.StartRecording,
+                Event.StopRecording,
+            )
+        )
+    }
+
+    @Test
+    fun `Case 100 - tapOn multiple times`() {
+        // Given
+        val commands = readCommands("100_tapOn_multiple_times")
+
+        val driver = driver {
+            element {
+                text = "Button"
+                bounds = Bounds(0, 0, 100, 100)
+            }
+        }
+
+        // When
+        Maestro(driver).use {
+            orchestra(it).runFlow(commands)
+        }
+
+
+        // Then
+        // No test failure
+        driver.assertEventCount(Event.Tap(Point(50, 50)), 3)
+    }
+
+    @Test
+    fun `Case 101 - doubleTapOn`() {
+        // Given
+        val commands = readCommands("101_doubleTapOn")
+
+        val driver = driver {
+            element {
+                text = "Button"
+                bounds = Bounds(0, 0, 100, 100)
+            }
+        }
+
+        // When
+        Maestro(driver).use {
+            orchestra(it).runFlow(commands)
+        }
+
+
+        // Then
+        // No test failure
+        driver.assertEventCount(Event.Tap(Point(50, 50)), 2)
+    }
+
+    @Test
+    fun `Case 102 - GraalJs config`() {
+        // given
+        val commands = readCommands("102_graaljs")
+        val driver = driver { }
+
+        // when
+        Maestro(driver).use {
+            orchestra(it).runFlow(commands)
+        }
+
+        // then
+        driver.assertEvents(
+            listOf(
+                Event.InputText("foo"),
+                Event.InputText("bar"),
+            )
+        )
+    }
+
+    @Test
+    fun `Case 103 - execute onFlowStart and onFlowComplete hooks`() {
+        // given
+        val commands = readCommands("103_on_flow_start_complete_hooks")
+        val driver = driver {
+        }
+        val receivedLogs = mutableListOf<String>()
+
+        // when
+        Maestro(driver).use {
+            orchestra(
+                it,
+                onCommandMetadataUpdate = { _, metadata ->
+                    receivedLogs += metadata.logMessages
+                }
+            ).runFlow(commands)
+        }
+
+        // Then
+        assertThat(receivedLogs).containsExactly(
+            "setup",
+            "teardown",
+        ).inOrder()
+        driver.assertEvents(
+            listOf(
+                Event.InputText("test1"),
+                Event.Tap(Point(100, 200)),
+                Event.InputText("test2"),
+            )
+        )
+    }
+
+    @Test
+    fun `Case 104 - execute onFlowStart and onFlowComplete hooks when flow failed`() {
+        // Given
+        val commands = readCommands("104_on_flow_start_complete_hooks_flow_failed")
+
+        val driver = driver {
+            element {
+                id = "another_id"
+                bounds = Bounds(0, 0, 100, 100)
+            }
+        }
+
+        // When & Then
+        assertThrows<MaestroException.AssertionFailure> {
+            Maestro(driver).use {
+                orchestra(it).runFlow(commands)
+            }
+        }
+        driver.assertEvents(
+            listOf(
+                Event.InputText("test1"),
+                Event.InputText("test2"),
+            )
+        )
+    }
+
+    @Test
+    fun `Case 105 - execute onFlowStart and onFlowComplete when js output is set`() {
+        // Given
+        val commands = readCommands("105_on_flow_start_complete_when_js_output_set")
+
+        val driver = driver {
+        }
+        val receivedLogs = mutableListOf<String>()
+
+        // when
+        Maestro(driver).use {
+            orchestra(
+                it,
+                onCommandMetadataUpdate = { _, metadata ->
+                    receivedLogs += metadata.logMessages
+                }
+            ).runFlow(commands)
+        }
+
+        // Then
+        assertThat(receivedLogs).containsExactly(
+            "setup",
+            "teardown",
+        ).inOrder()
+    }
+
+    @Test
+    fun `Case 106 - execute onFlowStart and onFlowComplete when js output is set with subflows`() {
+        // Given
+        val commands = readCommands("106_on_flow_start_complete_when_js_output_set_subflows")
+
+        val driver = driver {
+        }
+        val receivedLogs = mutableListOf<String>()
+
+        // when
+        Maestro(driver).use {
+            orchestra(
+                it,
+                onCommandMetadataUpdate = { _, metadata ->
+                    receivedLogs += metadata.logMessages
+                }
+            ).runFlow(commands)
+        }
+
+        // Then
+        assertThat(receivedLogs).containsExactly(
+            "subflow",
+            "setup subflow",
+            "teardown subflow",
+        ).inOrder()
+    }
+
+    @Test
+    fun `Case 107 - execute defineVariablesCommand before onFlowStart and onFlowComplete are executed`() {
+        // Given
+        val commands = readCommands("107_define_variables_command_before_hooks")
+
+        val driver = driver {
+        }
+        driver.addInstalledApp("com.example.app")
+        val receivedLogs = mutableListOf<String>()
+
+        // when
+        Maestro(driver).use {
+            orchestra(
+                it,
+                onCommandMetadataUpdate = { _, metadata ->
+                    receivedLogs += metadata.logMessages
+                }
+            ).runFlow(commands)
+        }
+
+        // Then
+        assertThat(receivedLogs).containsExactly(
+            "com.example.app",
+        ).inOrder()
+        driver.assertEvents(
+            listOf(
+                Event.LaunchApp("com.example.app")
+            )
+        )
+    }
+
+    @Test
+    fun `Case 108 - fail the flow and skip commands in case of onStart hook failure`() {
+        // Given
+        val commands = readCommands("108_failed_start_hook")
+        val driver = driver {
+        }
+        val receivedLogs = mutableListOf<String>()
+
+        // When & Then
+        assertThrows<MaestroException.AssertionFailure> {
+            val result = Maestro(driver).use {
+                orchestra(
+                    it,
+                    onCommandMetadataUpdate = { _, metadata ->
+                        receivedLogs += metadata.logMessages
+                    }
+                ).runFlow(commands)
+            }
+
+            assertThat(result).isFalse()
+        }
+        assertThat(receivedLogs).containsExactly(
+            "on start",
+            "on complete",
+        ).inOrder()
+    }
+
+    @Test
+    fun `Case 109 - fail the flow and execute commands in case of onComplete hook failure`() {
+        // Given
+        val commands = readCommands("109_failed_complete_hook")
+        val driver = driver {
+        }
+        val receivedLogs = mutableListOf<String>()
+
+        // When & Then
+        assertThrows<MaestroException.AssertionFailure> {
+            val result = Maestro(driver).use {
+                orchestra(
+                    it,
+                    onCommandMetadataUpdate = { _, metadata ->
+                        receivedLogs += metadata.logMessages
+                    }
+                ).runFlow(commands)
+            }
+
+            assertThat(result).isFalse()
+        }
+        assertThat(receivedLogs).containsExactly(
+            "on start",
+            "main flow",
+            "on complete",
         ).inOrder()
     }
 

@@ -7,11 +7,11 @@ import kotlin.system.exitProcess
 object PrintUtils {
 
     fun message(message: String) {
-        println(Ansi.ansi().render("@|cyan \n$message |@"))
+        println(Ansi.ansi().render("@|cyan \n$message|@"))
     }
 
     fun prompt(message: String): String {
-        print(Ansi.ansi().render("\n@|yellow,bold $message\n> |@"))
+        print(Ansi.ansi().render("\n@|yellow,bold $message\n>|@"))
         try {
             return readln().trim()
         } catch (e: IOException) {
@@ -61,6 +61,11 @@ object PrintUtils {
         } else {
             this
         }
+    }
+
+    fun clearConsole() {
+        print("\u001b[H\u001b[2J")
+        System.out.flush()
     }
 
 }

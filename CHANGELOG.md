@@ -1,5 +1,116 @@
 # Changelog
 
+## 1.32.0 - 20223-09-06
+
+Studio
+- Feature: Support writing Flows using AI (more info to come 🚀)
+- Feature: Maestro Studio can now run in multiple tabs simultaneously
+- Feature: Added element id and copy option for it
+- Tweak: Hide action buttons till command is hovered
+- Tweak: Hide Unnecessary Scrollbars
+- Tweak: Repl view scroll improvements
+- Tweak: Improve Maestro Studio performance
+- Fix: Selected element size
+- Fix: Performance issues with maestro studio device refresh
+- Fix: Fixed dark mode for element id
+
+CLI
+- Feature: New command to start or create a Maestro recommended device (docs)
+- Feature: Support id selection for testID with react-native-web (community contribution)
+- Feature: Control if browser automatically opens when running Maestro Studio via --no-window (community contribution)
+- Tweak: Show cancellation reason when available (Maestro Cloud)
+- Tweak: Update selenium-java and remove webdrivermanager to support Chrome 116+
+- Tweak: Show device type when running on Maestro Cloud
+- Tweak: Added better messaging and recovery options for Maestro Cloud uploads (useful for CI)
+- Tweak: Added better error messages for missing workspace and yaml validation errors
+- Tweak: Added file name and line number in yaml parsing error messages
+- Fix: Input text and erase text stability improvements for iOS
+- Fix: Leaking response body on iOS & better error handling for iOS Driver
+- Fix: Fixed Maestro Cloud wrong exit code when flow failed
+- Fix: Debug commands parsing would crash maestro
+- Fix: Cleaning up debug logs
+
+
+
+
+## 1.31.0 - 2023-08-10
+
+- Fix: Warning shown from OkHttp for leaking response bodies on CLI
+  - Closing response bodies for retries done on the XCUITest driver
+  - Closing response bodies for permissions
+  - Removing different thread execution done on hideKeyboard
+- Fix: Scroll for React native apps on screens with large view hierarchies on iOS
+- Fix: Showing more descriptive errors on flow file not found during maestro cloud command.
+- Fix: Input text characters being skipped or being appended later in the test on iOS
+- Fix: Crash in debug output generation when maestro flow contains "/"’
+- Fix: Resolved issue where tapping on the device in maestro studio produced inaccurate click locations due to incorrect coordinates. Now fixed for accurate device interaction
+- Fix: In Maestro Studio, the issue of window resizing causing devices to overflow off the screen has been resolved.
+- Feature: Add headers to HTTP response for API calls done with Maestro. Thanks, Jesse Willoughby! for this contribution.
+- Feature: Now it is possible to configure the path with the –debug-output option for debugging information that maestro dumps in the user directory by default.
+- Feature: Enhanced Maestro Studio with keyboard accessibility, streamlining navigation and facilitating the copy, run, and edit commands using the keyboard.
+- Change: Fail the test if any of the onFlowStart or onFlowComplete hooks fail
+- Change: Removed IDB on iOS. This may impact the performance of maestro commands like tapOn and assertVisible on iOS screens with large view hierarchies.
+  - Studio and CLI will now provide insights and warnings in case the hierarchy of these screens becomes extensive.
+- Change: In Maestro Studio, we've integrated screenshots of selected elements alongside their corresponding commands.
+- Change: In Maestro Studio, double-clicking will now execute the command.
+
+## 1.30.4 - 2023-07-19
+
+- Fix: correctly resolve external parameters for onStart/Complete hooks
+- Fix: reuse JSEngine for all executeCommands (hooks, main commands, subflows) actions
+
+## 1.30.3 - 2023-07-17
+
+- Update: Maestro Studio revamp improvements
+  - wrapped element names in sidebar 
+  - sidebar text always visible
+  - add "hintText" and "accesbilityText" in sidebar
+  - improve sidebar search
+  - fixed highlight issues in search
+  - various other small improvements
+
+## 1.30.2 - 2023-07-14
+
+- Revert connection improvements (from 1.30.1)
+
+## 1.30.1 - 2023-07-14
+
+- Fix: Allow running `maestro studio` and `maestro test` simultaneusly
+- Fix: Connection improvements
+
+## 1.30.0 - 2023-07-13
+
+- Feature: onFlowStart / onFlowComplete hooks
+- Feature: Maestro Studio revamp
+  - improved design
+  - search components panel
+  - improved drag-and-drop
+- Feature: Introduce `--app-binary-id` parameter for Maestro Cloud upload action to be able to re-use a previously uploaded app for different flows
+- Feature: Implement Experimental GraalJsEngine (ECMAScript 2022 compliant)
+- Fix: Save xctest xcodebuild logs output to system temp dir
+- Fix: Close existing screen recording if it was left open.
+  - Thanks, @carlosmuvi, for the contribution!
+- Fix: Execute sequential Flows even if no other Flows are present
+- Fix: Various XCTestClient connection improvements
+- Deprecate: `assertOutgoingRequestsCommand`
+- Deprecate: Network Mocking feature
+- Deprecate: Maestro Mock Server feature
+
+## 1.29.0 - 2023-06-19
+
+- Feature: Add test duration measurement and display
+- Feature: New screen recording commands
+  - Thanks, @tokou, for the contribution!
+- Feature: Add support for sequential execution
+- Feature: Add support for double taps + multiple taps in tapOn
+- Feature: Add support for custom Android driver startup timeout
+  - Thanks, @arildojr7, for the contribution!
+- Fix: Validate workspace prior to upload to Maestro Cloud
+- Fix: Resolve Android scrollUntilVisible flakiness
+- Fix: Resolve inputText flakiness
+- Fix: iOS url arguments
+  - Thanks, @tokou, for the contribution!
+
 ## 1.28.0 - 2023-05-18
 
 - Feature: runScript command now support conditional execution

@@ -6,11 +6,7 @@ import maestro.cli.CliError
 import maestro.cli.device.Device
 import maestro.cli.model.FlowStatus
 import maestro.cli.model.TestExecutionSummary
-import maestro.cli.report.CommandDebugMetadata
-import maestro.cli.report.FlowDebugMetadata
-import maestro.cli.report.ScreenshotDebugMetadata
-import maestro.cli.report.TestDebugReporter
-import maestro.cli.report.TestSuiteReporter
+import maestro.cli.report.*
 import maestro.cli.util.PrintUtils
 import maestro.cli.view.ErrorViewUtils
 import maestro.cli.view.TestSuiteStatusView
@@ -22,6 +18,7 @@ import maestro.orchestra.yaml.YamlCommandReader
 import okio.Sink
 import org.slf4j.LoggerFactory
 import java.io.File
+import java.nio.file.Path
 import kotlin.math.roundToLong
 import kotlin.system.measureTimeMillis
 import kotlin.time.Duration.Companion.seconds
@@ -30,67 +27,53 @@ class TestSuiteInteractor(
     private val maestro: Maestro,
     private val device: Device? = null,
     private val reporter: TestSuiteReporter,
-    private val includeTags: List<String> = emptyList(),
-    private val excludeTags: List<String> = emptyList(),
 ) {
 
     private val logger = LoggerFactory.getLogger(TestSuiteInteractor::class.java)
 
     fun runTestSuite(
-        input: File,
+        executionPlan: WorkspaceExecutionPlanner.ExecutionPlan,
         reportOut: Sink?,
         env: Map<String, String>,
+        debugOutputPath: Path
     ): TestExecutionSummary {
-        return if (input.isFile) {
-            runTestSuite(
-                listOf(input),
-                reportOut,
-                env,
-            )
-        } else {
-            val flowFiles = WorkspaceExecutionPlanner
-                .plan(
-                    input = input.toPath().toAbsolutePath(),
-                    includeTags = includeTags,
-                    excludeTags = excludeTags,
-                )
-                .flowsToRun
-
-            if (flowFiles.isEmpty()) {
-                throw CliError("No flow returned from the tag filter used")
-            }
-
-            runTestSuite(
-                flowFiles.map { it.toFile() },
-                reportOut,
-                env,
-            )
+        if (executionPlan.flowsToRun.isEmpty() && executionPlan.sequence?.flows?.isEmpty() == true) {
+            throw CliError("No flows returned from the tag filter used")
         }
-    }
 
-    private fun runTestSuite(
-        flows: List<File>,
-        reportOut: Sink?,
-        env: Map<String, String>,
-    ): TestExecutionSummary {
         val flowResults = mutableListOf<TestExecutionSummary.FlowResult>()
 
         PrintUtils.message("Waiting for flows to complete...")
         println()
 
         var passed = true
-        flows.forEach { flowFile ->
-            val result = runFlow(flowFile, env, maestro)
+
+        // first run sequence of flows if present
+        val flowSequence = executionPlan.sequence
+        for (flow in flowSequence?.flows ?: emptyList()) {
+            val result = runFlow(flow.toFile(), env, maestro, debugOutputPath)
+            flowResults.add(result)
+
+            if (result.status == FlowStatus.ERROR) {
+                passed = false
+                if (executionPlan.sequence?.continueOnFailure != true) {
+                    PrintUtils.message("Flow ${result.name} failed and continueOnFailure is set to false, aborting running sequential Flows")
+                    println()
+                    break
+                }
+            }
+        }
+
+        // proceed to run all other Flows
+        executionPlan.flowsToRun.forEach { flow ->
+            val result = runFlow(flow.toFile(), env, maestro, debugOutputPath)
 
             if (result.status == FlowStatus.ERROR) {
                 passed = false
             }
-
-            // TODO accumulate extra information
-            // - Command statuses
-            // - View hierarchies
             flowResults.add(result)
         }
+
 
         val suiteDuration = flowResults.sumOf { it.duration?.inWholeSeconds ?: 0 }.seconds
 
@@ -135,6 +118,7 @@ class TestSuiteInteractor(
         flowFile: File,
         env: Map<String, String>,
         maestro: Maestro,
+        debugOutputPath: Path
     ): TestExecutionSummary.FlowResult {
         var flowName: String = flowFile.nameWithoutExtension
         var flowStatus: FlowStatus
@@ -156,7 +140,7 @@ class TestSuiteInteractor(
             val result = kotlin.runCatching {
                 val out = File.createTempFile("screenshot-${System.currentTimeMillis()}", ".png")
                     .also { it.deleteOnExit() } // save to another dir before exiting
-                maestro.takeScreenshot(out)
+                maestro.takeScreenshot(out, false)
                 debugScreenshots.add(
                     ScreenshotDebugMetadata(
                         screenshot = out,
@@ -233,7 +217,7 @@ class TestSuiteInteractor(
         }
         val flowDuration = (flowTimeMillis / 1000f).roundToLong().seconds
 
-        TestDebugReporter.saveFlow(flowName, debug)
+        TestDebugReporter.saveFlow(flowName, debug, debugOutputPath)
 
         TestSuiteStatusView.showFlowCompletion(
             TestSuiteViewModel.FlowResult(

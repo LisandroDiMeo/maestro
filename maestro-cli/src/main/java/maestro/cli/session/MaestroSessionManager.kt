@@ -23,14 +23,13 @@ import dadb.Dadb
 import dadb.adbserver.AdbServer
 import io.grpc.ManagedChannelBuilder
 import ios.LocalIOSDevice
-import ios.idb.IdbIOSDevice
 import ios.simctl.SimctlIOSDevice
 import ios.xctest.XCTestIOSDevice
-import maestro.LocalIdbRunner
 import maestro.Maestro
 import maestro.cli.device.Device
 import maestro.cli.device.PickDeviceInteractor
 import maestro.cli.device.Platform
+import maestro.cli.util.ScreenReporter
 import maestro.debuglog.IOSDriverLogger
 import maestro.drivers.AndroidDriver
 import maestro.drivers.IOSDriver
@@ -38,6 +37,7 @@ import org.slf4j.LoggerFactory
 import sun.misc.Signal
 import sun.misc.SignalHandler
 import util.XCRunnerCLIUtils
+import xcuitest.XCTestClient
 import xcuitest.XCTestDriverClient
 import xcuitest.installer.LocalXCTestInstaller
 import java.util.UUID
@@ -88,6 +88,7 @@ object MaestroSessionManager {
             SessionStore.withExclusiveLock {
                 heartbeatFuture.cancel(true)
                 SessionStore.delete(sessionId, selectedDevice.platform)
+                runCatching { ScreenReporter.reportMaxDepth() }
 
                 if (SessionStore.activeSessions().isEmpty()) {
                     session.close()
@@ -128,16 +129,12 @@ object MaestroSessionManager {
             )
         }
 
-        if (isIOS(host, port)) {
-            return SelectedDevice(
-                platform = Platform.IOS,
-                host = host,
-                port = port,
-                deviceId = deviceId,
-            )
-        }
-
-        error("No devices found.")
+        return SelectedDevice(
+            platform = Platform.IOS,
+            host = null,
+            port = null,
+            deviceId = deviceId,
+        )
     }
 
     private fun createMaestro(
@@ -154,8 +151,6 @@ object MaestroSessionManager {
                     )
 
                     Platform.IOS -> createIOS(
-                        selectedDevice.host,
-                        selectedDevice.port,
                         selectedDevice.device.instanceId,
                         !connectToExistingSession
                     )
@@ -164,6 +159,7 @@ object MaestroSessionManager {
                 },
                 device = selectedDevice.device,
             )
+
             selectedDevice.platform == Platform.ANDROID -> MaestroSession(
                 maestro = pickAndroidDevice(
                     selectedDevice.host,
@@ -172,19 +168,20 @@ object MaestroSessionManager {
                 ),
                 device = null,
             )
+
             selectedDevice.platform == Platform.IOS -> MaestroSession(
                 maestro = pickIOSDevice(
-                    selectedDevice.host,
-                    selectedDevice.port,
                     selectedDevice.deviceId,
                     !connectToExistingSession,
                 ),
                 device = null,
             )
+
             selectedDevice.platform == Platform.WEB -> MaestroSession(
                 maestro = pickWebDevice(isStudio),
                 device = null
             )
+
             else -> error("Unable to create Maestro session")
         }
     }
@@ -249,13 +246,11 @@ object MaestroSessionManager {
     }
 
     private fun pickIOSDevice(
-        host: String?,
-        port: Int?,
         deviceId: String?,
         openDriver: Boolean,
     ): Maestro {
         val device = PickDeviceInteractor.pickDevice(deviceId)
-        return createIOS(host, port, device.instanceId, openDriver)
+        return createIOS(device.instanceId, openDriver)
     }
 
     private fun createAndroid(instanceId: String, openDriver: Boolean): Maestro {
@@ -274,30 +269,21 @@ object MaestroSessionManager {
     }
 
     private fun createIOS(
-        host: String?,
-        port: Int?,
         deviceId: String,
         openDriver: Boolean,
     ): Maestro {
-        val idbIOSDevice = IdbIOSDevice(
-            deviceId = deviceId,
-            idbRunner = LocalIdbRunner(
-                host ?: defaultHost,
-                port ?: defaultIdbPort,
-                deviceId,
-            )
-        )
 
         val xcTestInstaller = LocalXCTestInstaller(
             logger = IOSDriverLogger(LocalXCTestInstaller::class.java),
             deviceId = deviceId,
+            host = defaultHost,
+            defaultPort = defaultXcTestPort
         )
 
         val xcTestDriverClient = XCTestDriverClient(
-            host = defaultHost,
-            port = defaultXcTestPort,
             installer = xcTestInstaller,
             logger = IOSDriverLogger(XCTestDriverClient::class.java),
+            client = XCTestClient(defaultHost, defaultXcTestPort)
         )
 
         val xcTestDevice = XCTestIOSDevice(
@@ -314,7 +300,6 @@ object MaestroSessionManager {
         val iosDriver = IOSDriver(
             LocalIOSDevice(
                 deviceId = deviceId,
-                idbIOSDevice = idbIOSDevice,
                 xcTestDevice = xcTestDevice,
                 simctlIOSDevice = simctlIOSDevice,
             )
@@ -346,7 +331,6 @@ object MaestroSessionManager {
         fun close() {
             maestro.close()
         }
-
     }
 
     private class CustomSignalHandler() : SignalHandler {

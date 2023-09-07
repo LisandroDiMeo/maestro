@@ -20,10 +20,13 @@
 package maestro.orchestra.yaml
 
 import com.fasterxml.jackson.annotation.JsonCreator
+import com.fasterxml.jackson.core.JacksonException
+import com.fasterxml.jackson.core.JsonParseException
+import com.fasterxml.jackson.core.JsonProcessingException
 import maestro.KeyCode
 import maestro.Point
+import maestro.TapRepeat
 import maestro.orchestra.AssertConditionCommand
-import maestro.orchestra.AssertOutgoingRequestsCommand
 import maestro.orchestra.BackPressCommand
 import maestro.orchestra.ClearKeychainCommand
 import maestro.orchestra.Condition
@@ -38,7 +41,7 @@ import maestro.orchestra.InputRandomType
 import maestro.orchestra.InputTextCommand
 import maestro.orchestra.LaunchAppCommand
 import maestro.orchestra.MaestroCommand
-import maestro.orchestra.MockNetworkCommand
+import maestro.orchestra.MaestroConfig
 import maestro.orchestra.OpenLinkCommand
 import maestro.orchestra.PasteTextCommand
 import maestro.orchestra.PressKeyCommand
@@ -48,7 +51,9 @@ import maestro.orchestra.RunScriptCommand
 import maestro.orchestra.ScrollCommand
 import maestro.orchestra.ScrollUntilVisibleCommand
 import maestro.orchestra.SetLocationCommand
+import maestro.orchestra.StartRecordingCommand
 import maestro.orchestra.StopAppCommand
+import maestro.orchestra.StopRecordingCommand
 import maestro.orchestra.SwipeCommand
 import maestro.orchestra.TakeScreenshotCommand
 import maestro.orchestra.TapOnElementCommand
@@ -65,6 +70,7 @@ import kotlin.io.path.readText
 
 data class YamlFluentCommand(
     val tapOn: YamlElementSelectorUnion? = null,
+    val doubleTapOn: YamlElementSelectorUnion? = null,
     val longPressOn: YamlElementSelectorUnion? = null,
     val assertVisible: YamlElementSelectorUnion? = null,
     val assertNotVisible: YamlElementSelectorUnion? = null,
@@ -92,10 +98,10 @@ data class YamlFluentCommand(
     val runScript: YamlRunScript? = null,
     val waitForAnimationToEnd: YamlWaitForAnimationToEndCommand? = null,
     val evalScript: String? = null,
-    val mockNetwork: String? = null,
     val scrollUntilVisible: YamlScrollUntilVisible? = null,
     val travel: YamlTravelCommand? = null,
-    val assertOutgoingRequest: YamlAssertOutgoingRequestsCommand? = null,
+    val startRecording: YamlStartRecording? = null,
+    val stopRecording: YamlStopRecording? = null,
 ) {
 
     @SuppressWarnings("ComplexMethod")
@@ -113,7 +119,6 @@ data class YamlFluentCommand(
                     )
                 )
             )
-
             assertNotVisible != null -> listOf(
                 MaestroCommand(
                     AssertConditionCommand(
@@ -123,7 +128,6 @@ data class YamlFluentCommand(
                     )
                 )
             )
-
             assertTrue != null -> listOf(
                 MaestroCommand(
                     AssertConditionCommand(
@@ -133,49 +137,14 @@ data class YamlFluentCommand(
                     )
                 )
             )
-
             inputText != null -> listOf(MaestroCommand(InputTextCommand(inputText)))
-            inputRandomText != null -> listOf(
-                MaestroCommand(
-                    InputRandomCommand(
-                        inputType = InputRandomType.TEXT,
-                        length = inputRandomText.length
-                    )
-                )
-            )
-
-            inputRandomNumber != null -> listOf(
-                MaestroCommand(
-                    InputRandomCommand(
-                        inputType = InputRandomType.NUMBER,
-                        length = inputRandomNumber.length
-                    )
-                )
-            )
-
+            inputRandomText != null -> listOf(MaestroCommand(InputRandomCommand(inputType = InputRandomType.TEXT, length = inputRandomText.length)))
+            inputRandomNumber != null -> listOf(MaestroCommand(InputRandomCommand(inputType = InputRandomType.NUMBER, length = inputRandomNumber.length)))
             inputRandomEmail != null -> listOf(MaestroCommand(InputRandomCommand(inputType = InputRandomType.TEXT_EMAIL_ADDRESS)))
             inputRandomPersonName != null -> listOf(MaestroCommand(InputRandomCommand(inputType = InputRandomType.TEXT_PERSON_NAME)))
             swipe != null -> listOf(swipeCommand(swipe))
-            openLink != null -> listOf(
-                MaestroCommand(
-                    OpenLinkCommand(
-                        openLink.link,
-                        openLink.autoVerify,
-                        openLink.browser
-                    )
-                )
-            )
-
-            pressKey != null -> listOf(
-                MaestroCommand(
-                    PressKeyCommand(
-                        code = KeyCode.getByName(
-                            pressKey
-                        ) ?: throw SyntaxError("Unknown key name: $pressKey")
-                    )
-                )
-            )
-
+            openLink != null -> listOf(MaestroCommand(OpenLinkCommand(openLink.link, openLink.autoVerify, openLink.browser)))
+            pressKey != null -> listOf(MaestroCommand(PressKeyCommand(code = KeyCode.getByName(pressKey) ?: throw SyntaxError("Unknown key name: $pressKey"))))
             eraseText != null -> listOf(eraseCommand(eraseText))
             action != null -> listOf(
                 when (action) {
@@ -187,7 +156,6 @@ data class YamlFluentCommand(
                     else -> error("Unknown navigation target: $action")
                 }
             )
-
             takeScreenshot != null -> listOf(MaestroCommand(TakeScreenshotCommand(takeScreenshot.path)))
             extendedWaitUntil != null -> listOf(extendedWait(extendedWaitUntil))
             stopApp != null -> listOf(
@@ -197,7 +165,6 @@ data class YamlFluentCommand(
                     )
                 )
             )
-
             clearState != null -> listOf(
                 MaestroCommand(
                     maestro.orchestra.ClearStateCommand(
@@ -205,7 +172,6 @@ data class YamlFluentCommand(
                     )
                 )
             )
-
             runFlow != null -> listOf(runFlowCommand(appId, flowPath, runFlow))
             setLocation != null -> listOf(
                 MaestroCommand(
@@ -215,11 +181,9 @@ data class YamlFluentCommand(
                     )
                 )
             )
-
             repeat != null -> listOf(
                 repeatCommand(repeat, flowPath, appId)
             )
-
             copyTextFrom != null -> listOf(copyTextFromCommand(copyTextFrom))
             runScript != null -> listOf(
                 MaestroCommand(
@@ -232,7 +196,6 @@ data class YamlFluentCommand(
                     )
                 )
             )
-
             waitForAnimationToEnd != null -> listOf(
                 MaestroCommand(
                     WaitForAnimationToEndCommand(
@@ -240,7 +203,6 @@ data class YamlFluentCommand(
                     )
                 )
             )
-
             evalScript != null -> listOf(
                 MaestroCommand(
                     EvalScriptCommand(
@@ -248,23 +210,16 @@ data class YamlFluentCommand(
                     )
                 )
             )
-
-            mockNetwork != null -> listOf(
-                MaestroCommand(
-                    MockNetworkCommand(
-                        mockNetwork,
-                    )
-                )
-            )
-
             scrollUntilVisible != null -> listOf(scrollUntilVisibleCommand(scrollUntilVisible))
             travel != null -> listOf(travelCommand(travel))
-            assertOutgoingRequest != null -> listOf(
-                assertOutgoingRequestsCommand(
-                    assertOutgoingRequest
-                )
-            )
-
+            startRecording != null -> listOf(MaestroCommand(StartRecordingCommand(startRecording.path)))
+            stopRecording != null -> listOf(MaestroCommand(StopRecordingCommand()))
+            doubleTapOn != null -> {
+                val yamlDelay = (doubleTapOn as? YamlElementSelector)?.delay?.toLong()
+                val delay = if (yamlDelay != null && yamlDelay >= 0) yamlDelay else TapOnElementCommand.DEFAULT_REPEAT_DELAY
+                val tapRepeat = TapRepeat(2, delay)
+                listOf(tapCommand(doubleTapOn, tapRepeat = tapRepeat))
+            }
             else -> throw SyntaxError("Invalid command: No mapping provided for $this")
         }
     }
@@ -289,23 +244,16 @@ data class YamlFluentCommand(
             }
             ?: runFlow(flowPath, runFlow)
 
+        val config = runFlow.file?.let {
+            readConfig(flowPath, runFlow.file)
+        }
+
         return MaestroCommand(
             RunFlowCommand(
                 commands = commands,
                 condition = runFlow.`when`?.toCondition(),
                 sourceDescription = runFlow.file,
-            )
-        )
-    }
-
-    private fun assertOutgoingRequestsCommand(command: YamlAssertOutgoingRequestsCommand): MaestroCommand {
-        return MaestroCommand(
-            AssertOutgoingRequestsCommand(
-                path = command.path,
-                headersPresent = command.headersPresent,
-                headersAndValues = command.headersAndValues,
-                httpMethodIs = command.httpMethodIs,
-                requestBodyContains = command.requestBodyContains,
+                config
             )
         )
     }
@@ -321,10 +269,8 @@ data class YamlFluentCommand(
                             throw SyntaxError("Invalid travel point: $point")
                         }
 
-                        val latitude = spitPoint[0].toDoubleOrNull()
-                            ?: throw SyntaxError("Invalid travel point latitude: $point")
-                        val longitude = spitPoint[1].toDoubleOrNull()
-                            ?: throw SyntaxError("Invalid travel point longitude: $point")
+                        val latitude = spitPoint[0].toDoubleOrNull() ?: throw SyntaxError("Invalid travel point latitude: $point")
+                        val longitude = spitPoint[1].toDoubleOrNull() ?: throw SyntaxError("Invalid travel point longitude: $point")
 
                         TravelCommand.GeoPoint(
                             latitude = latitude,
@@ -336,15 +282,14 @@ data class YamlFluentCommand(
         )
     }
 
-    private fun repeatCommand(repeat: YamlRepeatCommand, flowPath: Path, appId: String) =
-        MaestroCommand(
-            RepeatCommand(
-                times = repeat.times,
-                condition = repeat.`while`?.toCondition(),
-                commands = repeat.commands
-                    .flatMap { it.toCommands(flowPath, appId) },
-            )
+    private fun repeatCommand(repeat: YamlRepeatCommand, flowPath: Path, appId: String) = MaestroCommand(
+        RepeatCommand(
+            times = repeat.times,
+            condition = repeat.`while`?.toCondition(),
+            commands = repeat.commands
+                .flatMap { it.toCommands(flowPath, appId) },
         )
+    )
 
     private fun eraseCommand(eraseText: YamlEraseText): MaestroCommand {
         return if (eraseText.charactersToErase != null) {
@@ -380,6 +325,11 @@ data class YamlFluentCommand(
             .withEnv(command.env)
     }
 
+    private fun readConfig(flowPath: Path, commandFile: String): MaestroConfig? {
+        val runFlowPath = resolvePath(flowPath, commandFile)
+        return YamlCommandReader.readConfig(runFlowPath).toCommand(runFlowPath).applyConfigurationCommand?.config
+    }
+
     private fun resolvePath(flowPath: Path, requestedPath: String): Path {
         val path = flowPath.fileSystem.getPath(requestedPath)
 
@@ -389,19 +339,13 @@ data class YamlFluentCommand(
             flowPath.resolveSibling(path).toAbsolutePath()
         }
         if (resolvedPath.equals(flowPath.toAbsolutePath())) {
-            throw InvalidFlowFile(
-                "Referenced Flow file can't be the same as the main Flow file: ${resolvedPath.toUri()}",
-                resolvedPath
-            )
+            throw InvalidFlowFile("Referenced Flow file can't be the same as the main Flow file: ${resolvedPath.toUri()}", resolvedPath)
         }
         if (!resolvedPath.exists()) {
             throw InvalidFlowFile("Flow file does not exist: ${resolvedPath.toUri()}", resolvedPath)
         }
         if (resolvedPath.isDirectory()) {
-            throw InvalidFlowFile(
-                "Flow file can't be a directory: ${resolvedPath.toUri()}",
-                resolvedPath
-            )
+            throw InvalidFlowFile("Flow file can't be a directory: ${resolvedPath.toUri()}", resolvedPath)
         }
         return resolvedPath
     }
@@ -440,10 +384,18 @@ data class YamlFluentCommand(
     private fun tapCommand(
         tapOn: YamlElementSelectorUnion,
         longPress: Boolean = false,
+        tapRepeat: TapRepeat? = null
     ): MaestroCommand {
         val retryIfNoChange = (tapOn as? YamlElementSelector)?.retryTapIfNoChange ?: true
         val waitUntilVisible = (tapOn as? YamlElementSelector)?.waitUntilVisible ?: false
         val point = (tapOn as? YamlElementSelector)?.point
+
+        val delay = (tapOn as? YamlElementSelector)?.delay?.toLong()
+        val repeat = tapRepeat ?: (tapOn as? YamlElementSelector)?.repeat?.let {
+            val count = if (it <= 0) 1 else it
+            val d = if (delay != null && delay >= 0) delay else TapOnElementCommand.DEFAULT_REPEAT_DELAY
+            TapRepeat(count, d)
+        }
 
         return if (point != null) {
             MaestroCommand(
@@ -451,6 +403,7 @@ data class YamlFluentCommand(
                     point = point,
                     retryIfNoChange = retryIfNoChange,
                     longPress = longPress,
+                    repeat = repeat
                 )
             )
         } else {
@@ -460,6 +413,7 @@ data class YamlFluentCommand(
                     retryIfNoChange = retryIfNoChange,
                     waitUntilVisible = waitUntilVisible,
                     longPress = longPress,
+                    repeat = repeat
                 )
             )
         }
@@ -467,13 +421,7 @@ data class YamlFluentCommand(
 
     private fun swipeCommand(swipe: YamlSwipe): MaestroCommand {
         when (swipe) {
-            is YamlSwipeDirection -> return MaestroCommand(
-                SwipeCommand(
-                    direction = swipe.direction,
-                    duration = swipe.duration
-                )
-            )
-
+            is YamlSwipeDirection -> return MaestroCommand(SwipeCommand(direction = swipe.direction, duration = swipe.duration))
             is YamlCoordinateSwipe -> {
                 val start = swipe.start
                 val end = swipe.end
@@ -492,25 +440,13 @@ data class YamlFluentCommand(
                     }
                 endPoint = Point(endPoints[0], endPoints[1])
 
-                return MaestroCommand(
-                    SwipeCommand(
-                        startPoint = startPoint,
-                        endPoint = endPoint,
-                        duration = swipe.duration
-                    )
-                )
+                return MaestroCommand(SwipeCommand(startPoint = startPoint, endPoint = endPoint, duration = swipe.duration))
             }
-
             is YamlRelativeCoordinateSwipe -> {
                 return MaestroCommand(
-                    SwipeCommand(
-                        startRelative = swipe.start,
-                        endRelative = swipe.end,
-                        duration = swipe.duration
-                    )
+                    SwipeCommand(startRelative = swipe.start, endRelative = swipe.end, duration = swipe.duration)
                 )
             }
-
             is YamlSwipeElement -> return swipeElementCommand(swipe)
             else -> {
                 throw IllegalStateException(
@@ -532,20 +468,14 @@ data class YamlFluentCommand(
     }
 
     private fun toElementSelector(selectorUnion: YamlElementSelectorUnion): ElementSelector {
-        return when (selectorUnion) {
-            is StringElementSelector -> {
-                ElementSelector(
-                    textRegex = selectorUnion.value,
-                )
-            }
-
-            is YamlElementSelector -> {
-                toElementSelector(selectorUnion)
-            }
-
-            else -> {
-                throw IllegalStateException("Unknown selector type: $selectorUnion")
-            }
+        return if (selectorUnion is StringElementSelector) {
+            ElementSelector(
+                textRegex = selectorUnion.value,
+            )
+        } else if (selectorUnion is YamlElementSelector) {
+            toElementSelector(selectorUnion)
+        } else {
+            throw IllegalStateException("Unknown selector type: $selectorUnion")
         }
     }
 
@@ -570,7 +500,6 @@ data class YamlFluentCommand(
             rightOf = selector.rightOf?.let { toElementSelector(it) },
             containsChild = selector.containsChild?.let { toElementSelector(it) },
             containsDescendants = selector.containsDescendants?.map { toElementSelector(it) },
-            optional = selector.optional ?: false,
             traits = selector.traits
                 ?.split(" ")
                 ?.map { ElementTrait.valueOf(it.replace('-', '_').uppercase()) },
@@ -579,8 +508,7 @@ data class YamlFluentCommand(
             selected = selector.selected,
             checked = selector.checked,
             focused = selector.focused,
-            classNameRegex = selector.className,
-            packageNameRegex = selector.packageName
+            optional = selector.optional ?: false,
         )
     }
 
@@ -600,8 +528,7 @@ data class YamlFluentCommand(
                 ScrollUntilVisibleCommand.DEFAULT_TIMEOUT_IN_MILLIS
             } else yaml.timeout
 
-        val visibility =
-            if (yaml.visibilityPercentage < 0) 0 else if (yaml.visibilityPercentage > 100) 100 else yaml.visibilityPercentage
+        val visibility = if (yaml.visibilityPercentage < 0) 0 else if (yaml.visibilityPercentage > 100) 100 else yaml.visibilityPercentage
         return MaestroCommand(
             ScrollUntilVisibleCommand(
                 selector = toElementSelector(yaml.element),
@@ -694,63 +621,12 @@ data class YamlFluentCommand(
                     waitForAnimationToEnd = YamlWaitForAnimationToEndCommand(null)
                 )
 
+                "stopRecording" -> YamlFluentCommand(
+                    stopRecording = YamlStopRecording()
+                )
+
                 else -> throw SyntaxError("Invalid command: \"$stringCommand\"")
             }
         }
-
-        fun fromCommand(maestroCommand: MaestroCommand): YamlFluentCommand {
-            fun extractRecursiveSelector(elementSelector: ElementSelector)
-                : YamlElementSelector {
-                return with(elementSelector) {
-                    YamlElementSelector(
-                        text = textRegex,
-                        id = idRegex,
-                        width = size?.width,
-                        height = size?.height,
-                        enabled = enabled,
-                        checked = checked,
-                        focused = focused,
-                        selected = selected,
-                        above = above?.let { extractRecursiveSelector(it) },
-                        below = below?.let { extractRecursiveSelector(it) },
-                        leftOf = leftOf?.let { extractRecursiveSelector(it) },
-                        rightOf = rightOf?.let { extractRecursiveSelector(it) },
-                        containsChild = containsChild?.let { extractRecursiveSelector(it) },
-                        containsDescendants =
-                            containsDescendants?.map { extractRecursiveSelector(it) },
-                        index = index
-                    )
-                }
-            }
-
-            return when (maestroCommand.asCommand()) {
-                is TapOnElementCommand -> {
-                    val yamlCommand = maestroCommand.tapOnElement?.selector?.run {
-                        YamlFluentCommand(
-                            tapOn = extractRecursiveSelector(this)
-                        )
-                    }
-                    yamlCommand ?: YamlFluentCommand()
-                }
-                is BackPressCommand -> { YamlFluentCommand(action = "back") }
-                is HideKeyboardCommand -> { YamlFluentCommand(action = "hide keyboard") }
-                is ScrollCommand -> YamlFluentCommand(action = "scroll")
-                is PasteTextCommand -> YamlFluentCommand(action = "pasteText")
-                is ClearKeychainCommand -> YamlFluentCommand(action = "clearKeychain")
-                is LaunchAppCommand -> YamlFluentCommand(launchApp = YamlLaunchApp(
-                    stopApp = maestroCommand.launchAppCommand?.stopApp,
-                    appId = maestroCommand.launchAppCommand?.appId,
-                    clearState = maestroCommand.launchAppCommand?.clearState,
-                    arguments = maestroCommand.launchAppCommand?.launchArguments,
-                    clearKeychain = maestroCommand.launchAppCommand?.clearKeychain,
-                    permissions = maestroCommand.launchAppCommand?.permissions
-                ))
-                is StopAppCommand -> YamlFluentCommand(
-                    stopApp = YamlStopApp(maestroCommand.stopAppCommand?.appId)
-                )
-                else -> YamlFluentCommand()
-            }
-        }
-
     }
 }

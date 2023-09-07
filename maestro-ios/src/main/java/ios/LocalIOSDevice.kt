@@ -1,29 +1,27 @@
 package ios
 
-import com.github.michaelbull.result.Result
-import com.github.michaelbull.result.expect
-import com.github.michaelbull.result.getOrThrow
-import com.github.michaelbull.result.recoverIf
-import com.github.michaelbull.result.runCatching
-import hierarchy.XCUIElement
+import com.github.michaelbull.result.*
 import ios.device.DeviceInfo
-import ios.idb.IdbIOSDevice
 import ios.simctl.SimctlIOSDevice
 import ios.xctest.XCTestIOSDevice
 import okio.Sink
-import java.io.File
 import java.io.InputStream
 import java.util.UUID
+import hierarchy.ViewHierarchy
+import maestro.utils.Insight
+import maestro.utils.Insights
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 
 class LocalIOSDevice(
     override val deviceId: String?,
-    private val idbIOSDevice: IdbIOSDevice,
     private val xcTestDevice: XCTestIOSDevice,
     private val simctlIOSDevice: SimctlIOSDevice,
 ) : IOSDevice {
 
+    private val executor by lazy { Executors.newSingleThreadScheduledExecutor() }
+
     override fun open() {
-        idbIOSDevice.open()
         xcTestDevice.open()
     }
 
@@ -31,15 +29,27 @@ class LocalIOSDevice(
         return xcTestDevice.deviceInfo()
     }
 
-    override fun contentDescriptor(): Result<XCUIElement, Throwable> {
-        return xcTestDevice.contentDescriptor()
-            .recoverIf(
-                { it is XCTestIOSDevice.IllegalArgumentSnapshotFailure },
-                {
-                    idbIOSDevice.contentDescriptor()
-                        .getOrThrow()
+    override fun viewHierarchy(): Result<ViewHierarchy, Throwable> {
+        var isViewHierarchyInProgress = true
+        val future = executor.schedule(
+            {
+                if (isViewHierarchyInProgress) {
+                    Insights.report(
+                        Insight(
+                            message = "Retrieving the hierarchy is taking longer than usual. This might be due to a " +
+                                    "deep hierarchy in the current view. Please wait a bit more to complete the operation.",
+                            level = Insight.Level.WARNING,
+                        )
+                    )
                 }
-            )
+            }, 15, TimeUnit.SECONDS
+        )
+        val result = xcTestDevice.viewHierarchy()
+        isViewHierarchyInProgress = false
+        if (!future.isDone) {
+            future.cancel(false)
+        }
+        return result
     }
 
     override fun tap(x: Int, y: Int): Result<Unit, Throwable> {
@@ -80,14 +90,6 @@ class LocalIOSDevice(
         return simctlIOSDevice.uninstall(id)
     }
 
-    override fun pullAppState(id: String, file: File): Result<Unit, Throwable> {
-        return idbIOSDevice.pullAppState(id, file)
-    }
-
-    override fun pushAppState(id: String, file: File): Result<Unit, Throwable> {
-        return idbIOSDevice.pushAppState(id, file)
-    }
-
     override fun clearAppState(id: String): Result<Unit, Throwable> {
         return simctlIOSDevice.clearAppState(id)
     }
@@ -125,11 +127,10 @@ class LocalIOSDevice(
     }
 
     override fun isShutdown(): Boolean {
-        return idbIOSDevice.isShutdown() && xcTestDevice.isShutdown()
+        return xcTestDevice.isShutdown()
     }
 
     override fun close() {
-        idbIOSDevice.close()
         xcTestDevice.close()
         simctlIOSDevice.close()
     }
@@ -140,8 +141,8 @@ class LocalIOSDevice(
 
     override fun setPermissions(id: String, permissions: Map<String, String>): Result<Unit, Throwable> {
         return runCatching {
-            simctlIOSDevice.setPermissions(id, permissions).expect {  }
-            xcTestDevice.setPermissions(id, permissions).expect {  }
+            simctlIOSDevice.setPermissions(id, permissions).expect { }
+            xcTestDevice.setPermissions(id, permissions).expect { }
         }
     }
 

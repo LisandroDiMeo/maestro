@@ -2,21 +2,19 @@ package ios.xctest
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.github.michaelbull.result.Err
-import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.runCatching
-import hierarchy.Error
-import hierarchy.XCUIElement
+import hierarchy.ViewHierarchy
 import ios.IOSDevice
 import ios.IOSScreenRecording
 import ios.device.DeviceInfo
-import maestro.logger.Logger
+import logger.Logger
+import maestro.utils.DepthTracker
 import okio.Sink
 import okio.buffer
 import xcuitest.XCTestDriverClient
 import xcuitest.api.GetRunningAppIdResponse
 import xcuitest.api.IsScreenStaticResponse
-import java.io.File
 import java.io.InputStream
 import java.util.UUID
 
@@ -39,7 +37,7 @@ class XCTestIOSDevice(
                     if (!response.isSuccessful) {
                         val message = "${response.code} ${response.message} - $bodyString"
                         logger.info("Device info failed: $message")
-                        throw UnknownFailure(message)
+                        return Err(UnknownFailure(message))
                     }
 
                     bodyString ?: throw UnknownFailure("Error: response body missing")
@@ -53,41 +51,15 @@ class XCTestIOSDevice(
         }
     }
 
-    override fun contentDescriptor(): Result<XCUIElement, Throwable> {
-        val appId = activeAppId() ?: error("Unable to obtain active app id")
-
-        return when (val result = getViewHierarchy(appId)) {
-            is Ok -> result
-            is Err -> Err(result.error)
+    override fun viewHierarchy(): Result<ViewHierarchy, Throwable> {
+        val installedApps = getInstalledApps()
+        val result = runCatching {
+            val viewHierarchy = client.viewHierarchy(installedApps)
+            DepthTracker.trackDepth(viewHierarchy.depth)
+            logger.info("Depth received: ${viewHierarchy.depth}")
+            viewHierarchy
         }
-    }
-
-    private fun getViewHierarchy(appId: String): Result<XCUIElement, Throwable> {
-        return try {
-            client.subTree(appId).use {
-                it.body.use { body ->
-                    if (it.isSuccessful) {
-                        val xcUiElement = body?.let { response ->
-                            val responseString = String(response.bytes())
-                            mapper.readValue(responseString, XCUIElement::class.java)
-                        } ?: error("View Hierarchy not available, response body is null")
-                        Ok(xcUiElement)
-                    } else {
-                        val err = body?.let { response ->
-                            val errorResponse = String(response.bytes()).trim()
-                            val error = mapper.readValue(errorResponse, Error::class.java)
-                            when (error.errorCode) {
-                                VIEW_HIERARCHY_SNAPSHOT_ERROR_CODE -> Err(IllegalArgumentSnapshotFailure())
-                                else -> Err(UnknownFailure(errorResponse))
-                            }
-                        } ?: Err(UnknownFailure("Error body for view hierarchy request not available"))
-                        err
-                    }
-                }
-            }
-        } catch (exception: Throwable) {
-            Err(exception)
-        }
+        return result
     }
 
     override fun tap(x: Int, y: Int): Result<Unit, Throwable> {
@@ -145,20 +117,22 @@ class XCTestIOSDevice(
     ): Result<Unit, Throwable> {
         return runCatching {
             client.swipeV2(
-                appId = activeAppId() ?: error("Unable to obtain active app id"),
+                installedApps = getInstalledApps(),
                 startX = xStart,
                 startY = yStart,
                 endX = xEnd,
                 endY = yEnd,
-                duration = duration
+                duration = duration,
             ).use {}
         }
     }
 
     override fun input(text: String): Result<Unit, Throwable> {
         return runCatching {
+            val appIds = getInstalledApps()
             client.inputText(
                 text = text,
+                appIds = appIds,
             ).use {
                 if (!it.isSuccessful) {
                     if (it.code == 404) {
@@ -174,14 +148,6 @@ class XCTestIOSDevice(
     }
 
     override fun uninstall(id: String): Result<Unit, Throwable> {
-        error("Not supported")
-    }
-
-    override fun pullAppState(id: String, file: File): Result<Unit, Throwable> {
-        error("Not supported")
-    }
-
-    override fun pushAppState(id: String, file: File): Result<Unit, Throwable> {
         error("Not supported")
     }
 
@@ -288,7 +254,8 @@ class XCTestIOSDevice(
     }
 
     override fun eraseText(charactersToErase: Int) {
-        client.eraseText(charactersToErase).use {}
+        val appIds = getInstalledApps()
+        client.eraseText(charactersToErase, appIds).use {}
     }
 
     private fun activeAppId(): String? {
@@ -298,9 +265,9 @@ class XCTestIOSDevice(
         return client.runningAppId(appIds).use { response ->
             response.body.use { body ->
                 val runningAppBundleId = if (response.isSuccessful) {
-                    body?.let { body ->
+                    body?.let {
                         val responseBody: GetRunningAppIdResponse = mapper.readValue(
-                            String(body.bytes()),
+                            String(it.bytes()),
                             GetRunningAppIdResponse::class.java
                         )
                         val runningAppId = responseBody.runningAppBundleId

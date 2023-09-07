@@ -20,11 +20,15 @@
 package maestro.cli.runner
 
 import maestro.orchestra.MaestroCommand
+import maestro.utils.Insight
 
 data class CommandState(
     val status: CommandStatus,
     val command: MaestroCommand,
+    val subOnStartCommands: List<CommandState>?,
+    val subOnCompleteCommands: List<CommandState>?,
     val numberOfRuns: Int? = null,
     val subCommands: List<CommandState>? = null,
     val logMessages: List<String> = emptyList(),
+    val insight: Insight = Insight("", Insight.Level.NONE)
 )

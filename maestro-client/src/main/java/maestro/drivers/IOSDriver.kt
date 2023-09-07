@@ -19,14 +19,11 @@
 
 package maestro.drivers
 
-import com.github.michaelbull.result.Err
-import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.expect
+import com.github.michaelbull.result.get
 import com.github.michaelbull.result.getOrThrow
 import com.github.michaelbull.result.onSuccess
-import hierarchy.IdbElementNode
-import hierarchy.XCUIElement
-import hierarchy.XCUIElementNode
+import hierarchy.AXElement
 import ios.IOSDevice
 import maestro.Capability
 import maestro.DeviceInfo
@@ -42,9 +39,7 @@ import maestro.TreeNode
 import maestro.UiElement.Companion.toUiElement
 import maestro.UiElement.Companion.toUiElementOrNull
 import maestro.ViewHierarchy
-import maestro.utils.FileUtils
-import maestro.utils.MaestroTimer
-import maestro.utils.ScreenshotUtils
+import maestro.utils.*
 import okio.Sink
 import org.slf4j.LoggerFactory
 import util.XCRunnerCLIUtils
@@ -59,7 +54,6 @@ class IOSDriver(
     private val iosDevice: IOSDevice,
 ) : Driver {
 
-    private val executor by lazy { Executors.newSingleThreadExecutor() }
     private val deviceInfo by lazy {
         iosDevice.deviceInfo().expect {}
     }
@@ -124,29 +118,6 @@ class IOSDriver(
         iosDevice.clearKeychain().expect {}
     }
 
-    override fun pullAppState(appId: String, outFile: File) {
-        if (!outFile.exists()) outFile.createNewFile()
-        val tmpDir = Files.createTempDirectory("maestro_state_")
-
-        iosDevice.pullAppState(appId, tmpDir.toFile()).getOrThrow {
-            MaestroException.UnableToPullState("Unable to pull state for $appId. ${it.message}")
-        }
-
-        FileUtils.zipDir(tmpDir, outFile.toPath())
-        FileUtils.deleteDir(tmpDir)
-    }
-
-    override fun pushAppState(appId: String, stateFile: File) {
-        val tmpDir = Files.createTempDirectory("maestro_state_")
-        FileUtils.unzip(stateFile.toPath(), tmpDir)
-
-        iosDevice.pushAppState(appId, tmpDir.toFile()).getOrThrow {
-            MaestroException.UnableToPushState("Unable to push state for $appId. ${it.message}")
-        }
-
-        FileUtils.deleteDir(tmpDir)
-    }
-
     override fun tap(point: Point) {
         iosDevice.tap(point.x, point.y).expect {}
     }
@@ -181,92 +152,60 @@ class IOSDriver(
     }
 
     override fun contentDescriptor(): TreeNode {
-        return when (val contentDescriptorResult = iosDevice.contentDescriptor()) {
-            is Ok -> mapHierarchy(contentDescriptorResult.value)
-            is Err -> TreeNode()
-        }
+        return viewHierarchy()
     }
 
-    override fun isUnicodeInputSupported(): Boolean {
-        return true
+    fun viewHierarchy(): TreeNode {
+        LOGGER.info("Requesting view hierarchy of the screen")
+        val hierarchyResult = iosDevice.viewHierarchy().expect {  }
+        LOGGER.info("Depth of the screen is ${hierarchyResult.depth}")
+        if (hierarchyResult.depth > WARNING_MAX_DEPTH) {
+            val message = "The view hierarchy has been calculated. The current depth of the hierarchy " +
+                    "is ${hierarchyResult.depth}. This might affect the execution time of your test. " +
+                    "If you are using React native, consider migrating to the new " +
+                    "architecture where view flattening is available. For more information on the " +
+                    "migration process, please visit: https://reactnative.dev/docs/new-architecture-intro"
+            Insights.report(Insight(message, Insight.Level.INFO))
+        } else {
+            Insights.report(Insight("", Insight.Level.NONE))
+        }
+        val hierarchy = hierarchyResult.axElement
+        return mapViewHierarchy(hierarchy)
     }
 
-    private fun mapHierarchy(xcUiElement: XCUIElement): TreeNode {
-        return when (xcUiElement) {
-            is XCUIElementNode -> parseXCUIElementNode(xcUiElement)
-            is IdbElementNode -> parseIdbElementNode(xcUiElement)
-            else -> error("Illegal instance for parsing hierarchy")
-        }
-    }
-
-    private fun parseIdbElementNode(xcUiElement: IdbElementNode) = TreeNode(
-        children = xcUiElement.children.map {
-            val attributes = mutableMapOf<String, String>()
-
-            (it.title
-                ?: it.axLabel
-                ?: it.axValue
-                )?.let { title ->
-                    attributes["text"] = title
-                }
-
-            (it.axUniqueId)?.let { resourceId ->
-                attributes["resource-id"] = resourceId
-            }
-
-            it.frame.let { frame ->
-                val left = frame.x.toInt()
-                val top = frame.y.toInt()
-                val right = left + frame.width.toInt()
-                val bottom = top + frame.height.toInt()
-
-                attributes["bounds"] = "[$left,$top][$right,$bottom]"
-            }
-
-            TreeNode(
-                attributes = attributes,
-                enabled = it.enabled,
-            )
-        }
-    )
-
-    private fun parseXCUIElementNode(xcUiElement: XCUIElementNode): TreeNode {
+    private fun mapViewHierarchy(element: AXElement): TreeNode {
         val attributes = mutableMapOf<String, String>()
-        val text = xcUiElement.title?.ifEmpty {
-            xcUiElement.value
-        }
-        attributes["accessibilityText"] = xcUiElement.label
-        attributes["text"] = text ?: ""
-        attributes["hintText"] = xcUiElement.placeholderValue ?: ""
-        attributes["resource-id"] = xcUiElement.identifier
-        val right = xcUiElement.frame.x + xcUiElement.frame.width
-        val bottom = xcUiElement.frame.y + xcUiElement.frame.height
-        attributes["bounds"] = "[${xcUiElement.frame.x.toInt()},${xcUiElement.frame.y.toInt()}][${right.toInt()},${bottom.toInt()}]"
-        attributes["enabled"] = xcUiElement.enabled.toString()
-        attributes["focused"] = xcUiElement.hasFocus.toString()
-        attributes["selected"] = xcUiElement.selected.toString()
-        attributes["elementType"] = xcUiElement.elementType.toString()
-
-        val checked = xcUiElement.elementType in CHECKABLE_ELEMENTS && xcUiElement.value == "1"
+        attributes["accessibilityText"] = element.label
+        attributes["title"] = element.title ?: ""
+        attributes["value"] = element.value ?: ""
+        attributes["text"] = element.title?.ifEmpty { element.value } ?: ""
+        attributes["hintText"] = element.placeholderValue ?: ""
+        attributes["resource-id"] = element.identifier
+        attributes["bounds"] = element.frame.boundsString
+        attributes["enabled"] = element.enabled.toString()
+        attributes["focused"] = element.hasFocus.toString()
+        attributes["selected"] = element.selected.toString()
+        attributes["elementType"] = element.elementType.toString()
+        val checked = element.elementType in CHECKABLE_ELEMENTS && element.value == "1"
         attributes["checked"] = checked.toString()
 
-        val children = mutableListOf<TreeNode>()
-        val childNodes = xcUiElement.children
-        if (childNodes != null) {
-            (0 until childNodes.size).forEach { i ->
-                children += mapHierarchy(childNodes[i])
-            }
+        val children = element.children.map {
+            mapViewHierarchy(it)
         }
 
         return TreeNode(
             attributes = attributes,
             children = children,
-            enabled = xcUiElement.enabled,
-            focused = xcUiElement.hasFocus,
-            selected = xcUiElement.selected,
+            enabled = element.enabled,
+            focused = element.hasFocus,
+            selected = element.selected,
             checked = checked,
-            clickable = xcUiElement.isClickable()
+            clickable = element.isClickable()
         )
+    }
+
+    override fun isUnicodeInputSupported(): Boolean {
+        return true
     }
 
     override fun scrollVertical() {
@@ -386,33 +325,25 @@ class IOSDriver(
     override fun backPress() {}
 
     override fun hideKeyboard() {
-        val future = executor.submit {
-            dismissKeyboardIntroduction()
+        dismissKeyboardIntroduction()
 
-            if (isKeyboardHidden()) return@submit
+        if (isKeyboardHidden()) return
 
-            swipe(
-                start = Point(widthPercentToPoint(0.5), heightPercentToPoint(0.5)),
-                end = Point(widthPercentToPoint(0.5), heightPercentToPoint(0.47)),
-                durationMs = 50,
-            )
+        swipe(
+            start = Point(widthPercentToPoint(0.5), heightPercentToPoint(0.5)),
+            end = Point(widthPercentToPoint(0.5), heightPercentToPoint(0.47)),
+            durationMs = 50,
+        )
 
-            if (isKeyboardHidden()) return@submit
+        if (isKeyboardHidden()) return
 
-            swipe(
-                start = Point(widthPercentToPoint(0.5), heightPercentToPoint(0.5)),
-                end = Point(widthPercentToPoint(0.47), heightPercentToPoint(0.5)),
-                durationMs = 50,
-            )
+        swipe(
+            start = Point(widthPercentToPoint(0.5), heightPercentToPoint(0.5)),
+            end = Point(widthPercentToPoint(0.47), heightPercentToPoint(0.5)),
+            durationMs = 50,
+        )
 
-            waitForAppToSettle(null, null)
-        }
-        try {
-            future.get(5, TimeUnit.SECONDS)
-        } catch (_: Exception) {
-            // swallow the timeout and exceptions
-            future.cancel(true)
-        }
+        waitForAppToSettle(null, null)
     }
 
     private fun isKeyboardHidden(): Boolean {
@@ -530,6 +461,8 @@ class IOSDriver(
         private const val ELEMENT_TYPE_CHECKBOX = 12
         private const val ELEMENT_TYPE_SWITCH = 40
         private const val ELEMENT_TYPE_TOGGLE = 41
+
+        private const val WARNING_MAX_DEPTH = 61
 
         private val CHECKABLE_ELEMENTS = setOf(
             ELEMENT_TYPE_CHECKBOX,

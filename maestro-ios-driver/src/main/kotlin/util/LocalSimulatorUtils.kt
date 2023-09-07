@@ -25,8 +25,8 @@ object LocalSimulatorUtils {
         return jacksonObjectMapper().readValue(json)
     }
 
-    fun awaitLaunch(deviceId: String) {
-        MaestroTimer.withTimeout(30000) {
+    fun awaitLaunch(deviceId: String, timeout: Long= 30000) {
+        MaestroTimer.withTimeout(timeout) {
             if (list()
                     .devices
                     .values
@@ -56,7 +56,7 @@ object LocalSimulatorUtils {
         return process.inputStream.bufferedReader().readLine()
     }
 
-    fun launchSimulator(deviceId: String) {
+    fun bootSimulator(deviceId: String) {
         runCommand(
             listOf(
                 "xcrun",
@@ -65,7 +65,8 @@ object LocalSimulatorUtils {
                 deviceId
             )
         )
-
+    }
+    fun launchSimulator(deviceId: String) {
         val simulatorPath = "${xcodePath()}/Applications/Simulator.app"
         var exceptionToThrow: Exception? = null
 

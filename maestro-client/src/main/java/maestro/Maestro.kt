@@ -33,6 +33,7 @@ import org.slf4j.LoggerFactory
 import java.awt.image.BufferedImage
 import java.io.File
 import java.util.UUID
+import kotlin.system.measureTimeMillis
 
 @Suppress("unused", "MemberVisibilityCanBePrivate")
 class Maestro(private val driver: Driver) : AutoCloseable {
@@ -42,6 +43,8 @@ class Maestro(private val driver: Driver) : AutoCloseable {
     private val cachedDeviceInfo by lazy {
         fetchDeviceInfo()
     }
+
+    private var screenRecordingInProgress = false
 
     fun deviceName(): String {
         return driver.name()
@@ -90,18 +93,6 @@ class Maestro(private val driver: Driver) : AutoCloseable {
         LOGGER.info("Clearing keychain")
 
         driver.clearKeychain()
-    }
-
-    fun pullAppState(appId: String, outFile: File) {
-        LOGGER.info("Pulling app state: $appId")
-
-        driver.pullAppState(appId, outFile)
-    }
-
-    fun pushAppState(appId: String, stateFile: File) {
-        LOGGER.info("Pushing app state: $appId")
-
-        driver.pushAppState(appId, stateFile)
     }
 
     fun backPress() {
@@ -175,9 +166,10 @@ class Maestro(private val driver: Driver) : AutoCloseable {
         retryIfNoChange: Boolean = true,
         waitUntilVisible: Boolean = false,
         longPress: Boolean = false,
-        appId: String? = null
+        appId: String? = null,
+        tapRepeat: TapRepeat? = null
     ) {
-        LOGGER.info("Tapping on element: $element")
+        LOGGER.info("Tapping on element: ${tapRepeat ?: ""} $element")
 
         val hierarchyBeforeTap = waitForAppToSettle(initialHierarchy, appId) ?: initialHierarchy
 
@@ -190,11 +182,12 @@ class Maestro(private val driver: Driver) : AutoCloseable {
             ).bounds
             .center()
         performTap(
-            center.x,
-            center.y,
-            retryIfNoChange,
-            longPress,
-            hierarchyBeforeTap,
+            x = center.x,
+            y = center.y,
+            retryIfNoChange = retryIfNoChange,
+            longPress = longPress,
+            initialHierarchy = hierarchyBeforeTap,
+            tapRepeat = tapRepeat
         )
 
         if (waitUntilVisible) {
@@ -208,11 +201,12 @@ class Maestro(private val driver: Driver) : AutoCloseable {
                 val hierarchy = waitUntilVisible(element)
 
                 tap(
-                    element,
-                    hierarchy,
+                    element = element,
+                    initialHierarchy = hierarchy,
                     retryIfNoChange = false,
                     waitUntilVisible = false,
                     longPress = longPress,
+                    tapRepeat = tapRepeat
                 )
             }
         }
@@ -223,6 +217,7 @@ class Maestro(private val driver: Driver) : AutoCloseable {
         percentY: Int,
         retryIfNoChange: Boolean = true,
         longPress: Boolean = false,
+        tapRepeat: TapRepeat? = null
     ) {
         val x = cachedDeviceInfo.widthGrid * percentX / 100
         val y = cachedDeviceInfo.heightGrid * percentY / 100
@@ -231,6 +226,7 @@ class Maestro(private val driver: Driver) : AutoCloseable {
             y = y,
             retryIfNoChange = retryIfNoChange,
             longPress = longPress,
+            tapRepeat = tapRepeat
         )
     }
 
@@ -239,8 +235,15 @@ class Maestro(private val driver: Driver) : AutoCloseable {
         y: Int,
         retryIfNoChange: Boolean = true,
         longPress: Boolean = false,
+        tapRepeat: TapRepeat? = null,
     ) {
-        performTap(x, y, retryIfNoChange, longPress)
+        performTap(
+            x = x,
+            y = y,
+            retryIfNoChange = retryIfNoChange,
+            longPress = longPress,
+            tapRepeat = tapRepeat
+        )
     }
 
     private fun getNumberOfRetries(retryIfNoChange: Boolean): Int {
@@ -252,14 +255,15 @@ class Maestro(private val driver: Driver) : AutoCloseable {
         y: Int,
         retryIfNoChange: Boolean = true,
         longPress: Boolean = false,
-        initialHierarchy: ViewHierarchy? = null
+        initialHierarchy: ViewHierarchy? = null,
+        tapRepeat: TapRepeat? = null
     ) {
         val capabilities = driver.capabilities()
 
         if (Capability.FAST_HIERARCHY in capabilities) {
-            hierarchyBasedTap(x, y, retryIfNoChange, longPress, initialHierarchy)
+            hierarchyBasedTap(x, y, retryIfNoChange, longPress, initialHierarchy, tapRepeat)
         } else {
-            screenshotBasedTap(x, y, retryIfNoChange, longPress, initialHierarchy)
+            screenshotBasedTap(x, y, retryIfNoChange, longPress, initialHierarchy, tapRepeat)
         }
     }
 
@@ -268,7 +272,8 @@ class Maestro(private val driver: Driver) : AutoCloseable {
         y: Int,
         retryIfNoChange: Boolean = true,
         longPress: Boolean = false,
-        initialHierarchy: ViewHierarchy? = null
+        initialHierarchy: ViewHierarchy? = null,
+        tapRepeat: TapRepeat? = null
     ) {
         LOGGER.info("Tapping at ($x, $y) using screenshot based logic for wait")
 
@@ -278,9 +283,16 @@ class Maestro(private val driver: Driver) : AutoCloseable {
         repeat(retries) {
             if (longPress) {
                 driver.longPress(Point(x, y))
-            } else {
-                driver.tap(Point(x, y))
-            }
+            } else if (tapRepeat != null) {
+                for (i in 0 until tapRepeat.repeat) {
+
+                    // subtract execution duration from tap delay
+                    val duration = measureTimeMillis { driver.tap(Point(x, y)) }
+                    val delay = if (duration >= tapRepeat.delay) 0 else tapRepeat.delay - duration
+
+                    if (tapRepeat.repeat > 1) Thread.sleep(delay) // do not wait for single taps
+                }
+            } else driver.tap(Point(x, y))
             val hierarchyAfterTap = waitForAppToSettle()
 
             if (hierarchyAfterTap == null || hierarchyBeforeTap != hierarchyAfterTap) {
@@ -295,7 +307,8 @@ class Maestro(private val driver: Driver) : AutoCloseable {
         y: Int,
         retryIfNoChange: Boolean = true,
         longPress: Boolean = false,
-        initialHierarchy: ViewHierarchy? = null
+        initialHierarchy: ViewHierarchy? = null,
+        tapRepeat: TapRepeat? = null
     ) {
         LOGGER.info("Tapping at ($x, $y) using hierarchy based logic for wait")
 
@@ -306,6 +319,15 @@ class Maestro(private val driver: Driver) : AutoCloseable {
         repeat(retries) {
             if (longPress) {
                 driver.longPress(Point(x, y))
+            } else if (tapRepeat != null) {
+                for (i in 0 until tapRepeat.repeat) {
+
+                    // subtract execution duration from tap delay
+                    val duration = measureTimeMillis { driver.tap(Point(x, y)) }
+                    val delay = if (duration >= tapRepeat.delay) 0 else tapRepeat.delay - duration
+
+                    if (tapRepeat.repeat > 1) Thread.sleep(delay) // do not wait for single taps
+                }
             } else {
                 driver.tap(Point(x, y))
             }
@@ -440,7 +462,7 @@ class Maestro(private val driver: Driver) : AutoCloseable {
         driver.close()
     }
 
-    fun takeScreenshot(outFile: File) {
+    fun takeScreenshot(outFile: File, compressed: Boolean) {
         LOGGER.info("Taking screenshot: $outFile")
 
         val absoluteOutFile = outFile.absoluteFile
@@ -450,7 +472,7 @@ class Maestro(private val driver: Driver) : AutoCloseable {
                 .sink()
                 .buffer()
                 .use {
-                    ScreenshotUtils.takeScreenshot(it, false, driver)
+                    ScreenshotUtils.takeScreenshot(it, compressed, driver)
                 }
         } else {
             throw MaestroException.DestinationIsNotWritable(
@@ -460,6 +482,16 @@ class Maestro(private val driver: Driver) : AutoCloseable {
     }
 
     fun startScreenRecording(out: Sink): ScreenRecording {
+        if (screenRecordingInProgress) {
+            LOGGER.info("Screen recording not started: Already in progress")
+            return object : ScreenRecording {
+                override fun close() {
+                    // No-op
+                }
+            }
+        }
+        screenRecordingInProgress = true
+
         LOGGER.info("Starting screen recording")
         val screenRecording = driver.startScreenRecording(out)
         val startTimestamp = System.currentTimeMillis()
@@ -473,6 +505,7 @@ class Maestro(private val driver: Driver) : AutoCloseable {
                     Thread.sleep(durationPadding)
                 }
                 screenRecording.close()
+                screenRecordingInProgress = false
             }
         }
     }
@@ -517,27 +550,6 @@ class Maestro(private val driver: Driver) : AutoCloseable {
 
     fun isUnicodeInputSupported(): Boolean {
         return driver.isUnicodeInputSupported()
-    }
-
-    fun assertOutgoingRequest(
-        path: String? = null,
-        assertHeaderIsPresent: List<String> = emptyList(),
-        assertHeadersAndValues: Map<String, String> = emptyMap(),
-        assertHttpMethod: String? = null,
-        assertRequestBodyContains: String? = null,
-    ): Boolean {
-        val events = AssertOutgoingRequestService.getMockEvents(sessionId)
-        if (events.isEmpty()) return false
-
-        val rules = OutgoingRequestRules(
-            path = path,
-            headersPresent = assertHeaderIsPresent,
-            headersAndValues = assertHeadersAndValues,
-            httpMethodIs = assertHttpMethod,
-            requestBodyContains = assertRequestBodyContains,
-        )
-        val matched = AssertOutgoingRequestService.match(events, rules)
-        return matched.isNotEmpty()
     }
 
     companion object {

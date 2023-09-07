@@ -3,7 +3,7 @@ package ios.simctl
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.runCatching
-import hierarchy.XCUIElement
+import hierarchy.ViewHierarchy
 import ios.IOSDevice
 import ios.IOSScreenRecording
 import ios.device.DeviceInfo
@@ -31,7 +31,7 @@ class SimctlIOSDevice(
         TODO("Not yet implemented")
     }
 
-    override fun contentDescriptor(): Result<XCUIElement, Throwable> {
+    override fun viewHierarchy(): Result<ViewHierarchy, Throwable> {
         TODO("Not yet implemented")
     }
 
@@ -69,14 +69,6 @@ class SimctlIOSDevice(
         return runCatching {
             LocalSimulatorUtils.uninstall(deviceId, id)
         }
-    }
-
-    override fun pullAppState(id: String, file: File): Result<Unit, Throwable> {
-        TODO("Not yet implemented")
-    }
-
-    override fun pushAppState(id: String, file: File): Result<Unit, Throwable> {
-        TODO("Not yet implemented")
     }
 
     override fun clearAppState(id: String): Result<Unit, Throwable> {

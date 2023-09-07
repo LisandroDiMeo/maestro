@@ -19,6 +19,7 @@
 
 package maestro.cli.runner
 
+import io.ktor.client.utils.EmptyContent.status
 import maestro.Maestro
 import maestro.MaestroException
 import maestro.cli.device.Device
@@ -30,9 +31,11 @@ import maestro.cli.runner.resultview.UiState
 import maestro.orchestra.ApplyConfigurationCommand
 import maestro.orchestra.CompositeCommand
 import maestro.orchestra.MaestroCommand
+import maestro.orchestra.MaestroConfig
 import maestro.orchestra.Orchestra
 import maestro.orchestra.OrchestraAppState
 import maestro.orchestra.yaml.YamlCommandReader
+import maestro.utils.Insight
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.util.IdentityHashMap
@@ -46,10 +49,12 @@ object MaestroCommandRunner {
         device: Device?,
         view: ResultView,
         commands: List<MaestroCommand>,
-        cachedAppState: OrchestraAppState?,
         debug: FlowDebugMetadata
     ): Result {
-        val initFlow = YamlCommandReader.getConfig(commands)?.initFlow
+        val config = YamlCommandReader.getConfig(commands)
+        val initFlow = config?.initFlow
+        val onFlowComplete = config?.onFlowComplete
+        val onFlowStart = config?.onFlowStart
 
         val commandStatuses = IdentityHashMap<MaestroCommand, CommandStatus>()
         val commandMetadata = IdentityHashMap<MaestroCommand, Orchestra.CommandMetadata>()
@@ -69,7 +74,7 @@ object MaestroCommandRunner {
             val result = kotlin.runCatching {
                 val out = File.createTempFile("screenshot-${System.currentTimeMillis()}", ".png")
                     .also { it.deleteOnExit() } // save to another dir before exiting
-                maestro.takeScreenshot(out)
+                maestro.takeScreenshot(out, false)
                 debugScreenshots.add(
                     ScreenshotDebugMetadata(
                         screenshot = out,
@@ -89,6 +94,16 @@ object MaestroCommandRunner {
                     device = device,
                     initCommands = toCommandStates(
                         initFlow?.commands ?: emptyList(),
+                        commandStatuses,
+                        commandMetadata
+                    ),
+                    onFlowStartCommands = toCommandStates(
+                        onFlowStart?.commands ?: emptyList(),
+                        commandStatuses,
+                        commandMetadata
+                    ),
+                    onFlowCompleteCommands = toCommandStates(
+                        onFlowComplete?.commands ?: emptyList(),
                         commandStatuses,
                         commandMetadata
                     ),
@@ -167,23 +182,15 @@ object MaestroCommandRunner {
             },
         )
 
-        val cachedState = if (cachedAppState == null) {
-            initFlow?.let {
-                orchestra.runInitFlow(it) ?: return Result(flowSuccess = false, cachedAppState = null)
-            }
-        } else {
-            initFlow?.commands?.forEach { commandStatuses[it] = CommandStatus.COMPLETED }
-            cachedAppState
-        }
+        val flowSuccess = orchestra.runFlow(commands)
 
-        val flowSuccess = orchestra.runFlow(commands, cachedState)
-        return Result(flowSuccess = flowSuccess, cachedAppState = cachedState)
+        return Result(flowSuccess = flowSuccess, cachedAppState = null)
     }
 
     private fun toCommandStates(
         commands: List<MaestroCommand>,
         commandStatuses: MutableMap<MaestroCommand, CommandStatus>,
-        commandMetadata: IdentityHashMap<MaestroCommand, Orchestra.CommandMetadata>
+        commandMetadata: IdentityHashMap<MaestroCommand, Orchestra.CommandMetadata>,
     ): List<CommandState> {
         return commands
             // Don't render configuration commands
@@ -191,12 +198,21 @@ object MaestroCommandRunner {
             .mapIndexed { _, command ->
                 CommandState(
                     command = commandMetadata[command]?.evaluatedCommand ?: command,
+                    subOnStartCommands = (command.asCommand() as? CompositeCommand)
+                        ?.config()
+                        ?.onFlowStart
+                        ?.let { toCommandStates(it.commands, commandStatuses, commandMetadata) },
+                    subOnCompleteCommands = (command.asCommand() as? CompositeCommand)
+                        ?.config()
+                        ?.onFlowComplete
+                        ?.let { toCommandStates(it.commands, commandStatuses, commandMetadata) },
                     status = commandStatuses[command] ?: CommandStatus.PENDING,
                     numberOfRuns = commandMetadata[command]?.numberOfRuns,
                     subCommands = (command.asCommand() as? CompositeCommand)
                         ?.subCommands()
                         ?.let { toCommandStates(it, commandStatuses, commandMetadata) },
                     logMessages = commandMetadata[command]?.logMessages ?: emptyList(),
+                    insight = commandMetadata[command]?.insight ?: Insight("", Insight.Level.NONE)
                 )
             }
     }

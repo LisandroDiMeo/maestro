@@ -22,6 +22,9 @@ package maestro.cli.runner.resultview
 import io.ktor.util.encodeBase64
 import maestro.cli.runner.CommandState
 import maestro.cli.runner.CommandStatus
+import maestro.utils.Insight
+import maestro.utils.Insights
+import maestro.utils.chunkStringByWordCount
 import org.fusesource.jansi.Ansi
 
 class AnsiResultView(
@@ -69,11 +72,23 @@ class AnsiResultView(
             render(" ║\n")
             renderCommands(state.initCommands)
         }
+        if (state.onFlowStartCommands.isNotEmpty()) {
+            render(" ║\n")
+            render(" ║  > On Flow Start\n")
+            render(" ║\n")
+            renderCommands(state.onFlowStartCommands)
+        }
         render(" ║\n")
         render(" ║  > Flow\n")
         render(" ║\n")
         renderCommands(state.commands)
         render(" ║\n")
+        if (state.onFlowCompleteCommands.isNotEmpty()) {
+            render(" ║\n")
+            render(" ║  > On Flow Complete\n")
+            render(" ║\n")
+            renderCommands(state.onFlowCompleteCommands)
+        }
         renderPrompt()
     }
 
@@ -105,7 +120,7 @@ class AnsiResultView(
         render(
             commandState.command.description()
                 .replace("(?<!\\\\)\\\$\\{.*}".toRegex()) { match ->
-                    "@|cyan ${match.value} |@"
+                    "@|cyan ${match.value}|@"
                 }
         )
 
@@ -122,12 +137,36 @@ class AnsiResultView(
             printLogMessages(indent, commandState)
         }
 
-        val expandSubCommands = commandState.status in setOf(CommandStatus.RUNNING, CommandStatus.FAILED) &&
+        if (commandState.insight.level != Insight.Level.NONE) {
+            printInsight(indent, commandState.insight)
+        }
+
+        val subCommandsHasNotPending =
             (commandState.subCommands?.any { subCommand -> subCommand.status != CommandStatus.PENDING } ?: false)
+        val onStartHasNotPending =
+            (commandState.subOnStartCommands?.any { subCommand -> subCommand.status != CommandStatus.PENDING } ?: false)
+        val onCompleteHasNotPending =
+            (commandState.subOnCompleteCommands?.any { subCommand -> subCommand.status != CommandStatus.PENDING } ?: false)
+        val expandSubCommands = commandState.status in setOf(CommandStatus.RUNNING, CommandStatus.FAILED) &&
+                (subCommandsHasNotPending || onStartHasNotPending || onCompleteHasNotPending)
 
         if (expandSubCommands) {
+            commandState.subOnStartCommands?.let {
+                render(" ║\n")
+                render(" ║  > On Flow Start\n")
+                render(" ║\n")
+                renderCommands(it)
+            }
+
             commandState.subCommands?.let { subCommands ->
                 renderCommands(subCommands, indent + 1)
+            }
+
+            commandState.subOnCompleteCommands?.let {
+                render(" ║\n")
+                render(" ║  > On Flow Complete\n")
+                render(" ║\n")
+                renderCommands(it)
             }
         }
     }
@@ -135,12 +174,26 @@ class AnsiResultView(
     private fun Ansi.printLogMessages(indent: Int, commandState: CommandState) {
         renderLineStart(indent + 1)
         render("   ")   // Space that a status symbol would normally occupy
-        render("@|yellow Log messages: |@\n")
+        render("@|yellow Log messages:|@\n")
 
         commandState.logMessages.forEach {
             renderLineStart(indent + 2)
             render("   ")   // Space that a status symbol would normally occupy
             render(it)
+            render("\n")
+        }
+    }
+
+    private fun Ansi.printInsight(indent: Int, insight: Insight) {
+        val level = insight.level.toString().lowercase().replaceFirstChar(Char::uppercase)
+        renderLineStart(indent + 1)
+        render("   ")   // Space that a status symbol would normally occupy
+        render("@|yellow $level:|@\n")
+
+        insight.message.chunkStringByWordCount(12).forEach { chunkedMessage ->
+            renderLineStart(indent + 2)
+            render("   ")   // Space that a status symbol would normally occupy
+            render(chunkedMessage)
             render("\n")
         }
     }
