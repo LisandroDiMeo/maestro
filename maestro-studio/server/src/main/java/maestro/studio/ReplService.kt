@@ -15,7 +15,6 @@ import io.ktor.server.routing.post
 import maestro.Maestro
 import maestro.orchestra.MaestroCommand
 import maestro.orchestra.Orchestra
-import maestro.orchestra.runcycle.FlowFileRunCycle
 import maestro.orchestra.yaml.YamlCommandReader
 import maestro.orchestra.yaml.YamlFluentCommand
 import java.nio.file.Paths
@@ -134,14 +133,12 @@ object ReplService {
                         runEntries(maestro, request.ids)
                     }
                 }
-
                 request.yaml != null -> {
                     val newEntries = createEntries(request.yaml)
                     thread {
                         runEntries(maestro, newEntries.map { it.id })
                     }
                 }
-
                 else -> {
                     call.respond(HttpStatusCode.BadRequest, "Must specify key \"ids\" or \"yaml\"")
                 }
@@ -161,9 +158,7 @@ object ReplService {
         routing.post("/api/repl/command/format") {
             val request = call.parseBody<FormatCommandsRequest>()
             val entries = state.getEntriesById(request.ids)
-            val inferredAppId =
-                entries.firstNotNullOfOrNull { e -> e.commands.firstNotNullOfOrNull { c -> c.launchAppCommand?.appId } }
-                    ?: "<your-app-id>"
+            val inferredAppId = entries.firstNotNullOfOrNull { e -> e.commands.firstNotNullOfOrNull { c -> c.launchAppCommand?.appId } } ?: "<your-app-id>"
             val commandsString = entries.joinToString("") { if (it.yaml.endsWith("\n")) it.yaml else "${it.yaml}\n" }
             val formattedFlow = FormattedFlow("appId: $inferredAppId", commandsString)
             val response = jacksonObjectMapper().writeValueAsString(formattedFlow)
@@ -217,15 +212,9 @@ object ReplService {
 
     private fun executeCommands(maestro: Maestro, commands: List<MaestroCommand>): Throwable? {
         var failure: Throwable? = null
-        val result = Orchestra(maestro, runCycle = object : FlowFileRunCycle() {
-            override fun onCommandFailed(
-                commandId: Int,
-                command: MaestroCommand,
-                error: Throwable
-            ): Orchestra.ErrorResolution {
-                failure = error
-                return Orchestra.ErrorResolution.FAIL
-            }
+        val result = Orchestra(maestro, onCommandFailed = { _, _, throwable ->
+            failure = throwable
+            Orchestra.ErrorResolution.FAIL
         }).executeCommands(commands)
         return if (result) null else (failure ?: RuntimeException("Command execution failed"))
     }
