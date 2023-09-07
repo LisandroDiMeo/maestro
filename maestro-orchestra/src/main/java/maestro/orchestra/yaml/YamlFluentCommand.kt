@@ -551,6 +551,60 @@ data class YamlFluentCommand(
 
     companion object {
 
+        fun fromCommand(maestroCommand: MaestroCommand): YamlFluentCommand {
+            fun extractRecursiveSelector(elementSelector: ElementSelector)
+                    : YamlElementSelector {
+                return with(elementSelector) {
+                    YamlElementSelector(
+                        text = textRegex,
+                        id = idRegex,
+                        width = size?.width,
+                        height = size?.height,
+                        enabled = enabled,
+                        checked = checked,
+                        focused = focused,
+                        selected = selected,
+                        above = above?.let { extractRecursiveSelector(it) },
+                        below = below?.let { extractRecursiveSelector(it) },
+                        leftOf = leftOf?.let { extractRecursiveSelector(it) },
+                        rightOf = rightOf?.let { extractRecursiveSelector(it) },
+                        containsChild = containsChild?.let { extractRecursiveSelector(it) },
+                        containsDescendants =
+                        containsDescendants?.map { extractRecursiveSelector(it) },
+                        index = index
+                    )
+                }
+            }
+
+            return when (maestroCommand.asCommand()) {
+                is TapOnElementCommand -> {
+                    val yamlCommand = maestroCommand.tapOnElement?.selector?.run {
+                        YamlFluentCommand(
+                            tapOn = extractRecursiveSelector(this)
+                        )
+                    }
+                    yamlCommand ?: YamlFluentCommand()
+                }
+                is BackPressCommand -> { YamlFluentCommand(action = "back") }
+                is HideKeyboardCommand -> { YamlFluentCommand(action = "hide keyboard") }
+                is ScrollCommand -> YamlFluentCommand(action = "scroll")
+                is PasteTextCommand -> YamlFluentCommand(action = "pasteText")
+                is ClearKeychainCommand -> YamlFluentCommand(action = "clearKeychain")
+                is LaunchAppCommand -> YamlFluentCommand(launchApp = YamlLaunchApp(
+                    stopApp = maestroCommand.launchAppCommand?.stopApp,
+                    appId = maestroCommand.launchAppCommand?.appId,
+                    clearState = maestroCommand.launchAppCommand?.clearState,
+                    arguments = maestroCommand.launchAppCommand?.launchArguments,
+                    clearKeychain = maestroCommand.launchAppCommand?.clearKeychain,
+                    permissions = maestroCommand.launchAppCommand?.permissions
+                ))
+                is StopAppCommand -> YamlFluentCommand(
+                    stopApp = YamlStopApp(maestroCommand.stopAppCommand?.appId)
+                )
+                else -> YamlFluentCommand()
+            }
+        }
+
         @Suppress("unused")
         @JvmStatic
         @JsonCreator(mode = JsonCreator.Mode.DELEGATING)

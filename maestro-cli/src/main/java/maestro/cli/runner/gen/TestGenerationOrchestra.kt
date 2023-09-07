@@ -11,8 +11,9 @@ import maestro.Maestro
 import maestro.MaestroException
 import maestro.ViewHierarchy
 import maestro.cli.runner.gen.hierarchyanalyzer.HierarchyAnalyzer
+import maestro.js.GraalJsEngine
 import maestro.js.JsEngine
-import maestro.networkproxy.NetworkProxy
+import maestro.js.RhinoJsEngine
 import maestro.orchestra.BackPressCommand
 import maestro.orchestra.ElementSelector
 import maestro.orchestra.HideKeyboardCommand
@@ -30,6 +31,7 @@ import maestro.orchestra.filter.FilterWithDescription
 import maestro.orchestra.filter.TraitFilters
 import maestro.orchestra.runcycle.RunCycle
 import maestro.utils.StringUtils.toRegexSafe
+import okhttp3.OkHttpClient
 import java.io.File
 
 class TestGenerationOrchestra(
@@ -38,7 +40,7 @@ class TestGenerationOrchestra(
     private val lookupTimeoutMs: Long = 17000L,
     private val runCycle: RunCycle,
     private val hierarchyAnalyzer: HierarchyAnalyzer,
-    private val jsEngine: JsEngine = JsEngine(),
+    private val httpClient: OkHttpClient? = null,
     private val testSize: Int = 5,
     private val endTestIfOutsideApp: Boolean = false
 ) {
@@ -48,8 +50,23 @@ class TestGenerationOrchestra(
     private var deviceInfo: DeviceInfo? = null
     private val commandsGenerated = mutableListOf<MaestroCommand>()
 
+    private lateinit var jsEngine: JsEngine
+
+    @Synchronized
+    private fun initJsEngine() {
+        if (this::jsEngine.isInitialized) {
+            jsEngine.close()
+        }
+        val shouldUseGraalJs = true
+        jsEngine = if (shouldUseGraalJs) {
+            httpClient?.let { GraalJsEngine(it) } ?: GraalJsEngine()
+        } else {
+            httpClient?.let { RhinoJsEngine(it) } ?: RhinoJsEngine()
+        }
+    }
+
     fun startGeneration() {
-        jsEngine.init()
+        initJsEngine()
         commandsGenerated.clear()
         openApplication()
         // TODO's: improve active waits

@@ -1,6 +1,6 @@
 package maestro.cli.runner.gen.hierarchyanalyzer
 
-import hierarchy.XCUIElementDeserializer.Companion.ELEMENT_TYPES
+import hierarchy.AXElement.Companion.ELEMENT_TYPES
 import maestro.TreeNode
 import maestro.ViewHierarchy
 import maestro.cli.runner.gen.commandselection.CommandSelectionStrategy
