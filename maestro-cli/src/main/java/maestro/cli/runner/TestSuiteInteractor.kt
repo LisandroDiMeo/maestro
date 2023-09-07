@@ -1,10 +1,12 @@
 package maestro.cli.runner
 
 import maestro.Maestro
+import maestro.MaestroException
 import maestro.cli.CliError
 import maestro.cli.device.Device
 import maestro.cli.model.FlowStatus
 import maestro.cli.model.TestExecutionSummary
+import maestro.cli.report.CommandDebugMetadata
 import maestro.cli.report.FlowDebugMetadata
 import maestro.cli.report.ScreenshotDebugMetadata
 import maestro.cli.report.TestDebugReporter
@@ -175,15 +177,46 @@ class TestSuiteInteractor(
 
                 val config = YamlCommandReader.getConfig(commands)
 
-                val testSuiteInteractorCycle = TestSuiteInteractorCycle(
-                    logger,
-                    debug,
-                    ::takeDebugScreenshot
-                )
-
                 val orchestra = Orchestra(
                     maestro = maestro,
-                    runCycle = testSuiteInteractorCycle
+                    onCommandStart = { _, command ->
+                        logger.info("${command.description()} RUNNING")
+                        debugCommands[command] = CommandDebugMetadata(
+                            timestamp = System.currentTimeMillis(),
+                            status = CommandStatus.RUNNING
+                        )
+                    },
+                    onCommandComplete = { _, command ->
+                        logger.info("${command.description()} COMPLETED")
+                        debugCommands[command]?.let {
+                            it.status = CommandStatus.COMPLETED
+                            it.calculateDuration()
+                        }
+                    },
+                    onCommandFailed = { _, command, e ->
+                        logger.info("${command.description()} FAILED")
+                        if (e is MaestroException) debug.exception = e
+                        debugCommands[command]?.let {
+                            it.status = CommandStatus.FAILED
+                            it.calculateDuration()
+                            it.error = e
+                        }
+
+                        takeDebugScreenshot(CommandStatus.FAILED)
+                        Orchestra.ErrorResolution.FAIL
+                    },
+                    onCommandSkipped = { _, command ->
+                        logger.info("${command.description()} SKIPPED")
+                        debugCommands[command]?.let {
+                            it.status = CommandStatus.SKIPPED
+                        }
+                    },
+                    onCommandReset = { command ->
+                        logger.info("${command.description()} PENDING")
+                        debugCommands[command]?.let {
+                            it.status = CommandStatus.PENDING
+                        }
+                    },
                 )
 
                 config?.name?.let {
@@ -225,5 +258,3 @@ class TestSuiteInteractor(
     }
 
 }
-
-
