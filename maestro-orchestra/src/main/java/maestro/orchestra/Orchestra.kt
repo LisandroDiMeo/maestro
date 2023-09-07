@@ -34,7 +34,6 @@ import maestro.orchestra.error.UnicodeNotSupportedError
 import maestro.orchestra.filter.FilterWithDescription
 import maestro.orchestra.filter.TraitFilters
 import maestro.orchestra.geo.Traveller
-import maestro.orchestra.runcycle.FlowFileRunCycle
 import maestro.orchestra.util.Env.evaluateScripts
 import maestro.orchestra.yaml.YamlCommandReader
 import maestro.toSwipeDirection
@@ -51,7 +50,13 @@ class Orchestra(
     private val lookupTimeoutMs: Long = 17000L,
     private val optionalLookupTimeoutMs: Long = 7000L,
     private val networkProxy: NetworkProxy = NetworkProxy(port = 8085),
-    private val runCycle: FlowFileRunCycle,
+    private val onFlowStart: (List<MaestroCommand>) -> Unit = {},
+    private val onCommandStart: (Int, MaestroCommand) -> Unit = { _, _ -> },
+    private val onCommandComplete: (Int, MaestroCommand) -> Unit = { _, _ -> },
+    private val onCommandFailed: (Int, MaestroCommand, Throwable) -> ErrorResolution = { _, _, e -> throw e },
+    private val onCommandSkipped: (Int, MaestroCommand) -> Unit = { _, _ -> },
+    private val onCommandReset: (MaestroCommand) -> Unit = {},
+    private val onCommandMetadataUpdate: (MaestroCommand, CommandMetadata) -> Unit = { _, _ -> },
     private val jsEngine: JsEngine = JsEngine(),
 ) {
 
@@ -84,7 +89,7 @@ class Orchestra(
             maestro.pushAppState(state.appId, state.file)
         }
 
-        runCycle.onFlowStart(commands)
+        onFlowStart(commands)
         return executeCommands(commands, config)
     }
 
@@ -124,7 +129,7 @@ class Orchestra(
 
         commands
             .forEachIndexed { index, command ->
-                runCycle.onCommandStart(index, command)
+                onCommandStart(index, command)
 
                 jsEngine.onLogMessage { msg ->
                     val metadata = getMetadata(command)
@@ -143,13 +148,12 @@ class Orchestra(
 
                 try {
                     executeCommand(evaluatedCommand, config)
-                    runCycle.onCommandComplete(index, command)
+                    onCommandComplete(index, command)
                 } catch (ignored: CommandSkipped) {
                     // Swallow exception
-                    runCycle.onCommandSkipped(index, command)
+                    onCommandSkipped(index, command)
                 } catch (e: Throwable) {
-
-                    when (runCycle.onCommandFailed(index, command, e)) {
+                    when (onCommandFailed(index, command, e)) {
                         ErrorResolution.FAIL -> return false
                         ErrorResolution.CONTINUE -> {
                             // Do nothing
@@ -407,7 +411,7 @@ class Orchestra(
 
     private fun updateMetadata(rawCommand: MaestroCommand, metadata: CommandMetadata) {
         rawCommandToMetadata[rawCommand] = metadata
-        runCycle.onCommandMetadataUpdate(rawCommand, metadata)
+        onCommandMetadataUpdate(rawCommand, metadata)
     }
 
     private fun getMetadata(rawCommand: MaestroCommand) = rawCommandToMetadata.getOrPut(rawCommand) {
@@ -415,7 +419,7 @@ class Orchestra(
     }
 
     private fun resetCommand(command: MaestroCommand) {
-        runCycle.onCommandReset(command)
+        onCommandReset(command)
 
         (command.asCommand() as? CompositeCommand)?.let {
             it.subCommands().forEach { command ->
@@ -507,7 +511,7 @@ class Orchestra(
         return try {
             commands
                 .mapIndexed { index, command ->
-                    runCycle.onCommandStart(index, command)
+                    onCommandStart(index, command)
 
                     val evaluatedCommand = command.evaluateScripts(jsEngine)
                     val metadata = getMetadata(command)
@@ -519,14 +523,14 @@ class Orchestra(
                     return@mapIndexed try {
                         executeCommand(evaluatedCommand, config)
                             .also {
-                                runCycle.onCommandComplete(index, command)
+                                onCommandComplete(index, command)
                             }
                     } catch (ignored: CommandSkipped) {
                         // Swallow exception
-                        runCycle.onCommandSkipped(index, command)
+                        onCommandSkipped(index, command)
                         false
                     } catch (e: Throwable) {
-                        when (runCycle.onCommandFailed(index, command, e)) {
+                        when (onCommandFailed(index, command, e)) {
                             ErrorResolution.FAIL -> throw e
                             ErrorResolution.CONTINUE -> {
                                 // Do nothing
@@ -925,7 +929,7 @@ class Orchestra(
     private fun resolveText(attributes: MutableMap<String, String>): String? {
         return if (!attributes["text"].isNullOrEmpty()) {
             attributes["text"]
-        } else if (!attributes["hintText"].isNullOrEmpty()) {
+        } else if(!attributes["hintText"].isNullOrEmpty()) {
             attributes["hintText"]
         } else {
             attributes["accessibilityText"]

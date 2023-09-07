@@ -57,7 +57,7 @@ class AndroidHierarchyAnalyzer(
     override fun isOutsideApp(hierarchy: ViewHierarchy, packageName: String): Boolean {
         return hierarchy
             .aggregate()
-            .any { it.attributes["packageName"] == packageName }
+            .none { it.attributes["packageName"] == packageName }
     }
 
     companion object {

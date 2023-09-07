@@ -59,7 +59,7 @@ class IOSHierarchyAnalyzer(
     }
 
     override fun isOutsideApp(hierarchy: ViewHierarchy, packageName: String): Boolean {
-        return !hierarchy.aggregate().any { it.attributes.values.toString().contains(packageName) }
+        return hierarchy.aggregate().none { it.attributes.values.toString().contains(packageName) }
     }
 
     private fun shouldBeIgnored(elementType: String): Boolean = when (elementType) {
