@@ -10,7 +10,6 @@ import maestro.cli.device.Platform
 import maestro.cli.runner.gen.TestGenerationOrchestra
 import maestro.cli.runner.gen.commandselection.CommandSelectionStrategy
 import maestro.cli.runner.gen.hierarchyanalyzer.AndroidHierarchyAnalyzer
-import maestro.cli.runner.gen.commandselection.RandomCommandSelection
 import maestro.cli.runner.gen.hierarchyanalyzer.IOSHierarchyAnalyzer
 import maestro.cli.runner.gen.viewdisambiguator.AndroidViewDisambiguator
 import maestro.cli.runner.gen.viewdisambiguator.IosViewDisambiguator
@@ -38,10 +37,7 @@ class TestSuiteGenerator(
 
     init {
         LogConfig.switchLogbackConfiguration(
-            "/Users/lisandrodimeo/"
-                + "Documents/Me/maestro/"
-                + "maestro-cli/src/main/"
-                + "resources/logback-generative.xml"
+            "maestro-cli/src/main/resources/logback-generative.xml"
         )
     }
 
@@ -49,15 +45,17 @@ class TestSuiteGenerator(
 
     fun generate() {
         val strategy = CommandSelectionStrategy.strategyFor(strategy)
-        val analyzer = when(device?.platform) {
+        val analyzer = when (device?.platform) {
             Platform.ANDROID -> AndroidHierarchyAnalyzer(
                 strategy,
                 AndroidViewDisambiguator()
             )
+
             Platform.IOS -> IOSHierarchyAnalyzer(
                 strategy,
                 IosViewDisambiguator()
             )
+
             else -> null
         }
         analyzer?.let {
@@ -69,7 +67,7 @@ class TestSuiteGenerator(
                 testSize = testSize,
                 endTestIfOutsideApp = endTestIfOutsideApp
             )
-            for(testId in 1..testSuiteSize) {
+            for (testId in 1..testSuiteSize) {
                 testGenerator.startGeneration()
                 generateFlowFile(testGenerator.generatedCommands(), testId)
             }
@@ -112,10 +110,7 @@ class TestSuiteGeneratorCycle(private val logger: Logger) : RunCycle() {
 
     init {
         LogConfig.switchLogbackConfiguration(
-            "/Users/lisandrodimeo/"
-                + "Documents/Me/maestro/"
-                + "maestro-cli/src/main/"
-                + "resources/logback-generative.xml"
+            "maestro-cli/src/main/resources/logback-generative.xml"
         )
     }
 

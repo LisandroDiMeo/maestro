@@ -20,7 +20,6 @@
 package maestro.orchestra
 
 import maestro.KeyCode
-import maestro.Maestro
 import maestro.Point
 import maestro.ScrollDirection
 import maestro.SwipeDirection
@@ -37,16 +36,6 @@ sealed interface Command {
 
     fun visible(): Boolean = true
 
-    // fun visit(maestro: MaestroCommandHost)
-
-}
-
-class MaestroCommandHost {
-    fun accept(maestroCommand: MaestroCommand) {
-        // maestroCommand.asCommand()?.visit(this)
-    }
-
-    fun swipe(swipeCommand: SwipeCommand){}
 }
 
 sealed interface CompositeCommand : Command {
@@ -70,15 +59,19 @@ data class SwipeCommand(
             elementSelector != null && direction != null -> {
                 "Swiping in $direction direction on ${elementSelector.description()}"
             }
+
             direction != null -> {
                 "Swiping in $direction direction in $duration ms"
             }
+
             startPoint != null && endPoint != null -> {
                 "Swipe from (${startPoint.x},${startPoint.y}) to (${endPoint.x},${endPoint.y}) in $duration ms"
             }
+
             startRelative != null && endRelative != null -> {
                 "Swipe from ($startRelative) to ($endRelative) in $duration ms"
             }
+
             else -> "Invalid input to swipe command"
         }
     }
@@ -397,7 +390,9 @@ data class LaunchAppCommand(
             appId = appId.evaluateScripts(jsEngine),
             launchArguments = launchArguments?.entries?.associate {
                 val value = it.value
-                it.key.evaluateScripts(jsEngine) to if (value is String) value.evaluateScripts(jsEngine) else it.value
+                it.key.evaluateScripts(jsEngine) to if (value is String) value.evaluateScripts(
+                    jsEngine
+                ) else it.value
             },
         )
     }
@@ -643,9 +638,11 @@ data class RepeatCommand(
             condition != null && timesInt > 1 -> {
                 "Repeat while ${condition.description()} (up to $timesInt times)"
             }
+
             condition != null -> {
                 "Repeat while ${condition.description()}"
             }
+
             timesInt > 1 -> "Repeat $timesInt times"
             else -> "Repeat indefinitely"
         }
@@ -747,8 +744,8 @@ data class TravelCommand(
             val dLon = Math.toRadians(another.longitude - longitude)
 
             val a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-                Math.cos(Math.toRadians(latitude)) * Math.cos(Math.toRadians(another.latitude)) *
-                Math.sin(dLon / 2) * Math.sin(dLon / 2)
+                    Math.cos(Math.toRadians(latitude)) * Math.cos(Math.toRadians(another.latitude)) *
+                    Math.sin(dLon / 2) * Math.sin(dLon / 2)
 
             val c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
             val distance = earthRadius * c * 1000 // convert to meters

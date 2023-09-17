@@ -79,7 +79,4 @@ object LogConfig {
         }
     }
 
-    object Filter {
-
-    }
 }

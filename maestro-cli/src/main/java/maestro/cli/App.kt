@@ -48,6 +48,7 @@ import kotlin.system.exitProcess
         LogoutCommand::class,
         BugReportCommand::class,
         StudioCommand::class,
+        StartDeviceCommand::class,
         GenerateCommand::class
     ]
 )
