@@ -27,6 +27,7 @@ import maestro.TapRepeat
 import maestro.js.JsEngine
 import maestro.orchestra.util.Env.evaluateScripts
 import maestro.orchestra.util.InputRandomTextHelper
+import java.nio.file.Path
 
 sealed interface Command {
 
@@ -97,7 +98,8 @@ data class ScrollUntilVisibleCommand(
     val direction: ScrollDirection,
     val scrollDuration: Long,
     val visibilityPercentage: Int,
-    val timeout: Long = DEFAULT_TIMEOUT_IN_MILLIS
+    val timeout: Long = DEFAULT_TIMEOUT_IN_MILLIS,
+    val centerElement: Boolean
 ) : Command {
 
     val visibilityPercentageNormalized = (visibilityPercentage / 100).toDouble()
@@ -116,6 +118,7 @@ data class ScrollUntilVisibleCommand(
         const val DEFAULT_TIMEOUT_IN_MILLIS = 20 * 1000L
         const val DEFAULT_SCROLL_DURATION = 40
         const val DEFAULT_ELEMENT_VISIBILITY_PERCENTAGE = 100
+        const val DEFAULT_CENTER_ELEMENT = false
     }
 }
 
@@ -325,7 +328,9 @@ data class AssertConditionCommand(
     private val timeout: String? = null,
 ) : Command {
 
-    fun timeoutMs() = timeout?.toLong()
+    fun timeoutMs(): Long? {
+        return timeout?.replace("_", "")?.toLong()
+    }
 
     override fun description(): String {
         return "Assert that ${condition.description()}"
@@ -774,6 +779,19 @@ data class StartRecordingCommand(val path: String) : Command {
     override fun evaluateScripts(jsEngine: JsEngine): StartRecordingCommand {
         return copy(
             path = path.evaluateScripts(jsEngine),
+        )
+    }
+}
+
+data class AddMediaCommand(val mediaPaths: List<String>): Command {
+
+    override fun description(): String {
+        return "Adding media files(${mediaPaths.size}) to the device"
+    }
+
+    override fun evaluateScripts(jsEngine: JsEngine): Command {
+        return copy(
+            mediaPaths = mediaPaths.map { it.evaluateScripts(jsEngine) }
         )
     }
 }
