@@ -106,7 +106,7 @@ class TestGenerationOrchestra(
     private fun openApplication() {
         val launchAppCommand = LaunchAppCommand(
             appId = packageName,
-            clearState = true,
+            clearState = false,
             clearKeychain = null,
             stopApp = true,
         )

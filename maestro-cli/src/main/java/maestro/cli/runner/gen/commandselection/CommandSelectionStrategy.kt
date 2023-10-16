@@ -1,5 +1,6 @@
 package maestro.cli.runner.gen.commandselection
 
+import maestro.cli.runner.gen.viewranking.ViewRanking
 import maestro.orchestra.MaestroCommand
 
 interface CommandSelectionStrategy {
@@ -12,6 +13,7 @@ interface CommandSelectionStrategy {
         fun strategyFor(strategy: String): CommandSelectionStrategy {
             return when(strategy.lowercase()) {
                 "random" -> RandomCommandSelection()
+                "viewranking" -> ViewRanking()
                 else -> RandomCommandSelection()
             }
         }

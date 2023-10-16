@@ -585,6 +585,18 @@ data class YamlFluentCommand(
                     }
                     yamlCommand ?: YamlFluentCommand()
                 }
+                is InputRandomCommand -> {
+                    YamlFluentCommand(
+                        action = "inputRandomText",
+                        inputRandomText = YamlInputRandomText(length = 8),
+                    )
+                }
+                is EraseTextCommand -> {
+                    YamlFluentCommand(
+                        action = "eraseText",
+                        eraseText = YamlEraseText(charactersToErase = 50)
+                    )
+                }
                 is BackPressCommand -> { YamlFluentCommand(action = "back") }
                 is HideKeyboardCommand -> { YamlFluentCommand(action = "hide keyboard") }
                 is ScrollCommand -> YamlFluentCommand(action = "scroll")
