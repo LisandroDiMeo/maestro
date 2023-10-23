@@ -24,6 +24,7 @@ import maestro.Point
 import maestro.ScrollDirection
 import maestro.SwipeDirection
 import maestro.TapRepeat
+import maestro.TreeNode
 import maestro.js.JsEngine
 import maestro.orchestra.util.Env.evaluateScripts
 import maestro.orchestra.util.InputRandomTextHelper
@@ -172,7 +173,7 @@ class BackPressCommand : Command {
     }
 }
 
-class HideKeyboardCommand : Command {
+class HideKeyboardCommand(val origin: Pair<MaestroCommand, TreeNode>? = null) : Command {
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -456,6 +457,7 @@ data class PressKeyCommand(
 
 data class EraseTextCommand(
     val charactersToErase: Int?,
+    val origin: Pair<MaestroCommand, TreeNode>? = null
 ) : Command {
 
     override fun description(): String {
@@ -546,6 +548,7 @@ enum class InputRandomType {
 data class InputRandomCommand(
     val inputType: InputRandomType? = InputRandomType.TEXT,
     val length: Int? = 8,
+    val origin: Pair<MaestroCommand, TreeNode>? = null
 ) : Command {
 
     fun genRandomString(): String {

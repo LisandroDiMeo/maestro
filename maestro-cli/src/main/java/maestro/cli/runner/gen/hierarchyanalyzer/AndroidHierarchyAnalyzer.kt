@@ -33,7 +33,10 @@ class AndroidHierarchyAnalyzer(
                 }
             }
         }
-        return selectionStrategy.pickFrom(commands.map { MaestroCommand(it) })
+        val commandToExecute = selectionStrategy.pickFrom(commands.map { MaestroCommand(it) })
+        val u = availableWidgets.firstOrNull { (it.second == commandToExecute.tapOnElement!!.selector) }?.first ?: TreeNode()
+        previousAction = commandToExecute to u
+        return commandToExecute
     }
 
     override fun isScrollable(nodes: List<TreeNode>): Boolean {
