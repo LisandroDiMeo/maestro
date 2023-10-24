@@ -7,7 +7,6 @@ import maestro.cli.runner.gen.viewdisambiguator.ViewDisambiguator
 import maestro.orchestra.BackPressCommand
 import maestro.orchestra.Command
 import maestro.orchestra.MaestroCommand
-import maestro.orchestra.ScrollCommand
 import maestro.orchestra.TapOnElementCommand
 
 class AndroidHierarchyAnalyzer(
@@ -16,11 +15,14 @@ class AndroidHierarchyAnalyzer(
 ) : HierarchyAnalyzer(viewDisambiguator) {
     override fun fetchCommandFrom(hierarchy: ViewHierarchy): MaestroCommand {
         val flattenNodes = hierarchy.aggregate()
-        val availableWidgets = extractWidgets(hierarchy, flattenNodes)
-        val commands = mutableListOf<Command>()
-        commands.addAll(keyboardOpenCommandsIfOpen(flattenNodes))
-        commands.add(BackPressCommand())
-        scrollCommandIfScrollable(flattenNodes)?.let { commands.add(it) }
+        val availableWidgets = extractWidgets(
+            hierarchy,
+            flattenNodes
+        )
+        val commands = mutableListOf<Pair<Command, TreeNode?>>()
+        commands.addAll(keyboardOpenCommandsIfOpen(flattenNodes).map { it to hierarchy.root })
+        commands.add(BackPressCommand() to hierarchy.root)
+        scrollCommandIfScrollable(flattenNodes)?.let { commands.add(it to hierarchy.root) }
 
         // Generate Tap commands
         availableWidgets.forEach { (node, selector) ->
@@ -29,12 +31,18 @@ class AndroidHierarchyAnalyzer(
                     val resourceAndPackage =
                         node.attributes["resource-id"] + "-" + node.attributes["packageName"]
                     if (ignoredResources.all { res -> !resourceAndPackage.contains(res) })
-                        commands.add(TapOnElementCommand(selector))
+                        commands.add(TapOnElementCommand(selector) to node)
                 }
             }
         }
-        val commandToExecute = selectionStrategy.pickFrom(commands.map { MaestroCommand(it) })
-        val u = availableWidgets.firstOrNull { (it.second == commandToExecute.tapOnElement!!.selector) }?.first ?: TreeNode()
+        val commandToExecute = selectionStrategy.pickFrom(
+            commands.map { (command, node) -> MaestroCommand(command) to node },
+            hierarchy.root,
+            false
+        )
+        val u =
+            availableWidgets.firstOrNull { (it.second == commandToExecute.tapOnElement!!.selector) }?.first
+                ?: TreeNode()
         previousAction = commandToExecute to u
         return commandToExecute
     }
@@ -57,7 +65,10 @@ class AndroidHierarchyAnalyzer(
         }
     }
 
-    override fun isOutsideApp(hierarchy: ViewHierarchy, packageName: String): Boolean {
+    override fun isOutsideApp(
+        hierarchy: ViewHierarchy,
+        packageName: String
+    ): Boolean {
         return hierarchy
             .aggregate()
             .none { it.attributes["packageName"] == packageName }

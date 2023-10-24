@@ -1,4 +1,4 @@
-package maestro.cli.report
+package maestro.cli.generative
 
 import maestro.TreeNode
 import maestro.cli.runner.gen.viewranking.actionhash.TreeDirectionHasher
@@ -36,7 +36,7 @@ class ActionHasherTest {
                     ),
                 ),
             )
-        ).run { TreeIndexer.simplifyTree(this) }
+        ).run { TreeIndexer.addTypeAndIndex(this) }
         val treeB = TreeNode(
             attributes = mutableMapOf(
                 "letter" to "E",
@@ -56,7 +56,7 @@ class ActionHasherTest {
                     ),
                 ),
             )
-        ).run { TreeIndexer.simplifyTree(this) }
+        ).run { TreeIndexer.addTypeAndIndex(this) }
         val hashA = actionHasher.hashAction(
             treeA,
             MaestroCommand(backPressCommand = BackPressCommand()),
@@ -96,7 +96,7 @@ class ActionHasherTest {
                     ),
                 ),
             )
-        ).run { TreeIndexer.simplifyTree(this) }
+        ).run { TreeIndexer.addTypeAndIndex(this) }
         val treeB = TreeNode(
             attributes = mutableMapOf(
                 "letter" to "A",
@@ -118,7 +118,7 @@ class ActionHasherTest {
                     ),
                 ),
             )
-        ).run { TreeIndexer.simplifyTree(this) }
+        ).run { TreeIndexer.addTypeAndIndex(this) }
         val hashA = actionHasher.hashAction(
             treeA,
             MaestroCommand(backPressCommand = BackPressCommand()),
@@ -158,7 +158,7 @@ class ActionHasherTest {
                     ),
                 ),
             )
-        ).run { TreeIndexer.simplifyTree(this) }
+        ).run { TreeIndexer.addTypeAndIndex(this) }
         val hashA = actionHasher.hashAction(treeA,
                                             MaestroCommand(tapOnElement = TapOnElementCommand(ElementSelector())),
                                             treeA.aggregate()
@@ -196,7 +196,7 @@ class ActionHasherTest {
                     ),
                 ),
             )
-        ).run { TreeIndexer.simplifyTree(this) }
+        ).run { TreeIndexer.addTypeAndIndex(this) }
         val hashA = actionHasher.hashAction(treeA,
                                             MaestroCommand(tapOnElement = TapOnElementCommand(ElementSelector())),
                                             treeA.aggregate()
@@ -234,7 +234,7 @@ class ActionHasherTest {
                     ),
                 ),
             )
-        ).run { TreeIndexer.simplifyTree(this) }
+        ).run { TreeIndexer.addTypeAndIndex(this) }
         val treeB = TreeNode(
             attributes = mutableMapOf(
                 "letter" to "A",
@@ -256,7 +256,7 @@ class ActionHasherTest {
                     ),
                 ),
             )
-        ).run { TreeIndexer.simplifyTree(this) }
+        ).run { TreeIndexer.addTypeAndIndex(this) }
         val hashA = actionHasher.hashAction(treeA,
                                             MaestroCommand(tapOnElement = TapOnElementCommand(ElementSelector())),
                                             treeA.aggregate()
@@ -294,7 +294,7 @@ class ActionHasherTest {
                     ),
                 ),
             )
-        ).run { TreeIndexer.simplifyTree(this) }
+        ).run { TreeIndexer.addTypeAndIndex(this) }
         val treeB = TreeNode(
             attributes = mutableMapOf(
                 "letter" to "A",
@@ -316,7 +316,7 @@ class ActionHasherTest {
                     ),
                 ),
             )
-        ).run { TreeIndexer.simplifyTree(this) }
+        ).run { TreeIndexer.addTypeAndIndex(this) }
         val hashA = actionHasher.hashAction(treeA,
                                             MaestroCommand(tapOnElement = TapOnElementCommand(ElementSelector())),
                                             treeA.aggregate()
@@ -354,7 +354,7 @@ class ActionHasherTest {
                     ),
                 ),
             )
-        ).run { TreeIndexer.simplifyTree(this) }
+        ).run { TreeIndexer.addTypeAndIndex(this) }
         val hashA = actionHasher.hashAction(
             treeA,
             MaestroCommand(InputRandomCommand(origin = MaestroCommand(BackPressCommand()) to TreeNode())),
@@ -401,7 +401,7 @@ class ActionHasherTest {
                     ),
                 ),
             )
-        ).run { TreeIndexer.simplifyTree(this) }
+        ).run { TreeIndexer.addTypeAndIndex(this) }
         val treeB = TreeNode(
             attributes = mutableMapOf(
                 "letter" to "A",
@@ -424,7 +424,7 @@ class ActionHasherTest {
                     ),
                 ),
             )
-        ).run { TreeIndexer.simplifyTree(this) }
+        ).run { TreeIndexer.addTypeAndIndex(this) }
         val hashA = actionHasher.hashAction(
             treeA,
             MaestroCommand(

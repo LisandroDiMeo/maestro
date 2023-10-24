@@ -18,6 +18,7 @@ class TreeDirectionHasher : ActionHasher {
         action: MaestroCommand,
         view: TreeNode?
     ): String {
+        val simpleTree = TreeIndexer.removeVisualAttributes(root)
         return if (action.tapOnElement != null) {
             // Tap based action, has a selector
             val directionHash = directionsFor(
@@ -25,32 +26,32 @@ class TreeDirectionHasher : ActionHasher {
                 view!!
             ).hashCode()
             val typeHash = view.attributes["type"].hashCode()
-            "${root.hashCode()}-$directionHash-$typeHash"
+            "${simpleTree.hashCode()}-$directionHash-$typeHash"
         } else {
             // Remove structural attributes (such as text, resource id, etc)
             // and only keep a type attribute (elementType or className).
             val extraHash = when {
                 action.inputRandomTextCommand != null -> {
                     val origin = action.inputRandomTextCommand?.origin
-                    origin?.second.hashCode()
+                    origin?.second?.run { TreeIndexer.removeVisualAttributes(this) }.hashCode()
                         .toString() + origin?.first?.asCommand()?.javaClass.hashCode().toString()
                 }
 
                 action.hideKeyboardCommand != null -> {
                     val origin = action.hideKeyboardCommand?.origin
-                    origin?.second.hashCode()
+                    origin?.second?.run { TreeIndexer.removeVisualAttributes(this) }.hashCode()
                         .toString() + origin?.first?.asCommand()?.javaClass.hashCode().toString()
                 }
 
                 action.eraseTextCommand != null -> {
                     val origin = action.eraseTextCommand?.origin
-                    origin?.second.hashCode()
+                    origin?.second?.run { TreeIndexer.removeVisualAttributes(this) }.hashCode()
                         .toString() + origin?.first?.asCommand()?.javaClass.hashCode().toString()
                 }
 
                 else -> action.hashCode().toString()
             }
-            root.hashCode().toString() + extraHash
+            simpleTree.hashCode().toString() + extraHash
         }
     }
 
@@ -105,7 +106,7 @@ class TreeDirectionHasher : ActionHasher {
 
 object TreeIndexer {
 
-    fun simplifyTree(root: TreeNode): TreeNode {
+    fun addTypeAndIndex(root: TreeNode): TreeNode {
         val newTree = root.copy()
         addIndexesToTree(
             newTree,
@@ -114,12 +115,28 @@ object TreeIndexer {
         return newTree
     }
 
-    fun addIndexesToTree(
+    fun removeVisualAttributes(root: TreeNode): TreeNode {
+        val newTree = root.copy()
+        removeVisualAttributesInplace(newTree)
+        return newTree
+    }
+
+    private fun removeVisualAttributesInplace(root: TreeNode) {
+        val index = root.attributes["index"]
+        val type = root.attributes["type"]
+        root.attributes.clear()
+        root.attributes["index"] = index ?: ""
+        root.attributes["type"] = type ?: ""
+        root.children.forEach {
+            removeVisualAttributesInplace(it)
+        }
+    }
+
+    private fun addIndexesToTree(
         root: TreeNode,
         i: Int = 0
     ): Int {
         val type = ((root.attributes["elementType"] ?: "").ifEmpty { root.attributes["className"] })
-        root.attributes.clear()
         root.attributes["index"] = i.toString()
         root.attributes["type"] = type ?: ""
         var k = i + 1
@@ -133,31 +150,3 @@ object TreeIndexer {
     }
 }
 
-
-fun main() {
-
-}
-
-private fun testAddIndex() {
-    val t = TreeNode(
-        attributes = mutableMapOf("letter" to "R"),
-        children = listOf(
-            TreeNode(
-                attributes = mutableMapOf("letter" to "A"),
-                children = listOf(
-                    TreeNode(
-                        attributes = mutableMapOf("letter" to "C"),
-                    ),
-                    TreeNode(
-                        attributes = mutableMapOf("letter" to "D"),
-                    )
-                )
-            ),
-            TreeNode(
-                attributes = mutableMapOf("letter" to "B"),
-            )
-        )
-    )
-    TreeIndexer.addIndexesToTree(t)
-    println(t.aggregate().map { it.attributes["index"] + "-" + it.attributes["letter"] }.toString())
-}

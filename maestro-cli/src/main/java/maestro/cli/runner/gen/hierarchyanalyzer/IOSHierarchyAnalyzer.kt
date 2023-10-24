@@ -12,24 +12,34 @@ import maestro.orchestra.MaestroCommand
 import maestro.orchestra.TapOnElementCommand
 
 class IOSHierarchyAnalyzer(
-    private val selectionStrategy: CommandSelectionStrategy, private val viewDisambiguator: ViewDisambiguator
+    private val selectionStrategy: CommandSelectionStrategy,
+    private val viewDisambiguator: ViewDisambiguator
 ) : HierarchyAnalyzer(viewDisambiguator) {
     override fun fetchCommandFrom(hierarchy: ViewHierarchy): MaestroCommand {
         val flattenNodes = hierarchy.aggregate()
-        val availableWidgets = extractWidgets(hierarchy, flattenNodes)
-        val commands = mutableListOf<Command>()
-        commands.addAll(keyboardOpenCommandsIfOpen(flattenNodes))
-        commands.add(BackPressCommand())
-        scrollCommandIfScrollable(flattenNodes)?.let { commands.add(it) }
+        val availableWidgets = extractWidgets(
+            hierarchy,
+            flattenNodes
+        )
+        val commands = mutableListOf<Pair<Command, TreeNode?>>()
+        commands.addAll(keyboardOpenCommandsIfOpen(flattenNodes).map { it to hierarchy.root })
+        commands.add(BackPressCommand() to hierarchy.root)
+        scrollCommandIfScrollable(flattenNodes)?.let { commands.add(it to hierarchy.root) }
 
         // Generate Tap commands
         availableWidgets.forEach { (node, selector) ->
             node.clickable?.let {
-                commands.add(TapOnElementCommand(selector))
+                commands.add(TapOnElementCommand(selector) to node)
             }
         }
-        val commandToExecute = selectionStrategy.pickFrom(commands.map { MaestroCommand(it) })
-        val u = availableWidgets.firstOrNull { (it.second == commandToExecute.tapOnElement!!.selector) }?.first ?: TreeNode()
+        val commandToExecute = selectionStrategy.pickFrom(
+            commands.map { (command, node) -> MaestroCommand(command) to node },
+            hierarchy.root,
+            false
+        )
+        val u =
+            availableWidgets.firstOrNull { (it.second == commandToExecute.tapOnElement!!.selector) }?.first
+                ?: TreeNode()
         previousAction = commandToExecute to u
         return commandToExecute
     }
@@ -40,14 +50,17 @@ class IOSHierarchyAnalyzer(
         nodes.any { ELEMENT_TYPES[it.attributes["elementType"]] == "key" }
 
     override fun extractWidgets(
-        hierarchy: ViewHierarchy, flattenNodes: List<TreeNode>
+        hierarchy: ViewHierarchy,
+        flattenNodes: List<TreeNode>
     ): List<Pair<TreeNode, ElementSelector>> {
 
         val bannedChildren = flattenNodes.first { treeNode ->
-            val childrenAttributes = treeNode.children.map { attrs -> attrs.attributes.values.toString() }.toString()
-            val isStatusBar = childrenAttributes.contains(batteryIndicatorRegex) && (childrenAttributes.contains(
-                absoluteHourIndicatorRegex
-            ) || childrenAttributes.contains(relativeHourIndicatorRegex))
+            val childrenAttributes =
+                treeNode.children.map { attrs -> attrs.attributes.values.toString() }.toString()
+            val isStatusBar =
+                childrenAttributes.contains(batteryIndicatorRegex) && (childrenAttributes.contains(
+                    absoluteHourIndicatorRegex
+                ) || childrenAttributes.contains(relativeHourIndicatorRegex))
             isStatusBar
         }.children
 
@@ -55,13 +68,22 @@ class IOSHierarchyAnalyzer(
             !shouldBeIgnored(
                 ELEMENT_TYPES[treeNode.attributes["elementType"]] ?: "any"
             ) || treeNode in bannedChildren
-        }.map { it to viewDisambiguator.disambiguate(hierarchy.root, it, flattenNodes) }.filter {
+        }.map {
+            it to viewDisambiguator.disambiguate(
+                hierarchy.root,
+                it,
+                flattenNodes
+            )
+        }.filter {
             viewDisambiguator.properlyDisambiguated(it.second)
         }
         return availableWidgets
     }
 
-    override fun isOutsideApp(hierarchy: ViewHierarchy, packageName: String): Boolean {
+    override fun isOutsideApp(
+        hierarchy: ViewHierarchy,
+        packageName: String
+    ): Boolean {
         return hierarchy.aggregate().none { it.attributes.values.toString().contains(packageName) }
     }
 

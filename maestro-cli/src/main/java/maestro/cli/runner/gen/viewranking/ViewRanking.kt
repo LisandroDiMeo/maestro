@@ -1,171 +1,76 @@
 package maestro.cli.runner.gen.viewranking
 
+import maestro.TreeNode
 import maestro.cli.runner.gen.commandselection.CommandSelectionStrategy
-import maestro.cli.runner.gen.viewranking.encoding.ActionEncoder
-import maestro.cli.runner.gen.viewranking.encoding.ActionIdentifier
-import maestro.cli.runner.gen.viewranking.encoding.ScreenEncoder
-import maestro.cli.runner.gen.viewranking.encoding.ScreenIdentifier
-import maestro.orchestra.BackPressCommand
-import maestro.orchestra.ElementSelector
+import maestro.cli.runner.gen.viewranking.actionhash.TreeDirectionHasher
 import maestro.orchestra.MaestroCommand
-import maestro.orchestra.ScrollCommand
-import maestro.orchestra.TapOnElementCommand
 import kotlin.random.Random
 
 class ViewRanking(
-    private val screenEncoder: ScreenEncoder = ScreenEncoder(),
-    private val actionEncoder: ActionEncoder = ActionEncoder(),
     private val random: Random = Random(1024L)
 ) : CommandSelectionStrategy {
 
-    private val model: MutableMap<ScreenIdentifier, List<ActionIdentifier>> = mutableMapOf()
-    private val ranking: MutableMap<ScreenIdentifier, MutableMap<ActionIdentifier, Double>> =
-        mutableMapOf()
-    private var lastActionExecuted: ActionIdentifier? = null
-    private var lastScreenVisited: ScreenIdentifier? = null
+    private val model: MutableMap<String, ActionInformation> = mutableMapOf()
 
-    override fun pickFrom(availableCommands: List<MaestroCommand>): MaestroCommand {
-        val actionsIdentifier = availableCommands.map { actionEncoder.encode(it) }
-        val screenIdentifier = screenEncoder.encode(availableCommands)
-        var previouslySeenScreen: ScreenIdentifier? = null
-        model.forEach { (screenId, actionsId) ->
-            if (actionsId == actionsIdentifier) {
-                previouslySeenScreen = screenId
-            }
+    private val actionHasher = TreeDirectionHasher()
+
+    private var previousAction: String = ""
+
+    override fun pickFrom(
+        availableCommands: List<Pair<MaestroCommand, TreeNode?>>,
+        root: TreeNode,
+        newTest: Boolean
+    ): MaestroCommand {
+        val hashedActions = availableCommands.map { (command, node) ->
+            actionHasher.hashAction(
+                root,
+                command,
+                node
+            ) to command
         }
-        previouslySeenScreen?.let { screenId ->
-            model[screenId] = actionsIdentifier
-            val highest = highestRankAction(availableCommands, screenId)
-            val actionIdentifier = actionEncoder.encode(highest)
-            lastActionExecuted = actionIdentifier
-            lastScreenVisited = screenIdentifier
-            ranking[screenId]!![actionIdentifier] = rank(highest, screenId)
-            return highest
-        } ?: run {
-            model[screenIdentifier] = actionsIdentifier
-            ranking[screenIdentifier] = mutableMapOf()
-            availableCommands.forEach {
-                ranking[screenIdentifier]!![actionEncoder.encode(it)] = INITIAL_RANKING
+        addEdgesToPreviousAction(hashedActions)
+        updateModelWithIncomingActions(hashedActions)
+        val actionToExecute = hashedActions
+            .map { (hash, command) -> hash to (priority(command) to command) }
+            .sortedBy { (hash, priorityAndCommandPair) ->
+                val (priority, _) = priorityAndCommandPair
+                if (model[hash]?.second == true) {
+                    Int.MAX_VALUE
+                } else priority
             }
-            val highest = highestRankAction(availableCommands, screenIdentifier)
-            val actionIdentifier = actionEncoder.encode(highest)
-            lastActionExecuted = actionIdentifier
-            lastScreenVisited = screenIdentifier
-            ranking[screenIdentifier]!![actionIdentifier] = rank(highest, screenIdentifier)
-            return highest
+            .map { (hash, priorityAndCommandPair) -> hash to priorityAndCommandPair.second }
+            .first()
+        previousAction = actionToExecute.first
+        return actionToExecute.second
+    }
+
+    private fun addEdgesToPreviousAction(hashedActions: List<Pair<String, MaestroCommand>>) {
+        if (!isEmpty()) {
+            model[previousAction] = hashedActions.map { (hash, _) -> hash } to true
         }
     }
 
-    private fun highestRankAction(
-        actions: List<MaestroCommand>,
-        screenIdentifier: ScreenIdentifier
-    ): MaestroCommand =
-        actions.map { action -> action to rank(action, screenIdentifier) }
-            .maxByOrNull { it.second }!!.first
-
-    private fun rank(command: MaestroCommand, screenIdentifier: ScreenIdentifier): Double {
-        val actionId = actionEncoder.encode(command)
-        if (actionId in ranking[screenIdentifier]!!) {
-            return (ranking[screenIdentifier]!![actionId] ?: 0.0) * 0.90
-        }
-        var rank = ranking[screenIdentifier]!![actionId]!!
-        when {
-            command.tapOnElement != null -> {
-                val selector = command.tapOnElement!!.selector
-                selector.idRegex?.let { rank *= 1.20 }
-                selector.textRegex?.let { rank *= 1.15 }
-                selector.containsChild?.let { rank *= 1.10 }
-                selector.classNameRegex?.let { rank *= 1.05 }
-                selector.packageNameRegex?.let { rank *= 1.05 }
-            }
-
-            command.backPressCommand != null -> {
-                rank *= 1.10
-            }
-
-            command.inputTextCommand != null -> {
-                rank *= 1.35
-            }
-
-            command.hideKeyboardCommand != null -> {
-                rank *= 1.10
-            }
-
-            command.scrollCommand != null -> {
-                rank *= 1.10
-            }
-        }
-        return rank
-    }
-
-    fun printRanking() {
-        ranking.forEach { (screenId, screenRank) ->
-            println("===== Ranking for $screenId =====")
-            screenRank.forEach { (actionId, actionRank) ->
-                println("$actionId -> $actionRank")
-            }
+    private fun updateModelWithIncomingActions(hashedActions: List<Pair<String, MaestroCommand>>) {
+        hashedActions.forEach { (hash, _) ->
+            if (hash !in model.keys) model[hash] = emptyList<String>() to false
         }
     }
 
-    companion object {
-        private const val INITIAL_RANKING = 0.5
+    private fun priority(maestroCommand: MaestroCommand): Int {
+        return when {
+            maestroCommand.tapOnElement != null -> 0
+            maestroCommand.inputRandomTextCommand != null -> 1
+            maestroCommand.hideKeyboardCommand != null -> 2
+            maestroCommand.eraseTextCommand != null -> 2
+            maestroCommand.backPressCommand != null -> 3
+            else -> 4
+        }
     }
+
+    fun isEmpty(): Boolean = model.isEmpty()
 
 }
 
-
-fun main() {
-    val viewRanking = ViewRanking()
-    val initalCommands = listOf(
-        MaestroCommand(
-            tapOnElement = TapOnElementCommand(
-                selector = ElementSelector(
-                    idRegex = "id1"
-                )
-            )
-        ),
-        MaestroCommand(
-            tapOnElement = TapOnElementCommand(
-                selector = ElementSelector(
-                    textRegex = "hola"
-                )
-            )
-        ),
-        MaestroCommand(
-            tapOnElement = TapOnElementCommand(
-                selector = ElementSelector(
-                    classNameRegex = "className"
-                )
-            )
-        ),
-        MaestroCommand(backPressCommand = BackPressCommand()),
-        MaestroCommand(scrollCommand = ScrollCommand()),
-    )
-    val selected = viewRanking.pickFrom(initalCommands)
-    viewRanking.printRanking()
-    println(selected)
-    val otherCommands = listOf(
-        MaestroCommand(
-            tapOnElement = TapOnElementCommand(
-                selector = ElementSelector(
-                    idRegex = "id2"
-                )
-            )
-        ),
-        MaestroCommand(
-            tapOnElement = TapOnElementCommand(
-                selector = ElementSelector(
-                    classNameRegex = "className"
-                )
-            )
-        ),
-        MaestroCommand(backPressCommand = BackPressCommand()),
-        MaestroCommand(scrollCommand = ScrollCommand()),
-    )
-    val selected2 = viewRanking.pickFrom(otherCommands)
-    viewRanking.printRanking()
-    println(selected2)
-
-}
+typealias ActionInformation = Pair<List<String>, Boolean>
 
 
