@@ -88,6 +88,15 @@ class ViewRanking(
 
     fun isEmpty(): Boolean = model.isEmpty()
 
+    fun edgesFor(command: MaestroCommand, node: TreeNode?, root: TreeNode): ActionInformation? {
+        val hash = actionHasher.hashAction(
+            root,
+            command,
+            node
+        )
+        return model[hash]
+    }
+
 }
 
 typealias ActionInformation = Pair<List<String>, Boolean>

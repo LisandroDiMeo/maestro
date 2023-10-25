@@ -2,6 +2,7 @@ package maestro.cli.generative
 
 import maestro.TreeNode
 import maestro.cli.runner.gen.viewranking.ViewRanking
+import maestro.cli.runner.gen.viewranking.actionhash.TreeDirectionHasher
 import maestro.orchestra.BackPressCommand
 import maestro.orchestra.ElementSelector
 import maestro.orchestra.InputRandomCommand
@@ -172,7 +173,7 @@ class ViewRankingTest {
     }
 
     @Test
-    fun `view ranking prioritizes unused actions`(){
+    fun `view ranking prioritizes unused actions`() {
         val root = TreeNode(
             children = listOf(TreeNode(attributes = mutableMapOf("text" to "Press Me")))
         )
@@ -217,8 +218,66 @@ class ViewRankingTest {
         )
     }
 
-    fun `view ranking prioritizes actions that leads to unused actions` () {
+    @Test
+    fun `view ranking properly adds edges between actions`() {
+        val rootOrigin = TreeNode(
+            children = listOf(TreeNode(attributes = mutableMapOf("text" to "Press Me")))
+        )
+        val commandsFetchedForTheFirstTime = listOf(
+            MaestroCommand(
+                BackPressCommand()
+            ) to rootOrigin,
+            MaestroCommand(
+                ScrollCommand()
+            ) to rootOrigin,
+            MaestroCommand(
+                tapOnElement = TapOnElementCommand(selector = ElementSelector(textRegex = "Press Me"))
+            ) to rootOrigin.children[0],
+        )
+        val rootDestination = TreeNode(
+            children = listOf(TreeNode(mutableMapOf("text" to "Hello!")))
+        )
+        val commandsForNewScreen = listOf(
+            MaestroCommand(
+                BackPressCommand()
+            ) to rootOrigin,
+            MaestroCommand(
+                ScrollCommand()
+            ) to rootOrigin
+        )
+        val a = viewRanking.pickFrom(
+            commandsFetchedForTheFirstTime,
+            rootOrigin,
+            false
+        )
+        val b = viewRanking.pickFrom(
+            commandsForNewScreen,
+            rootDestination,
+            false
+        )
+        Assertions.assertTrue(a in commandsFetchedForTheFirstTime.map { it.first })
+        Assertions.assertTrue(b in commandsForNewScreen.map { it.first })
+        val (_, node) = commandsFetchedForTheFirstTime[2]
+        val actionHasher = TreeDirectionHasher()
+        val hashesDestination = commandsForNewScreen.map { (a, b) ->
+            actionHasher.hashAction(
+                rootDestination,
+                a,
+                b
+            )
+        }
+        val edges = viewRanking.edgesFor(
+            a,
+            node,
+            rootOrigin
+        )
+        Assertions.assertEquals(edges?.first, hashesDestination)
 
+    }
+
+    @Test
+    fun `view ranking not updates the model when the test is new and model is not empty`() {
+        
     }
 
 
