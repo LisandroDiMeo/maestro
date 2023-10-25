@@ -4,11 +4,8 @@ import maestro.TreeNode
 import maestro.cli.runner.gen.commandselection.CommandSelectionStrategy
 import maestro.cli.runner.gen.viewranking.actionhash.TreeDirectionHasher
 import maestro.orchestra.MaestroCommand
-import kotlin.random.Random
 
-class ViewRanking(
-    private val random: Random = Random(1024L)
-) : CommandSelectionStrategy {
+class ViewRanking : CommandSelectionStrategy {
 
     private val model: MutableMap<String, ActionInformation> = mutableMapOf()
 
@@ -28,7 +25,7 @@ class ViewRanking(
                 node
             ) to command
         }
-        addEdgesToPreviousAction(hashedActions)
+        if (!newTest) addEdgesToPreviousAction(hashedActions)
         updateModelWithIncomingActions(hashedActions)
 
         val (bestRankedActionHash, bestRankedAction) = hashedActions.map { (hash, command) ->

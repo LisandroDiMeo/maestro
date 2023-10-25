@@ -16,7 +16,7 @@ abstract class HierarchyAnalyzer(
 ) {
 
     protected var previousAction: Pair<MaestroCommand,TreeNode>? = null
-    abstract fun fetchCommandFrom(hierarchy: ViewHierarchy): MaestroCommand
+    abstract fun fetchCommandFrom(hierarchy: ViewHierarchy, newTest: Boolean): MaestroCommand
 
     open fun extractWidgets(hierarchy: ViewHierarchy, flattenNodes: List<TreeNode>): List<Pair<TreeNode, ElementSelector>> {
         val root = hierarchy.root

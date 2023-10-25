@@ -271,13 +271,61 @@ class ViewRankingTest {
             node,
             rootOrigin
         )
-        Assertions.assertEquals(edges?.first, hashesDestination)
+        Assertions.assertEquals(
+            edges?.first,
+            hashesDestination
+        )
 
     }
 
     @Test
     fun `view ranking not updates the model when the test is new and model is not empty`() {
-        
+        val root = TreeNode(
+            children = listOf(TreeNode(attributes = mutableMapOf("text" to "Press Me")))
+        )
+        val commandsFetchedForTheFirstTime = listOf(
+            MaestroCommand(
+                BackPressCommand()
+            ) to root,
+            MaestroCommand(
+                ScrollCommand()
+            ) to root,
+            MaestroCommand(
+                tapOnElement = TapOnElementCommand(selector = ElementSelector(textRegex = "Press Me"))
+            ) to root.children[0],
+        )
+
+        viewRanking.pickFrom(
+            commandsFetchedForTheFirstTime,
+            root,
+            true
+        )
+        viewRanking.pickFrom(
+            commandsFetchedForTheFirstTime,
+            root,
+            false
+        )
+        viewRanking.pickFrom(
+            commandsFetchedForTheFirstTime,
+            root,
+            false
+        )
+        // New test start here
+        viewRanking.pickFrom(
+            commandsFetchedForTheFirstTime,
+            root,
+            true
+        )
+
+        val edges = viewRanking.edgesFor(
+            commandsFetchedForTheFirstTime[1].first,
+            commandsFetchedForTheFirstTime[1].second,
+            root
+        )
+        Assertions.assertEquals(
+            edges?.first,
+            emptyList<String>()
+        )
     }
 
 

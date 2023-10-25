@@ -32,7 +32,6 @@ import maestro.orchestra.filter.TraitFilters
 import maestro.orchestra.runcycle.RunCycle
 import maestro.utils.StringUtils.toRegexSafe
 import okhttp3.OkHttpClient
-import java.io.File
 
 class TestGenerationOrchestra(
     private val maestro: Maestro,
@@ -76,7 +75,10 @@ class TestGenerationOrchestra(
             }
             val hierarchy = maestro.viewHierarchy()
             if (endTestIfOutsideApp && isOutsideApp(hierarchy) && currentIteration > 1) return
-            val command = hierarchyAnalyzer.fetchCommandFrom(hierarchy)
+            val command = hierarchyAnalyzer.fetchCommandFrom(
+                hierarchy,
+                currentIteration == 1
+            )
             commandsGenerated.add(command)
 
             runCycle.onCommandStart(currentIteration, command)
