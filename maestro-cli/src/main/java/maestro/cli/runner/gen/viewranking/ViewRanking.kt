@@ -30,18 +30,37 @@ class ViewRanking(
         }
         addEdgesToPreviousAction(hashedActions)
         updateModelWithIncomingActions(hashedActions)
-        val actionToExecute = hashedActions
-            .map { (hash, command) -> hash to (priority(command) to command) }
-            .sortedBy { (hash, priorityAndCommandPair) ->
-                val (priority, _) = priorityAndCommandPair
-                if (model[hash]?.second == true) {
-                    Int.MAX_VALUE
-                } else priority
-            }
-            .map { (hash, priorityAndCommandPair) -> hash to priorityAndCommandPair.second }
-            .first()
-        previousAction = actionToExecute.first
-        return actionToExecute.second
+
+        val (bestRankedActionHash, bestRankedAction) = hashedActions.map { (hash, command) ->
+            val rank = rank(
+                hash,
+                command
+            )
+            hash to (command to rank)
+        }.sortedWith(
+            compareBy(
+                { it.second.second.second },
+                { it.second.second.first },
+                { it.second.second.third }
+            )
+        ).map { it.first to it.second.first }.first()
+
+        previousAction = bestRankedActionHash
+        return bestRankedAction
+    }
+
+    private fun rank(
+        actionHashed: String,
+        command: MaestroCommand
+    ): ActionRank {
+        val priority = priority(command)
+        val unused = if (model[actionHashed]!!.second) 1 else 0
+        val hopsToUnusedActions = Int.MAX_VALUE
+        return Triple(
+            priority,
+            unused,
+            hopsToUnusedActions
+        )
     }
 
     private fun addEdgesToPreviousAction(hashedActions: List<Pair<String, MaestroCommand>>) {
@@ -72,5 +91,6 @@ class ViewRanking(
 }
 
 typealias ActionInformation = Pair<List<String>, Boolean>
+typealias ActionRank = Triple<Int, Int, Int>
 
 

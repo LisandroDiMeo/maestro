@@ -4,6 +4,7 @@ import maestro.TreeNode
 import maestro.cli.runner.gen.viewranking.ViewRanking
 import maestro.orchestra.BackPressCommand
 import maestro.orchestra.ElementSelector
+import maestro.orchestra.InputRandomCommand
 import maestro.orchestra.MaestroCommand
 import maestro.orchestra.ScrollCommand
 import maestro.orchestra.TapOnElementCommand
@@ -97,7 +98,10 @@ class ViewRankingTest {
             root,
             false
         )
-        Assertions.assertEquals(action.tapOnElement, TapOnElementCommand(selector = ElementSelector(textRegex = "Press Me")))
+        Assertions.assertEquals(
+            action.tapOnElement,
+            TapOnElementCommand(selector = ElementSelector(textRegex = "Press Me"))
+        )
     }
 
     @Test
@@ -127,12 +131,95 @@ class ViewRankingTest {
             root,
             false
         )
-        Assertions.assertNotEquals(action1, action2)
+        Assertions.assertNotEquals(
+            action1,
+            action2
+        )
 
     }
 
     @Test
-    fun `x`() {
+    fun `view ranking prioritizes input text if no tap action exists`() {
+        val root = TreeNode(
+            children = listOf(TreeNode(attributes = mutableMapOf("text" to "Type text")))
+        )
+        val inputRandomTextCommand = InputRandomCommand(
+            origin = MaestroCommand(
+                tapOnElement = TapOnElementCommand(selector = ElementSelector(textRegex = "Press Me"))
+            ) to root.children[0]
+        )
+        val commandsFetchedForTheFirstTime = listOf(
+            MaestroCommand(
+                BackPressCommand()
+            ) to root,
+            MaestroCommand(
+                ScrollCommand()
+            ) to root,
+            MaestroCommand(
+                inputRandomTextCommand = inputRandomTextCommand
+            ) to root
+        )
+
+        val action = viewRanking.pickFrom(
+            commandsFetchedForTheFirstTime,
+            root,
+            false
+        )
+        Assertions.assertEquals(
+            action.inputRandomTextCommand,
+            inputRandomTextCommand
+        )
+    }
+
+    @Test
+    fun `view ranking prioritizes unused actions`(){
+        val root = TreeNode(
+            children = listOf(TreeNode(attributes = mutableMapOf("text" to "Press Me")))
+        )
+        val commandsFetchedForTheFirstTime = listOf(
+            MaestroCommand(
+                BackPressCommand()
+            ) to root,
+            MaestroCommand(
+                ScrollCommand()
+            ) to root,
+            MaestroCommand(
+                tapOnElement = TapOnElementCommand(selector = ElementSelector(textRegex = "Press Me"))
+            ) to root.children[0],
+        )
+
+        val action1 = viewRanking.pickFrom(
+            commandsFetchedForTheFirstTime,
+            root,
+            false
+        )
+        val action2 = viewRanking.pickFrom(
+            commandsFetchedForTheFirstTime,
+            root,
+            false
+        )
+        val action3 = viewRanking.pickFrom(
+            commandsFetchedForTheFirstTime,
+            root,
+            false
+        )
+        Assertions.assertEquals(
+            action1.tapOnElement,
+            TapOnElementCommand(selector = ElementSelector(textRegex = "Press Me"))
+        )
+        Assertions.assertEquals(
+            action2.backPressCommand,
+            BackPressCommand()
+        )
+        Assertions.assertEquals(
+            action3.scrollCommand,
+            ScrollCommand()
+        )
+    }
+
+    fun `view ranking prioritizes actions that leads to unused actions` () {
 
     }
+
+
 }
