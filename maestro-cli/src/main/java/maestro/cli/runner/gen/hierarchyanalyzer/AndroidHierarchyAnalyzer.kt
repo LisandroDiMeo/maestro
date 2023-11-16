@@ -3,6 +3,7 @@ package maestro.cli.runner.gen.hierarchyanalyzer
 import maestro.TreeNode
 import maestro.ViewHierarchy
 import maestro.cli.runner.gen.commandselection.CommandSelectionStrategy
+import maestro.cli.runner.gen.viewdisambiguator.DisambiguationRule
 import maestro.cli.runner.gen.viewdisambiguator.ViewDisambiguator
 import maestro.orchestra.BackPressCommand
 import maestro.orchestra.Command
@@ -11,7 +12,7 @@ import maestro.orchestra.TapOnElementCommand
 
 class AndroidHierarchyAnalyzer(
     private val selectionStrategy: CommandSelectionStrategy,
-    private val viewDisambiguator: ViewDisambiguator,
+    override val viewDisambiguator: DisambiguationRule,
 ) : HierarchyAnalyzer(viewDisambiguator) {
     override fun fetchCommandFrom(
         hierarchy: ViewHierarchy,
@@ -43,10 +44,12 @@ class AndroidHierarchyAnalyzer(
             hierarchy.root,
             newTest
         )
-        val u =
-            availableWidgets.firstOrNull { (it.second == commandToExecute.tapOnElement!!.selector) }?.first
+        val nodeForCommand =
+            availableWidgets.firstOrNull { (it.second == commandToExecute.tapOnElement?.selector) }?.first
                 ?: TreeNode()
-        previousAction = commandToExecute to u
+        if((previousAction != null && previousAction!!.first.inputRandomTextCommand == null) || previousAction == null) {
+            previousAction = commandToExecute to nodeForCommand
+        }
         return commandToExecute
     }
 

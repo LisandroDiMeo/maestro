@@ -11,8 +11,7 @@ import maestro.cli.runner.gen.TestGenerationOrchestra
 import maestro.cli.runner.gen.commandselection.CommandSelectionStrategy
 import maestro.cli.runner.gen.hierarchyanalyzer.AndroidHierarchyAnalyzer
 import maestro.cli.runner.gen.hierarchyanalyzer.IOSHierarchyAnalyzer
-import maestro.cli.runner.gen.viewdisambiguator.AndroidViewDisambiguator
-import maestro.cli.runner.gen.viewdisambiguator.IosViewDisambiguator
+import maestro.cli.runner.gen.viewdisambiguator.SequentialDisambiguation
 import maestro.debuglog.LogConfig
 import maestro.orchestra.MaestroCommand
 import maestro.orchestra.Orchestra
@@ -45,15 +44,17 @@ class TestSuiteGenerator(
 
     fun generate() {
         val strategy = CommandSelectionStrategy.strategyFor(strategy)
+        val disambiguationRule =
+            SequentialDisambiguation.sequentialRuleForIdTextAccTextAndAllTogether()
         val analyzer = when (device?.platform) {
             Platform.ANDROID -> AndroidHierarchyAnalyzer(
                 strategy,
-                AndroidViewDisambiguator()
+                disambiguationRule
             )
 
             Platform.IOS -> IOSHierarchyAnalyzer(
                 strategy,
-                IosViewDisambiguator()
+                disambiguationRule
             )
 
             else -> null
@@ -69,13 +70,19 @@ class TestSuiteGenerator(
             )
             for (testId in 1..testSuiteSize) {
                 testGenerator.startGeneration()
-                generateFlowFile(testGenerator.generatedCommands(), testId)
+                generateFlowFile(
+                    testGenerator.generatedCommands(),
+                    testId
+                )
             }
         }
     }
 
 
-    private fun generateFlowFile(commands: List<MaestroCommand>, id: Int = 0) {
+    private fun generateFlowFile(
+        commands: List<MaestroCommand>,
+        id: Int = 0
+    ) {
         logger.info("Brewing up Flow File $id ☕️...")
         val yamlCommands = commands.map { YamlFluentCommand.fromCommand(it) }
         val config = ConfigHeader(packageName)
@@ -84,13 +91,28 @@ class TestSuiteGenerator(
             ObjectMapper(YAMLFactory().disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER))
         flowFileMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL)
         val tempGeneratedFlowFile = File("temp-generated-flow.yaml")
-        flowFileMapper.writeValue(tempGeneratedFlowFile, yamlCommands)
+        flowFileMapper.writeValue(
+            tempGeneratedFlowFile,
+            yamlCommands
+        )
         val configFile = File("config.yaml")
-        configHeaderMapper.writeValue(configFile, config)
+        configHeaderMapper.writeValue(
+            configFile,
+            config
+        )
         val generatedFlowFile = File("generated-flows/generated-flow-$id.yaml")
-        FileOutputStream(generatedFlowFile, true).use { output ->
+        FileOutputStream(
+            generatedFlowFile,
+            true
+        ).use { output ->
             configFile
-                .forEachBlock { buffer, bytesRead -> output.write(buffer, 0, bytesRead) }
+                .forEachBlock { buffer, bytesRead ->
+                    output.write(
+                        buffer,
+                        0,
+                        bytesRead
+                    )
+                }
             tempGeneratedFlowFile
                 .forEachBlock { buffer, bytesRead ->
                     output.write(
@@ -114,23 +136,34 @@ class TestSuiteGeneratorCycle(private val logger: Logger) : RunCycle() {
         )
     }
 
-    override fun onCommandStart(commandId: Int, command: MaestroCommand) {
+    override fun onCommandStart(
+        commandId: Int,
+        command: MaestroCommand
+    ) {
         logger.info("Executing command ($commandId, ${command.description()}) ⏳")
     }
 
-    override fun onCommandComplete(commandId: Int, command: MaestroCommand) {
+    override fun onCommandComplete(
+        commandId: Int,
+        command: MaestroCommand
+    ) {
         logger.info("Command ($commandId,${command.description()}) completed successfully ✅")
     }
 
     override fun onCommandFailed(
-        commandId: Int, command: MaestroCommand, error: Throwable
+        commandId: Int,
+        command: MaestroCommand,
+        error: Throwable
     ): Orchestra.ErrorResolution {
         logger.error("Command ($commandId,${command.description()}) failed ❌")
         logger.error("Reason: ${error.message}")
         return Orchestra.ErrorResolution.FAIL
     }
 
-    override fun onCommandSkipped(commandId: Int, command: MaestroCommand) {
+    override fun onCommandSkipped(
+        commandId: Int,
+        command: MaestroCommand
+    ) {
         logger.warn("Command ($commandId,${command.description()}) was skipped ⏭️")
     }
 

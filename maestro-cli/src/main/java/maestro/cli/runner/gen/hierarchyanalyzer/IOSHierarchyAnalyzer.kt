@@ -4,6 +4,7 @@ import hierarchy.AXElement.Companion.ELEMENT_TYPES
 import maestro.TreeNode
 import maestro.ViewHierarchy
 import maestro.cli.runner.gen.commandselection.CommandSelectionStrategy
+import maestro.cli.runner.gen.viewdisambiguator.DisambiguationRule
 import maestro.cli.runner.gen.viewdisambiguator.ViewDisambiguator
 import maestro.orchestra.BackPressCommand
 import maestro.orchestra.Command
@@ -13,7 +14,7 @@ import maestro.orchestra.TapOnElementCommand
 
 class IOSHierarchyAnalyzer(
     private val selectionStrategy: CommandSelectionStrategy,
-    private val viewDisambiguator: ViewDisambiguator
+    override val viewDisambiguator: DisambiguationRule,
 ) : HierarchyAnalyzer(viewDisambiguator) {
     override fun fetchCommandFrom(
         hierarchy: ViewHierarchy,
@@ -77,8 +78,6 @@ class IOSHierarchyAnalyzer(
                 it,
                 flattenNodes
             )
-        }.filter {
-            viewDisambiguator.properlyDisambiguated(it.second)
         }
         return availableWidgets
     }

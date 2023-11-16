@@ -10,13 +10,42 @@ import maestro.orchestra.MaestroCommand
 import maestro.orchestra.TapOnElementCommand
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
+import kotlin.random.Random
 
 class ActionHasherTest {
 
     private val actionHasher = TreeDirectionHasher()
 
+    /**
+     * Contacts App has a design issue that overlaps two screens (the main)
+     * under the search screen, so you can still detect main screen views when you are
+     * on the search screen.
+     */
+    private val screen1 = "generative-test-resources/screen1.json"
+    private val screen2 = "generative-test-resources/screen2.json"
+
+
+    private val contactsMainScreen = TreeNodeReader.read(screen1)
+    private val searchScreen = TreeNodeReader.read(screen2)
+
+    private val searchScreenWithNoInputFile =
+        "generative-test-resources/searchscreen_no_input.json"
+    private val searchScreenWithFirstInputFile =
+        "generative-test-resources/searchscreen_first_input.json"
+    private val searchScreenWithSecondInputFile =
+        "generative-test-resources/searchscreen_second_input.json"
+    private val searchScreenWithInputAndKeyboardClosedFile =
+        "generative-test-resources/searchscreen_keyboard_closed_with_input.json"
+
+    private val searchScreenWithNoInput = TreeNodeReader.read(searchScreenWithNoInputFile)
+    private val searchScreenWithFirstInput = TreeNodeReader.read(searchScreenWithFirstInputFile)
+    private val searchScreenWithSecondInput = TreeNodeReader.read(searchScreenWithSecondInputFile)
+    private val searchScreenWithInputAndKeyboardClosed =
+        TreeNodeReader.read(searchScreenWithInputAndKeyboardClosedFile)
+
+
     @Test
-    fun `hashing two back press over two screens produce different hash`() {
+    fun `hashing back press over different screens produce different hash`() {
         val treeA = TreeNode(
             attributes = mutableMapOf(
                 "letter" to "A",
@@ -378,7 +407,7 @@ class ActionHasherTest {
     }
 
     @Test
-    fun `hashing two input actions with different text over the same screen produce the same hash`(){
+    fun `hashing two input actions with different text over the same screen produce the same hash`() {
         val treeA = TreeNode(
             attributes = mutableMapOf(
                 "letter" to "A",
@@ -450,6 +479,106 @@ class ActionHasherTest {
         Assertions.assertEquals(
             hashA,
             hashB
+        )
+    }
+
+    @Test
+    fun `hashing contacts main screen with all tap events produces a different hash for each node`() {
+        val treeWithIndexes = TreeIndexer.addTypeAndIndex(contactsMainScreen)
+        val flattenNodes = treeWithIndexes.aggregate()
+        val tapCommand = MaestroCommand(tapOnElement = TapOnElementCommand(ElementSelector()))
+        val hashes = flattenNodes.map {
+            actionHasher.hashAction(
+                treeWithIndexes,
+                tapCommand,
+                it
+            )
+        }
+        val setOfHashes = hashes.toSet()
+        Assertions.assertEquals(
+            setOfHashes.size,
+            hashes.size
+        )
+    }
+
+    @Test
+    fun `hashing contacts main screen with all back actions produces a unique hash`() {
+        val treeWithIndexes = TreeIndexer.addTypeAndIndex(contactsMainScreen)
+        val flattenNodes = treeWithIndexes.aggregate()
+        val backCommand = MaestroCommand(backPressCommand = BackPressCommand())
+        val hashes = flattenNodes.map {
+            actionHasher.hashAction(
+                treeWithIndexes,
+                backCommand,
+                it
+            )
+        }
+        Assertions.assertEquals(
+            hashes.toSet().size,
+            1
+        )
+    }
+
+    @Test
+    fun `hashing two input actions on contacts main screen with different origins produce different hashes`() {
+        val treeWithIndexes = TreeIndexer.addTypeAndIndex(contactsMainScreen)
+        val random = Random(1024)
+        val flattenNodes = treeWithIndexes.aggregate()
+        val tapCommandA =
+            MaestroCommand(tapOnElement = TapOnElementCommand(ElementSelector(textRegex = "ButtonA")))
+        val tapCommandB =
+            MaestroCommand(tapOnElement = TapOnElementCommand(ElementSelector(textRegex = "ButtonB")))
+        val inputCommandA = MaestroCommand(
+            inputRandomTextCommand = InputRandomCommand(
+                origin = tapCommandA to flattenNodes.random(random)
+            )
+        )
+        val inputCommandB = MaestroCommand(
+            inputRandomTextCommand = InputRandomCommand(
+                origin = tapCommandB to flattenNodes.random(random)
+            )
+        )
+        val hashA = actionHasher.hashAction(
+            treeWithIndexes,
+            inputCommandA,
+            null
+        )
+        val hashB = actionHasher.hashAction(
+            treeWithIndexes,
+            inputCommandB,
+            null
+        )
+        Assertions.assertNotEquals(
+            hashA,
+            hashB
+        )
+    }
+
+    @Test
+    fun `after input twice in the same textfield, if nothing but the field changes, is idempotent`() {
+        val searchScreenFirstInput = TreeIndexer.addTypeAndIndex(this.searchScreenWithFirstInput)
+        val searchScreenSecondInput = TreeIndexer.addTypeAndIndex(this.searchScreenWithSecondInput)
+        val actionThatOpenedTheField = MaestroCommand(
+            tapOnElement = TapOnElementCommand(ElementSelector(textRegex = "open"))
+        )
+        val inputRandomCommand =
+            InputRandomCommand(origin = actionThatOpenedTheField to TreeNode(mutableMapOf("text" to "open")))
+        val firstInput = MaestroCommand(inputRandomTextCommand = inputRandomCommand)
+        val secondInput = MaestroCommand(inputRandomTextCommand = inputRandomCommand)
+
+        val firstHash = actionHasher.hashAction(
+            searchScreenFirstInput,
+            firstInput,
+            null
+        )
+        val secondHash = actionHasher.hashAction(
+            searchScreenSecondInput,
+            secondInput,
+            null
+        )
+        Assertions.assertEquals(
+            firstHash,
+            secondHash
         )
     }
 

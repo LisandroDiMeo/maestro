@@ -10,7 +10,11 @@ abstract class ViewDisambiguator {
      * It's recommended that after view is disambiguated, check with [properlyDisambiguated]
      * if it satisfy that criteria.
      */
-    abstract fun disambiguate(root: TreeNode, view: TreeNode, flattenNodes: List<TreeNode>): ElementSelector
+    abstract fun disambiguate(
+        root: TreeNode,
+        view: TreeNode,
+        flattenNodes: List<TreeNode>
+    ): ElementSelector
 
     abstract fun properlyDisambiguated(selector: ElementSelector): Boolean
 
@@ -26,3 +30,4 @@ abstract class ViewDisambiguator {
     }
 
 }
+

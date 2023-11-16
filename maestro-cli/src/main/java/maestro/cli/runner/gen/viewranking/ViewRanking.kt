@@ -4,6 +4,7 @@ import maestro.TreeNode
 import maestro.cli.runner.gen.commandselection.CommandSelectionStrategy
 import maestro.cli.runner.gen.viewranking.actionhash.TreeDirectionHasher
 import maestro.orchestra.MaestroCommand
+import javax.swing.Action
 
 class ViewRanking : CommandSelectionStrategy {
 
@@ -43,6 +44,7 @@ class ViewRanking : CommandSelectionStrategy {
         ).map { it.first to it.second.first }.first()
 
         previousAction = bestRankedActionHash
+        model[previousAction] = ActionInformation(emptyList(), true)
         return bestRankedAction
     }
 

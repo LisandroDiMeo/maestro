@@ -22,36 +22,38 @@ class TreeDirectionHasher : ActionHasher {
         return if (action.tapOnElement != null) {
             // Tap based action, has a selector
             val directionHash = directionsFor(
-                root,
+                simpleTree,
                 view!!
             ).hashCode()
             val typeHash = view.attributes["type"].hashCode()
-            "${simpleTree.hashCode()}-$directionHash-$typeHash"
+            "$directionHash-$typeHash"
         } else {
             // Remove structural attributes (such as text, resource id, etc)
             // and only keep a type attribute (elementType or className).
-            val extraHash = when {
+            when {
                 action.inputRandomTextCommand != null -> {
                     val origin = action.inputRandomTextCommand?.origin
                     origin?.second?.run { TreeIndexer.removeVisualAttributes(this) }.hashCode()
-                        .toString() + origin?.first?.asCommand()?.javaClass.hashCode().toString()
+                        .toString() + origin?.first?.asCommand()?.javaClass.hashCode()
+                        .toString() + action.asCommand()?.javaClass.hashCode().toString()
                 }
 
                 action.hideKeyboardCommand != null -> {
                     val origin = action.hideKeyboardCommand?.origin
                     origin?.second?.run { TreeIndexer.removeVisualAttributes(this) }.hashCode()
-                        .toString() + origin?.first?.asCommand()?.javaClass.hashCode().toString()
+                        .toString() + origin?.first?.asCommand()?.javaClass.hashCode()
+                        .toString() + action.asCommand()?.javaClass.hashCode().toString()
                 }
 
                 action.eraseTextCommand != null -> {
                     val origin = action.eraseTextCommand?.origin
                     origin?.second?.run { TreeIndexer.removeVisualAttributes(this) }.hashCode()
-                        .toString() + origin?.first?.asCommand()?.javaClass.hashCode().toString()
+                        .toString() + origin?.first?.asCommand()?.javaClass.hashCode()
+                        .toString() + action.asCommand()?.javaClass.hashCode().toString()
                 }
 
-                else -> action.hashCode().toString()
+                else -> simpleTree.hashCode().toString() + action.hashCode().toString()
             }
-            simpleTree.hashCode().toString() + extraHash
         }
     }
 
@@ -107,7 +109,7 @@ class TreeDirectionHasher : ActionHasher {
 object TreeIndexer {
 
     fun addTypeAndIndex(root: TreeNode): TreeNode {
-        val newTree = root.copy()
+        val newTree = root.clone()
         addIndexesToTree(
             newTree,
             0
@@ -116,7 +118,7 @@ object TreeIndexer {
     }
 
     fun removeVisualAttributes(root: TreeNode): TreeNode {
-        val newTree = root.copy()
+        val newTree = root.clone()
         removeVisualAttributesInplace(newTree)
         return newTree
     }
@@ -150,3 +152,14 @@ object TreeIndexer {
     }
 }
 
+fun TreeNode.clone(): TreeNode {
+    return TreeNode(
+        selected = selected,
+        checked = checked,
+        enabled = enabled,
+        clickable = clickable,
+        focused = focused,
+        attributes = attributes.toMap().toMutableMap(),
+        children = children.map { it.clone() }
+    )
+}

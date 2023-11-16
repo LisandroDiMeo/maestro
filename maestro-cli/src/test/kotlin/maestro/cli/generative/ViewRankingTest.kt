@@ -1,8 +1,12 @@
 package maestro.cli.generative
 
 import maestro.TreeNode
+import maestro.ViewHierarchy
+import maestro.cli.runner.gen.hierarchyanalyzer.AndroidHierarchyAnalyzer
+import maestro.cli.runner.gen.viewdisambiguator.SequentialDisambiguation
 import maestro.cli.runner.gen.viewranking.ViewRanking
 import maestro.cli.runner.gen.viewranking.actionhash.TreeDirectionHasher
+import maestro.cli.runner.gen.viewranking.actionhash.TreeIndexer
 import maestro.orchestra.BackPressCommand
 import maestro.orchestra.ElementSelector
 import maestro.orchestra.InputRandomCommand
@@ -16,6 +20,14 @@ import org.junit.jupiter.api.Test
 class ViewRankingTest {
 
     private lateinit var viewRanking: ViewRanking
+
+    private val screen1 = "generative-test-resources/contacts_main_screen.json"
+    private val screen2 = "generative-test-resources/contacts_main_screen_with_phone_filter.json"
+    private val screen3 =
+        "generative-test-resources/contacts_main_screen_with_phone_and_email_filter.json"
+    private val contactsMainScreen = TreeNodeReader.read(screen1)
+    private val contactsMainScreenWithPhoneFilter = TreeNodeReader.read(screen2)
+    private val contactsMainScreenWithPhoneAndEmailFilter = TreeNodeReader.read(screen3)
 
     @BeforeEach
     fun setup() {
@@ -328,5 +340,73 @@ class ViewRankingTest {
         )
     }
 
+    @Test
+    fun `view ranking will pick all the tap actions before other ones`() {
+        val contactsMainScreen = TreeIndexer.addTypeAndIndex(this.contactsMainScreen)
+        // We will assume for this test, that all actions are idempotent (e.g. they don't change the screen)
+        val androidViewAnalyzer = AndroidHierarchyAnalyzer(
+            viewRanking,
+            SequentialDisambiguation.sequentialRuleForIdTextAccTextAndAllTogether()
+        )
+        var selectedCommand: MaestroCommand? = null
+        var changed = true
+        var firstTime = true
+        val executedCommands = mutableListOf<MaestroCommand>()
+        while (changed) {
+            val commandToExecute = androidViewAnalyzer.fetchCommandFrom(
+                ViewHierarchy(contactsMainScreen),
+                firstTime
+            )
+            executedCommands.add(commandToExecute)
+            firstTime = false
+            changed = commandToExecute != selectedCommand
+            selectedCommand = commandToExecute
+        }
+        val commandExecutionOrder =
+            executedCommands.toSet().map { it.asCommand()?.javaClass.toString() }
+        val tapType = "class maestro.orchestra.TapOnElementCommand"
+        val lastTapActionIndex = commandExecutionOrder.lastIndexOf(tapType)
+        val allTapsExecuted = commandExecutionOrder.subList(
+            0,
+            lastTapActionIndex
+        )
+        val otherActionsExecuted = commandExecutionOrder.subList(
+            lastTapActionIndex + 1,
+            commandExecutionOrder.size
+        )
+        Assertions.assertTrue(allTapsExecuted.all { it == tapType })
+        Assertions.assertTrue(otherActionsExecuted.all { it != tapType })
+    }
+
+    @Test
+    fun `extra test`() {
+        val contactsMainScreen = ViewHierarchy(TreeIndexer.addTypeAndIndex(this.contactsMainScreen))
+        val contactsMainScreenWithPhoneFilter =
+            ViewHierarchy(TreeIndexer.addTypeAndIndex(this.contactsMainScreenWithPhoneFilter))
+        val androidViewAnalyzer = AndroidHierarchyAnalyzer(
+            viewRanking,
+            SequentialDisambiguation.sequentialRuleForIdTextAccTextAndAllTogether()
+        )
+        val a = androidViewAnalyzer.fetchCommandFrom(
+            contactsMainScreen,
+            true
+        )
+        val b = androidViewAnalyzer.fetchCommandFrom(
+            contactsMainScreenWithPhoneFilter,
+            false
+        )
+        val c = androidViewAnalyzer.fetchCommandFrom(
+            contactsMainScreenWithPhoneFilter,
+            false
+        )
+        Assertions.assertEquals(
+            a,
+            b
+        )
+        Assertions.assertNotEquals(
+            a,
+            c
+        )
+    }
 
 }

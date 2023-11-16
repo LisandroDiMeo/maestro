@@ -11,6 +11,7 @@ import maestro.Maestro
 import maestro.MaestroException
 import maestro.ViewHierarchy
 import maestro.cli.runner.gen.hierarchyanalyzer.HierarchyAnalyzer
+import maestro.cli.runner.gen.viewranking.actionhash.TreeIndexer
 import maestro.js.GraalJsEngine
 import maestro.js.JsEngine
 import maestro.js.RhinoJsEngine
@@ -73,7 +74,7 @@ class TestGenerationOrchestra(
             runBlocking {
                 delay(500L)
             }
-            val hierarchy = maestro.viewHierarchy()
+            val hierarchy = maestro.viewHierarchy().run { ViewHierarchy(root = TreeIndexer.addTypeAndIndex(this.root)) }
             if (endTestIfOutsideApp && isOutsideApp(hierarchy) && currentIteration > 1) return
             val command = hierarchyAnalyzer.fetchCommandFrom(
                 hierarchy,
