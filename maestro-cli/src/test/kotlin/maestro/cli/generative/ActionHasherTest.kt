@@ -21,12 +21,9 @@ class ActionHasherTest {
      * under the search screen, so you can still detect main screen views when you are
      * on the search screen.
      */
-    private val screen1 = "generative-test-resources/screen1.json"
-    private val screen2 = "generative-test-resources/screen2.json"
+    private val contactsMainScreenJson = "generative-test-resources/contacts_main_screen.json"
 
-
-    private val contactsMainScreen = TreeNodeReader.read(screen1)
-    private val searchScreen = TreeNodeReader.read(screen2)
+    private val contactsMainScreen = TreeNodeReader.read(contactsMainScreenJson)
 
     private val searchScreenWithNoInputFile =
         "generative-test-resources/searchscreen_no_input.json"
@@ -37,11 +34,18 @@ class ActionHasherTest {
     private val searchScreenWithInputAndKeyboardClosedFile =
         "generative-test-resources/searchscreen_keyboard_closed_with_input.json"
 
+
+    private val problematicScreenJson =
+        "generative-test-resources/main_screen_problematic.json"
+    private val problematicScreen = TreeNodeReader.read(problematicScreenJson)
+
+
     private val searchScreenWithNoInput = TreeNodeReader.read(searchScreenWithNoInputFile)
     private val searchScreenWithFirstInput = TreeNodeReader.read(searchScreenWithFirstInputFile)
     private val searchScreenWithSecondInput = TreeNodeReader.read(searchScreenWithSecondInputFile)
     private val searchScreenWithInputAndKeyboardClosed =
         TreeNodeReader.read(searchScreenWithInputAndKeyboardClosedFile)
+
 
 
     @Test
@@ -579,6 +583,25 @@ class ActionHasherTest {
         Assertions.assertEquals(
             firstHash,
             secondHash
+        )
+    }
+
+    @Test
+    fun `houston we have problems`(){
+        val treeWithIndexes = TreeIndexer.addTypeAndIndex(contactsMainScreen)
+        val pTreeWithIndexes = TreeIndexer.addTypeAndIndex(problematicScreen)
+
+        // - tapOn:
+        //    id: "com.google.android.contacts:id/open_search_bar"
+        val action = MaestroCommand(
+            tapOnElement = TapOnElementCommand(ElementSelector(idRegex = "com.google.android.contacts:id/open_search_bar"))
+        )
+        val view = treeWithIndexes.aggregate().first { it.attributes["resource-id"] == "com.google.android.contacts:id/open_search_bar" }
+        val viewFromProblematic = pTreeWithIndexes.aggregate().first { it.attributes["resource-id"] == "com.google.android.contacts:id/open_search_bar" }
+        val firstHash = actionHasher.hashAction(
+            treeWithIndexes,
+            action,
+            null
         )
     }
 

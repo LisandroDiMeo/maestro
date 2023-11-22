@@ -13,9 +13,9 @@ import org.junit.jupiter.api.Test
 
 class DisambiguationRulesTest {
 
-    private val screen1 = "generative-test-resources/screen1.json"
+    private val contactsMainScreenJson = "generative-test-resources/contacts_main_screen.json"
 
-    private val contactsMainScreen = TreeNodeReader.read(screen1)
+    private val contactsMainScreen = TreeNodeReader.read(contactsMainScreenJson)
 
     private val uniqueIdRule = HasUniqueId()
     private val uniqueTextRule = HasUniqueText()

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator
 import maestro.Maestro
+import maestro.TreeNode
 import maestro.cli.device.Device
 import maestro.cli.device.Platform
 import maestro.cli.runner.gen.TestGenerationOrchestra
@@ -12,6 +13,7 @@ import maestro.cli.runner.gen.commandselection.CommandSelectionStrategy
 import maestro.cli.runner.gen.hierarchyanalyzer.AndroidHierarchyAnalyzer
 import maestro.cli.runner.gen.hierarchyanalyzer.IOSHierarchyAnalyzer
 import maestro.cli.runner.gen.viewdisambiguator.SequentialDisambiguation
+import maestro.cli.runner.gen.viewranking.ViewRanking
 import maestro.debuglog.LogConfig
 import maestro.orchestra.MaestroCommand
 import maestro.orchestra.Orchestra
@@ -74,6 +76,21 @@ class TestSuiteGenerator(
                     testGenerator.generatedCommands(),
                     testId
                 )
+            }
+            if (strategy is ViewRanking) {
+                outputModel(strategy.exploration)
+            }
+
+        }
+    }
+
+    private fun outputModel(model: Map<String, TreeNode>) {
+        FileOutputStream("output.txt", true).use {
+            model.forEach { t, u ->
+                val s = "$t -> $u"
+                s.toByteArray(charset = Charsets.UTF_8).apply {
+                    it.write(this)
+                }
             }
         }
     }

@@ -1,0 +1,1595 @@
+Listening for transport dt_socket at address: 5005
+Running on emulator-5554
+16:10:21.642 [main] DEBUG io.netty.util.internal.logging.InternalLoggerFactory - Using SLF4J as the default logging framework
+16:10:21.644 [main] DEBUG io.netty.util.internal.PlatformDependent0 - -Dio.netty.noUnsafe: false
+16:10:21.644 [main] DEBUG io.netty.util.internal.PlatformDependent0 - Java version: 11
+16:10:21.645 [main] DEBUG io.netty.util.internal.PlatformDependent0 - sun.misc.Unsafe.theUnsafe: available
+16:10:21.646 [main] DEBUG io.netty.util.internal.PlatformDependent0 - sun.misc.Unsafe.copyMemory: available
+16:10:21.646 [main] DEBUG io.netty.util.internal.PlatformDependent0 - sun.misc.Unsafe.storeFence: available
+16:10:21.646 [main] DEBUG io.netty.util.internal.PlatformDependent0 - java.nio.Buffer.address: available
+16:10:21.646 [main] DEBUG io.netty.util.internal.PlatformDependent0 - direct buffer constructor: unavailable: Reflective setAccessible(true) disabled
+16:10:21.646 [main] DEBUG io.netty.util.internal.PlatformDependent0 - java.nio.Bits.unaligned: available, true
+16:10:21.647 [main] DEBUG io.netty.util.internal.PlatformDependent0 - jdk.internal.misc.Unsafe.allocateUninitializedArray(int): unavailable: class io.netty.util.internal.PlatformDependent0$7 cannot access class jdk.internal.misc.Unsafe (in module java.base) because module java.base does not export jdk.internal.misc to unnamed module @48075da3
+16:10:21.648 [main] DEBUG io.netty.util.internal.PlatformDependent0 - java.nio.DirectByteBuffer.<init>(long, int): unavailable
+16:10:21.648 [main] DEBUG io.netty.util.internal.PlatformDependent - sun.misc.Unsafe: available
+16:10:21.670 [main] DEBUG io.netty.util.internal.PlatformDependent - maxDirectMemory: 4294967296 bytes (maybe)
+16:10:21.670 [main] DEBUG io.netty.util.internal.PlatformDependent - -Dio.netty.tmpdir: /var/folders/8_/xpvr18_947scmkc4d02nkz8m0000gn/T (java.io.tmpdir)
+16:10:21.670 [main] DEBUG io.netty.util.internal.PlatformDependent - -Dio.netty.bitMode: 64 (sun.arch.data.model)
+16:10:21.670 [main] DEBUG io.netty.util.internal.PlatformDependent - Platform: MacOS
+16:10:21.671 [main] DEBUG io.netty.util.internal.PlatformDependent - -Dio.netty.maxDirectMemory: -1 bytes
+16:10:21.671 [main] DEBUG io.netty.util.internal.PlatformDependent - -Dio.netty.uninitializedArrayAllocationThreshold: -1
+16:10:21.671 [main] DEBUG io.netty.util.internal.CleanerJava9 - java.nio.ByteBuffer.cleaner(): available
+16:10:21.671 [main] DEBUG io.netty.util.internal.PlatformDependent - -Dio.netty.noPreferDirect: false
+16:10:21.723 [main] DEBUG io.netty.channel.MultithreadEventLoopGroup - -Dio.netty.eventLoopThreads: 20
+16:10:21.726 [main] DEBUG io.netty.util.concurrent.GlobalEventExecutor - -Dio.netty.globalEventExecutor.quietPeriodSeconds: 1
+16:10:21.729 [main] DEBUG io.netty.util.internal.InternalThreadLocalMap - -Dio.netty.threadLocalMap.stringBuilder.initialSize: 1024
+16:10:21.729 [main] DEBUG io.netty.util.internal.InternalThreadLocalMap - -Dio.netty.threadLocalMap.stringBuilder.maxSize: 4096
+16:10:21.732 [main] DEBUG io.netty.channel.nio.NioEventLoop - -Dio.netty.noKeySetOptimization: false
+16:10:21.732 [main] DEBUG io.netty.channel.nio.NioEventLoop - -Dio.netty.selectorAutoRebuildThreshold: 512
+16:10:21.735 [main] DEBUG io.netty.util.internal.PlatformDependent - org.jctools-core.MpscChunkedArrayQueue: available
+16:10:23.525 [grpc-default-executor-0] DEBUG io.netty.util.ResourceLeakDetector - -Dio.netty.leakDetection.level: simple
+16:10:23.526 [grpc-default-executor-0] DEBUG io.netty.util.ResourceLeakDetector - -Dio.netty.leakDetection.targetRecords: 4
+16:10:23.528 [grpc-default-executor-0] DEBUG io.netty.buffer.AbstractByteBuf - -Dio.netty.buffer.checkAccessible: true
+16:10:23.528 [grpc-default-executor-0] DEBUG io.netty.buffer.AbstractByteBuf - -Dio.netty.buffer.checkBounds: true
+16:10:23.528 [grpc-default-executor-0] DEBUG io.netty.util.ResourceLeakDetectorFactory - Loaded default ResourceLeakDetector: io.netty.util.ResourceLeakDetector@2b07421e
+16:10:23.552 [grpc-default-executor-0] DEBUG io.netty.buffer.PooledByteBufAllocator - -Dio.netty.allocator.numHeapArenas: 20
+16:10:23.552 [grpc-default-executor-0] DEBUG io.netty.buffer.PooledByteBufAllocator - -Dio.netty.allocator.numDirectArenas: 20
+16:10:23.552 [grpc-default-executor-0] DEBUG io.netty.buffer.PooledByteBufAllocator - -Dio.netty.allocator.pageSize: 8192
+16:10:23.552 [grpc-default-executor-0] DEBUG io.netty.buffer.PooledByteBufAllocator - -Dio.netty.allocator.maxOrder: 9
+16:10:23.552 [grpc-default-executor-0] DEBUG io.netty.buffer.PooledByteBufAllocator - -Dio.netty.allocator.chunkSize: 4194304
+16:10:23.552 [grpc-default-executor-0] DEBUG io.netty.buffer.PooledByteBufAllocator - -Dio.netty.allocator.smallCacheSize: 256
+16:10:23.552 [grpc-default-executor-0] DEBUG io.netty.buffer.PooledByteBufAllocator - -Dio.netty.allocator.normalCacheSize: 64
+16:10:23.552 [grpc-default-executor-0] DEBUG io.netty.buffer.PooledByteBufAllocator - -Dio.netty.allocator.maxCachedBufferCapacity: 32768
+16:10:23.552 [grpc-default-executor-0] DEBUG io.netty.buffer.PooledByteBufAllocator - -Dio.netty.allocator.cacheTrimInterval: 8192
+16:10:23.552 [grpc-default-executor-0] DEBUG io.netty.buffer.PooledByteBufAllocator - -Dio.netty.allocator.cacheTrimIntervalMillis: 0
+16:10:23.552 [grpc-default-executor-0] DEBUG io.netty.buffer.PooledByteBufAllocator - -Dio.netty.allocator.useCacheForAllThreads: false
+16:10:23.552 [grpc-default-executor-0] DEBUG io.netty.buffer.PooledByteBufAllocator - -Dio.netty.allocator.maxCachedByteBuffersPerChunk: 1023
+16:10:23.562 [grpc-default-executor-0] DEBUG io.netty.channel.DefaultChannelId - -Dio.netty.processId: 21050 (auto-detected)
+16:10:23.563 [grpc-default-executor-0] DEBUG io.netty.util.NetUtil - -Djava.net.preferIPv4Stack: false
+16:10:23.563 [grpc-default-executor-0] DEBUG io.netty.util.NetUtil - -Djava.net.preferIPv6Addresses: false
+16:10:23.566 [grpc-default-executor-0] DEBUG io.netty.util.NetUtilInitializations - Loopback interface: lo0 (lo0, 0:0:0:0:0:0:0:1%lo0)
+16:10:23.566 [grpc-default-executor-0] DEBUG io.netty.util.NetUtil - Failed to get SOMAXCONN from sysctl and file /proc/sys/net/core/somaxconn. Default: 128
+16:10:23.567 [grpc-default-executor-0] DEBUG io.netty.channel.DefaultChannelId - -Dio.netty.machineId: 5c:e9:1e:ff:fe:ba:85:e0 (auto-detected)
+16:10:23.579 [grpc-default-executor-0] DEBUG io.netty.buffer.ByteBufUtil - -Dio.netty.allocator.type: pooled
+16:10:23.579 [grpc-default-executor-0] DEBUG io.netty.buffer.ByteBufUtil - -Dio.netty.threadLocalDirectBufferSize: 0
+16:10:23.579 [grpc-default-executor-0] DEBUG io.netty.buffer.ByteBufUtil - -Dio.netty.maxThreadLocalCharBufferSize: 16384
+16:10:23.584 [grpc-default-executor-0] DEBUG io.netty.util.Recycler - -Dio.netty.recycler.maxCapacityPerThread: 4096
+16:10:23.584 [grpc-default-executor-0] DEBUG io.netty.util.Recycler - -Dio.netty.recycler.ratio: 8
+16:10:23.584 [grpc-default-executor-0] DEBUG io.netty.util.Recycler - -Dio.netty.recycler.chunkSize: 32
+16:10:23.584 [grpc-default-executor-0] DEBUG io.netty.util.Recycler - -Dio.netty.recycler.blocking: false
+16:10:23.584 [grpc-default-executor-0] DEBUG io.netty.util.Recycler - -Dio.netty.recycler.batchFastThreadLocalOnly: true
+16:10:23.591 [grpc-nio-worker-ELG-1-2] DEBUG io.grpc.netty.NettyClientHandler - [id: 0xfe305136, L:/127.0.0.1:61639 - R:localhost/127.0.0.1:7001] OUTBOUND SETTINGS: ack=false settings={ENABLE_PUSH=0, MAX_CONCURRENT_STREAMS=0, INITIAL_WINDOW_SIZE=1048576, MAX_HEADER_LIST_SIZE=8192}
+16:10:23.594 [grpc-nio-worker-ELG-1-2] DEBUG io.grpc.netty.NettyClientHandler - [id: 0xfe305136, L:/127.0.0.1:61639 - R:localhost/127.0.0.1:7001] OUTBOUND WINDOW_UPDATE: streamId=0 windowSizeIncrement=983041
+16:10:23.598 [grpc-nio-worker-ELG-1-2] DEBUG io.grpc.netty.NettyClientHandler - [id: 0xfe305136, L:/127.0.0.1:61639 - R:localhost/127.0.0.1:7001] INBOUND SETTINGS: ack=false settings={MAX_CONCURRENT_STREAMS=2147483647, INITIAL_WINDOW_SIZE=1048576, MAX_HEADER_LIST_SIZE=8192}
+16:10:23.599 [grpc-nio-worker-ELG-1-2] DEBUG io.grpc.netty.NettyClientHandler - [id: 0xfe305136, L:/127.0.0.1:61639 - R:localhost/127.0.0.1:7001] OUTBOUND SETTINGS: ack=true
+16:10:23.604 [grpc-nio-worker-ELG-1-2] DEBUG io.grpc.netty.NettyClientHandler - [id: 0xfe305136, L:/127.0.0.1:61639 - R:localhost/127.0.0.1:7001] INBOUND WINDOW_UPDATE: streamId=0 windowSizeIncrement=983041
+16:10:23.604 [grpc-nio-worker-ELG-1-2] DEBUG io.grpc.netty.NettyClientHandler - [id: 0xfe305136, L:/127.0.0.1:61639 - R:localhost/127.0.0.1:7001] INBOUND SETTINGS: ack=true
+16:10:23.611 [grpc-nio-worker-ELG-1-2] DEBUG io.grpc.netty.NettyClientHandler - [id: 0xfe305136, L:/127.0.0.1:61639 - R:localhost/127.0.0.1:7001] OUTBOUND HEADERS: streamId=3 headers=GrpcHttp2OutboundHeaders[:authority: localhost:7001, :path: /maestro_android.MaestroDriver/deviceInfo, :method: POST, :scheme: http, content-type: application/grpc, te: trailers, user-agent: grpc-java-netty/1.50.2, grpc-accept-encoding: gzip] streamDependency=0 weight=16 exclusive=false padding=0 endStream=false
+16:10:23.615 [grpc-nio-worker-ELG-1-2] DEBUG io.grpc.netty.NettyClientHandler - [id: 0xfe305136, L:/127.0.0.1:61639 - R:localhost/127.0.0.1:7001] OUTBOUND DATA: streamId=3 padding=0 endStream=true length=5 bytes=0000000000
+16:10:23.622 [grpc-nio-worker-ELG-1-2] DEBUG io.grpc.netty.NettyClientHandler - [id: 0xfe305136, L:/127.0.0.1:61639 - R:localhost/127.0.0.1:7001] INBOUND PING: ack=false bytes=1234
+16:10:23.622 [grpc-nio-worker-ELG-1-2] DEBUG io.grpc.netty.NettyClientHandler - [id: 0xfe305136, L:/127.0.0.1:61639 - R:localhost/127.0.0.1:7001] OUTBOUND PING: ack=true bytes=1234
+16:10:23.630 [grpc-nio-worker-ELG-1-2] DEBUG io.grpc.netty.NettyClientHandler - [id: 0xfe305136, L:/127.0.0.1:61639 - R:localhost/127.0.0.1:7001] INBOUND HEADERS: streamId=3 headers=GrpcHttp2ResponseHeaders[:status: 200, content-type: application/grpc, grpc-encoding: identity, grpc-accept-encoding: gzip] padding=0 endStream=false
+16:10:23.671 [grpc-nio-worker-ELG-1-2] DEBUG io.grpc.netty.NettyClientHandler - [id: 0xfe305136, L:/127.0.0.1:61639 - R:localhost/127.0.0.1:7001] INBOUND DATA: streamId=3 padding=0 endStream=false length=11 bytes=000000000608800c108010
+16:10:23.671 [grpc-nio-worker-ELG-1-2] DEBUG io.grpc.netty.NettyClientHandler - [id: 0xfe305136, L:/127.0.0.1:61639 - R:localhost/127.0.0.1:7001] OUTBOUND PING: ack=false bytes=1234
+16:10:23.673 [grpc-nio-worker-ELG-1-2] DEBUG io.grpc.netty.NettyClientHandler - [id: 0xfe305136, L:/127.0.0.1:61639 - R:localhost/127.0.0.1:7001] INBOUND HEADERS: streamId=3 headers=GrpcHttp2ResponseHeaders[grpc-status: 0] padding=0 endStream=true
+16:10:23.675 [grpc-nio-worker-ELG-1-2] DEBUG io.grpc.netty.NettyClientHandler - [id: 0xfe305136, L:/127.0.0.1:61639 - R:localhost/127.0.0.1:7001] INBOUND PING: ack=true bytes=1234
+16:10:23.678 [grpc-nio-worker-ELG-1-2] DEBUG io.grpc.netty.NettyClientHandler - [id: 0xfe305136, L:/127.0.0.1:61639 - R:localhost/127.0.0.1:7001] OUTBOUND HEADERS: streamId=5 headers=GrpcHttp2OutboundHeaders[:authority: localhost:7001, :path: /maestro_android.MaestroDriver/viewHierarchy, :method: POST, :scheme: http, content-type: application/grpc, te: trailers, user-agent: grpc-java-netty/1.50.2, grpc-accept-encoding: gzip] streamDependency=0 weight=16 exclusive=false padding=0 endStream=false
+16:10:23.678 [grpc-nio-worker-ELG-1-2] DEBUG io.grpc.netty.NettyClientHandler - [id: 0xfe305136, L:/127.0.0.1:61639 - R:localhost/127.0.0.1:7001] OUTBOUND DATA: streamId=5 padding=0 endStream=true length=5 bytes=0000000000
+16:10:23.680 [grpc-nio-worker-ELG-1-2] DEBUG io.grpc.netty.NettyClientHandler - [id: 0xfe305136, L:/127.0.0.1:61639 - R:localhost/127.0.0.1:7001] INBOUND PING: ack=false bytes=1234
+16:10:23.680 [grpc-nio-worker-ELG-1-2] DEBUG io.grpc.netty.NettyClientHandler - [id: 0xfe305136, L:/127.0.0.1:61639 - R:localhost/127.0.0.1:7001] OUTBOUND PING: ack=true bytes=1234
+16:10:23.932 [grpc-nio-worker-ELG-1-2] DEBUG io.grpc.netty.NettyClientHandler - [id: 0xfe305136, L:/127.0.0.1:61639 - R:localhost/127.0.0.1:7001] INBOUND HEADERS: streamId=5 headers=GrpcHttp2ResponseHeaders[:status: 200, content-type: application/grpc, grpc-encoding: identity, grpc-accept-encoding: gzip] padding=0 endStream=false
+16:10:23.980 [grpc-nio-worker-ELG-1-2] DEBUG io.grpc.netty.NettyClientHandler - [id: 0xfe305136, L:/127.0.0.1:61639 - R:localhost/127.0.0.1:7001] INBOUND DATA: streamId=5 padding=0 endStream=false length=16384 bytes=000000750d0a89ea013c3f786d6c2076657273696f6e3d27312e302720656e636f64696e673d275554462d3827207374616e64616c6f6e653d2779657327203f...
+16:10:23.980 [grpc-nio-worker-ELG-1-2] DEBUG io.grpc.netty.NettyClientHandler - [id: 0xfe305136, L:/127.0.0.1:61639 - R:localhost/127.0.0.1:7001] OUTBOUND PING: ack=false bytes=1234
+16:10:23.981 [grpc-nio-worker-ELG-1-2] DEBUG io.grpc.netty.NettyClientHandler - [id: 0xfe305136, L:/127.0.0.1:61639 - R:localhost/127.0.0.1:7001] INBOUND DATA: streamId=5 padding=0 endStream=false length=13586 bytes=3236345d223e0d0a202020202020202020202020202020202020202020203c6e6f646520696e6465783d2230222068696e74546578743d222220746578743d22...
+16:10:23.982 [grpc-nio-worker-ELG-1-2] DEBUG io.grpc.netty.NettyClientHandler - [id: 0xfe305136, L:/127.0.0.1:61639 - R:localhost/127.0.0.1:7001] INBOUND HEADERS: streamId=5 headers=GrpcHttp2ResponseHeaders[grpc-status: 0] padding=0 endStream=true
+16:10:23.982 [grpc-nio-worker-ELG-1-2] DEBUG io.grpc.netty.NettyClientHandler - [id: 0xfe305136, L:/127.0.0.1:61639 - R:localhost/127.0.0.1:7001] INBOUND PING: ack=true bytes=1234
+{
+  "attributes" : { },
+  "children" : [ {
+    "attributes" : {
+      "ignoreBoundsFiltering" : "false"
+    },
+    "children" : [ {
+      "attributes" : {
+        "text" : "",
+        "accessibilityText" : "",
+        "className" : "android.widget.FrameLayout",
+        "packageName" : "com.android.systemui",
+        "hintText" : "",
+        "ignoreBoundsFiltering" : "false",
+        "resource-id" : "",
+        "clickable" : "false",
+        "bounds" : "[0,0][1536,48]",
+        "enabled" : "true",
+        "focused" : "false",
+        "checked" : "false",
+        "selected" : "false"
+      },
+      "children" : [ {
+        "attributes" : {
+          "text" : "",
+          "accessibilityText" : "",
+          "className" : "android.widget.FrameLayout",
+          "packageName" : "com.android.systemui",
+          "hintText" : "",
+          "ignoreBoundsFiltering" : "false",
+          "resource-id" : "com.android.systemui:id/status_bar_launch_animation_container",
+          "clickable" : "false",
+          "bounds" : "[0,0][1536,48]",
+          "enabled" : "true",
+          "focused" : "false",
+          "checked" : "false",
+          "selected" : "false"
+        },
+        "children" : [ ],
+        "clickable" : false,
+        "enabled" : true,
+        "focused" : false,
+        "checked" : false,
+        "selected" : false
+      }, {
+        "attributes" : {
+          "text" : "",
+          "accessibilityText" : "",
+          "className" : "android.widget.FrameLayout",
+          "packageName" : "com.android.systemui",
+          "hintText" : "",
+          "ignoreBoundsFiltering" : "false",
+          "resource-id" : "com.android.systemui:id/status_bar_container",
+          "clickable" : "false",
+          "bounds" : "[0,0][1536,48]",
+          "enabled" : "true",
+          "focused" : "false",
+          "checked" : "false",
+          "selected" : "false"
+        },
+        "children" : [ {
+          "attributes" : {
+            "text" : "",
+            "accessibilityText" : "",
+            "className" : "android.widget.FrameLayout",
+            "packageName" : "com.android.systemui",
+            "hintText" : "",
+            "ignoreBoundsFiltering" : "false",
+            "resource-id" : "com.android.systemui:id/status_bar",
+            "clickable" : "false",
+            "bounds" : "[0,0][1536,48]",
+            "enabled" : "true",
+            "focused" : "false",
+            "checked" : "false",
+            "selected" : "false"
+          },
+          "children" : [ {
+            "attributes" : {
+              "text" : "",
+              "accessibilityText" : "",
+              "className" : "android.widget.LinearLayout",
+              "packageName" : "com.android.systemui",
+              "hintText" : "",
+              "ignoreBoundsFiltering" : "false",
+              "resource-id" : "com.android.systemui:id/status_bar_contents",
+              "clickable" : "false",
+              "bounds" : "[0,0][1496,48]",
+              "enabled" : "true",
+              "focused" : "false",
+              "checked" : "false",
+              "selected" : "false"
+            },
+            "children" : [ {
+              "attributes" : {
+                "text" : "",
+                "accessibilityText" : "",
+                "className" : "android.widget.FrameLayout",
+                "packageName" : "com.android.systemui",
+                "hintText" : "",
+                "ignoreBoundsFiltering" : "false",
+                "resource-id" : "com.android.systemui:id/status_bar_start_side_container",
+                "clickable" : "false",
+                "bounds" : "[16,0][748,48]",
+                "enabled" : "true",
+                "focused" : "false",
+                "checked" : "false",
+                "selected" : "false"
+              },
+              "children" : [ {
+                "attributes" : {
+                  "text" : "",
+                  "accessibilityText" : "",
+                  "className" : "android.widget.FrameLayout",
+                  "packageName" : "com.android.systemui",
+                  "hintText" : "",
+                  "ignoreBoundsFiltering" : "false",
+                  "resource-id" : "com.android.systemui:id/status_bar_start_side_content",
+                  "clickable" : "false",
+                  "bounds" : "[16,0][178,48]",
+                  "enabled" : "true",
+                  "focused" : "false",
+                  "checked" : "false",
+                  "selected" : "false"
+                },
+                "children" : [ {
+                  "attributes" : {
+                    "text" : "",
+                    "accessibilityText" : "",
+                    "className" : "android.widget.LinearLayout",
+                    "packageName" : "com.android.systemui",
+                    "hintText" : "",
+                    "ignoreBoundsFiltering" : "false",
+                    "resource-id" : "com.android.systemui:id/status_bar_start_side_except_heads_up",
+                    "clickable" : "false",
+                    "bounds" : "[16,0][178,48]",
+                    "enabled" : "true",
+                    "focused" : "false",
+                    "checked" : "false",
+                    "selected" : "false"
+                  },
+                  "children" : [ {
+                    "attributes" : {
+                      "text" : "7:10 ",
+                      "accessibilityText" : "7:10 PM",
+                      "className" : "android.widget.TextView",
+                      "packageName" : "com.android.systemui",
+                      "hintText" : "",
+                      "ignoreBoundsFiltering" : "false",
+                      "resource-id" : "com.android.systemui:id/clock",
+                      "clickable" : "false",
+                      "bounds" : "[16,0][82,48]",
+                      "enabled" : "true",
+                      "focused" : "false",
+                      "checked" : "false",
+                      "selected" : "false"
+                    },
+                    "children" : [ ],
+                    "clickable" : false,
+                    "enabled" : true,
+                    "focused" : false,
+                    "checked" : false,
+                    "selected" : false
+                  }, {
+                    "attributes" : {
+                      "text" : "",
+                      "accessibilityText" : "",
+                      "className" : "android.widget.FrameLayout",
+                      "packageName" : "com.android.systemui",
+                      "hintText" : "",
+                      "ignoreBoundsFiltering" : "false",
+                      "resource-id" : "com.android.systemui:id/notification_icon_area",
+                      "clickable" : "false",
+                      "bounds" : "[82,0][178,48]",
+                      "enabled" : "true",
+                      "focused" : "false",
+                      "checked" : "false",
+                      "selected" : "false"
+                    },
+                    "children" : [ {
+                      "attributes" : {
+                        "text" : "",
+                        "accessibilityText" : "",
+                        "className" : "android.view.ViewGroup",
+                        "packageName" : "com.android.systemui",
+                        "hintText" : "",
+                        "ignoreBoundsFiltering" : "false",
+                        "resource-id" : "com.android.systemui:id/notificationIcons",
+                        "clickable" : "false",
+                        "bounds" : "[82,0][178,48]",
+                        "enabled" : "true",
+                        "focused" : "false",
+                        "checked" : "false",
+                        "selected" : "false"
+                      },
+                      "children" : [ {
+                        "attributes" : {
+                          "text" : "",
+                          "accessibilityText" : "Digital Wellbeing notification: Need time to focus?",
+                          "className" : "android.widget.ImageView",
+                          "packageName" : "com.android.systemui",
+                          "hintText" : "",
+                          "ignoreBoundsFiltering" : "false",
+                          "resource-id" : "",
+                          "clickable" : "false",
+                          "bounds" : "[82,0][130,48]",
+                          "enabled" : "true",
+                          "focused" : "false",
+                          "checked" : "false",
+                          "selected" : "false"
+                        },
+                        "children" : [ ],
+                        "clickable" : false,
+                        "enabled" : true,
+                        "focused" : false,
+                        "checked" : false,
+                        "selected" : false
+                      }, {
+                        "attributes" : {
+                          "text" : "",
+                          "accessibilityText" : "Android System notification: ",
+                          "className" : "android.widget.ImageView",
+                          "packageName" : "com.android.systemui",
+                          "hintText" : "",
+                          "ignoreBoundsFiltering" : "false",
+                          "resource-id" : "",
+                          "clickable" : "false",
+                          "bounds" : "[130,0][178,48]",
+                          "enabled" : "true",
+                          "focused" : "false",
+                          "checked" : "false",
+                          "selected" : "false"
+                        },
+                        "children" : [ ],
+                        "clickable" : false,
+                        "enabled" : true,
+                        "focused" : false,
+                        "checked" : false,
+                        "selected" : false
+                      } ],
+                      "clickable" : false,
+                      "enabled" : true,
+                      "focused" : false,
+                      "checked" : false,
+                      "selected" : false
+                    } ],
+                    "clickable" : false,
+                    "enabled" : true,
+                    "focused" : false,
+                    "checked" : false,
+                    "selected" : false
+                  } ],
+                  "clickable" : false,
+                  "enabled" : true,
+                  "focused" : false,
+                  "checked" : false,
+                  "selected" : false
+                } ],
+                "clickable" : false,
+                "enabled" : true,
+                "focused" : false,
+                "checked" : false,
+                "selected" : false
+              } ],
+              "clickable" : false,
+              "enabled" : true,
+              "focused" : false,
+              "checked" : false,
+              "selected" : false
+            }, {
+              "attributes" : {
+                "text" : "",
+                "accessibilityText" : "",
+                "className" : "android.widget.FrameLayout",
+                "packageName" : "com.android.systemui",
+                "hintText" : "",
+                "ignoreBoundsFiltering" : "false",
+                "resource-id" : "com.android.systemui:id/status_bar_end_side_container",
+                "clickable" : "false",
+                "bounds" : "[748,0][1480,48]",
+                "enabled" : "true",
+                "focused" : "false",
+                "checked" : "false",
+                "selected" : "false"
+              },
+              "children" : [ {
+                "attributes" : {
+                  "text" : "",
+                  "accessibilityText" : "",
+                  "className" : "android.widget.LinearLayout",
+                  "packageName" : "com.android.systemui",
+                  "hintText" : "",
+                  "ignoreBoundsFiltering" : "false",
+                  "resource-id" : "com.android.systemui:id/status_bar_end_side_content",
+                  "clickable" : "false",
+                  "bounds" : "[1387,0][1480,48]",
+                  "enabled" : "true",
+                  "focused" : "false",
+                  "checked" : "false",
+                  "selected" : "false"
+                },
+                "children" : [ {
+                  "attributes" : {
+                    "text" : "",
+                    "accessibilityText" : "",
+                    "className" : "android.widget.LinearLayout",
+                    "packageName" : "com.android.systemui",
+                    "hintText" : "",
+                    "ignoreBoundsFiltering" : "false",
+                    "resource-id" : "com.android.systemui:id/system_icons",
+                    "clickable" : "false",
+                    "bounds" : "[1387,0][1480,48]",
+                    "enabled" : "true",
+                    "focused" : "false",
+                    "checked" : "false",
+                    "selected" : "false"
+                  },
+                  "children" : [ {
+                    "attributes" : {
+                      "text" : "",
+                      "accessibilityText" : "",
+                      "className" : "android.widget.LinearLayout",
+                      "packageName" : "com.android.systemui",
+                      "hintText" : "",
+                      "ignoreBoundsFiltering" : "false",
+                      "resource-id" : "com.android.systemui:id/statusIcons",
+                      "clickable" : "false",
+                      "bounds" : "[1387,0][1464,48]",
+                      "enabled" : "true",
+                      "focused" : "false",
+                      "checked" : "false",
+                      "selected" : "false"
+                    },
+                    "children" : [ {
+                      "attributes" : {
+                        "text" : "",
+                        "accessibilityText" : "",
+                        "className" : "android.widget.FrameLayout",
+                        "packageName" : "com.android.systemui",
+                        "hintText" : "",
+                        "ignoreBoundsFiltering" : "false",
+                        "resource-id" : "com.android.systemui:id/wifi_combo",
+                        "clickable" : "false",
+                        "bounds" : "[1387,2][1422,46]",
+                        "enabled" : "true",
+                        "focused" : "false",
+                        "checked" : "false",
+                        "selected" : "false"
+                      },
+                      "children" : [ {
+                        "attributes" : {
+                          "text" : "",
+                          "accessibilityText" : "",
+                          "className" : "android.widget.LinearLayout",
+                          "packageName" : "com.android.systemui",
+                          "hintText" : "",
+                          "ignoreBoundsFiltering" : "false",
+                          "resource-id" : "com.android.systemui:id/wifi_group",
+                          "clickable" : "false",
+                          "bounds" : "[1392,2][1422,46]",
+                          "enabled" : "true",
+                          "focused" : "false",
+                          "checked" : "false",
+                          "selected" : "false"
+                        },
+                        "children" : [ {
+                          "attributes" : {
+                            "text" : "",
+                            "accessibilityText" : "",
+                            "className" : "android.widget.FrameLayout",
+                            "packageName" : "com.android.systemui",
+                            "hintText" : "",
+                            "ignoreBoundsFiltering" : "false",
+                            "resource-id" : "com.android.systemui:id/wifi_combo",
+                            "clickable" : "false",
+                            "bounds" : "[1392,9][1422,39]",
+                            "enabled" : "true",
+                            "focused" : "false",
+                            "checked" : "false",
+                            "selected" : "false"
+                          },
+                          "children" : [ {
+                            "attributes" : {
+                              "text" : "",
+                              "accessibilityText" : "Wifi signal full.,No internet",
+                              "className" : "android.widget.ImageView",
+                              "packageName" : "com.android.systemui",
+                              "hintText" : "",
+                              "ignoreBoundsFiltering" : "false",
+                              "resource-id" : "com.android.systemui:id/wifi_signal",
+                              "clickable" : "false",
+                              "bounds" : "[1392,9][1422,39]",
+                              "enabled" : "true",
+                              "focused" : "false",
+                              "checked" : "false",
+                              "selected" : "false"
+                            },
+                            "children" : [ ],
+                            "clickable" : false,
+                            "enabled" : true,
+                            "focused" : false,
+                            "checked" : false,
+                            "selected" : false
+                          } ],
+                          "clickable" : false,
+                          "enabled" : true,
+                          "focused" : false,
+                          "checked" : false,
+                          "selected" : false
+                        } ],
+                        "clickable" : false,
+                        "enabled" : true,
+                        "focused" : false,
+                        "checked" : false,
+                        "selected" : false
+                      } ],
+                      "clickable" : false,
+                      "enabled" : true,
+                      "focused" : false,
+                      "checked" : false,
+                      "selected" : false
+                    }, {
+                      "attributes" : {
+                        "text" : "",
+                        "accessibilityText" : "Phone three bars.",
+                        "className" : "android.widget.FrameLayout",
+                        "packageName" : "com.android.systemui",
+                        "hintText" : "",
+                        "ignoreBoundsFiltering" : "false",
+                        "resource-id" : "com.android.systemui:id/mobile_combo",
+                        "clickable" : "false",
+                        "bounds" : "[1422,2][1452,46]",
+                        "enabled" : "true",
+                        "focused" : "false",
+                        "checked" : "false",
+                        "selected" : "false"
+                      },
+                      "children" : [ {
+                        "attributes" : {
+                          "text" : "",
+                          "accessibilityText" : "",
+                          "className" : "android.widget.LinearLayout",
+                          "packageName" : "com.android.systemui",
+                          "hintText" : "",
+                          "ignoreBoundsFiltering" : "false",
+                          "resource-id" : "com.android.systemui:id/mobile_group",
+                          "clickable" : "false",
+                          "bounds" : "[1422,2][1452,46]",
+                          "enabled" : "true",
+                          "focused" : "false",
+                          "checked" : "false",
+                          "selected" : "false"
+                        },
+                        "children" : [ {
+                          "attributes" : {
+                            "text" : "",
+                            "accessibilityText" : "",
+                            "className" : "android.widget.FrameLayout",
+                            "packageName" : "com.android.systemui",
+                            "hintText" : "",
+                            "ignoreBoundsFiltering" : "false",
+                            "resource-id" : "",
+                            "clickable" : "false",
+                            "bounds" : "[1422,9][1452,39]",
+                            "enabled" : "true",
+                            "focused" : "false",
+                            "checked" : "false",
+                            "selected" : "false"
+                          },
+                          "children" : [ {
+                            "attributes" : {
+                              "text" : "",
+                              "accessibilityText" : "",
+                              "className" : "android.widget.ImageView",
+                              "packageName" : "com.android.systemui",
+                              "hintText" : "",
+                              "ignoreBoundsFiltering" : "false",
+                              "resource-id" : "com.android.systemui:id/mobile_signal",
+                              "clickable" : "false",
+                              "bounds" : "[1422,9][1452,39]",
+                              "enabled" : "true",
+                              "focused" : "false",
+                              "checked" : "false",
+                              "selected" : "false"
+                            },
+                            "children" : [ ],
+                            "clickable" : false,
+                            "enabled" : true,
+                            "focused" : false,
+                            "checked" : false,
+                            "selected" : false
+                          } ],
+                          "clickable" : false,
+                          "enabled" : true,
+                          "focused" : false,
+                          "checked" : false,
+                          "selected" : false
+                        } ],
+                        "clickable" : false,
+                        "enabled" : true,
+                        "focused" : false,
+                        "checked" : false,
+                        "selected" : false
+                      } ],
+                      "clickable" : false,
+                      "enabled" : true,
+                      "focused" : false,
+                      "checked" : false,
+                      "selected" : false
+                    } ],
+                    "clickable" : false,
+                    "enabled" : true,
+                    "focused" : false,
+                    "checked" : false,
+                    "selected" : false
+                  }, {
+                    "attributes" : {
+                      "text" : "",
+                      "accessibilityText" : "Battery 100 percent.",
+                      "className" : "android.widget.LinearLayout",
+                      "packageName" : "com.android.systemui",
+                      "hintText" : "",
+                      "ignoreBoundsFiltering" : "false",
+                      "resource-id" : "com.android.systemui:id/battery",
+                      "clickable" : "false",
+                      "bounds" : "[1464,0][1480,48]",
+                      "enabled" : "true",
+                      "focused" : "false",
+                      "checked" : "false",
+                      "selected" : "false"
+                    },
+                    "children" : [ {
+                      "attributes" : {
+                        "text" : "",
+                        "accessibilityText" : "",
+                        "className" : "android.widget.ImageView",
+                        "packageName" : "com.android.systemui",
+                        "hintText" : "",
+                        "ignoreBoundsFiltering" : "false",
+                        "resource-id" : "",
+                        "clickable" : "false",
+                        "bounds" : "[1464,11][1480,37]",
+                        "enabled" : "true",
+                        "focused" : "false",
+                        "checked" : "false",
+                        "selected" : "false"
+                      },
+                      "children" : [ ],
+                      "clickable" : false,
+                      "enabled" : true,
+                      "focused" : false,
+                      "checked" : false,
+                      "selected" : false
+                    } ],
+                    "clickable" : false,
+                    "enabled" : true,
+                    "focused" : false,
+                    "checked" : false,
+                    "selected" : false
+                  } ],
+                  "clickable" : false,
+                  "enabled" : true,
+                  "focused" : false,
+                  "checked" : false,
+                  "selected" : false
+                } ],
+                "clickable" : false,
+                "enabled" : true,
+                "focused" : false,
+                "checked" : false,
+                "selected" : false
+              } ],
+              "clickable" : false,
+              "enabled" : true,
+              "focused" : false,
+              "checked" : false,
+              "selected" : false
+            } ],
+            "clickable" : false,
+            "enabled" : true,
+            "focused" : false,
+            "checked" : false,
+            "selected" : false
+          } ],
+          "clickable" : false,
+          "enabled" : true,
+          "focused" : false,
+          "checked" : false,
+          "selected" : false
+        } ],
+        "clickable" : false,
+        "enabled" : true,
+        "focused" : false,
+        "checked" : false,
+        "selected" : false
+      } ],
+      "clickable" : false,
+      "enabled" : true,
+      "focused" : false,
+      "checked" : false,
+      "selected" : false
+    }, {
+      "attributes" : {
+        "text" : "",
+        "accessibilityText" : "",
+        "className" : "android.widget.FrameLayout",
+        "packageName" : "com.google.android.apps.nexuslauncher",
+        "hintText" : "",
+        "ignoreBoundsFiltering" : "false",
+        "resource-id" : "",
+        "clickable" : "false",
+        "bounds" : "[0,0][1536,2048]",
+        "enabled" : "true",
+        "focused" : "false",
+        "checked" : "false",
+        "selected" : "false"
+      },
+      "children" : [ {
+        "attributes" : {
+          "text" : "",
+          "accessibilityText" : "",
+          "className" : "android.widget.LinearLayout",
+          "packageName" : "com.google.android.apps.nexuslauncher",
+          "hintText" : "",
+          "ignoreBoundsFiltering" : "false",
+          "resource-id" : "",
+          "clickable" : "false",
+          "bounds" : "[0,0][1536,2048]",
+          "enabled" : "true",
+          "focused" : "false",
+          "checked" : "false",
+          "selected" : "false"
+        },
+        "children" : [ {
+          "attributes" : {
+            "text" : "",
+            "accessibilityText" : "",
+            "className" : "android.widget.FrameLayout",
+            "packageName" : "com.google.android.apps.nexuslauncher",
+            "hintText" : "",
+            "ignoreBoundsFiltering" : "false",
+            "resource-id" : "android:id/content",
+            "clickable" : "false",
+            "bounds" : "[0,0][1536,2048]",
+            "enabled" : "true",
+            "focused" : "false",
+            "checked" : "false",
+            "selected" : "false"
+          },
+          "children" : [ {
+            "attributes" : {
+              "text" : "",
+              "accessibilityText" : "",
+              "className" : "android.widget.FrameLayout",
+              "packageName" : "com.google.android.apps.nexuslauncher",
+              "hintText" : "",
+              "ignoreBoundsFiltering" : "false",
+              "resource-id" : "com.google.android.apps.nexuslauncher:id/launcher",
+              "clickable" : "false",
+              "bounds" : "[0,0][1536,2048]",
+              "enabled" : "true",
+              "focused" : "false",
+              "checked" : "false",
+              "selected" : "false"
+            },
+            "children" : [ {
+              "attributes" : {
+                "text" : "",
+                "accessibilityText" : "",
+                "className" : "android.widget.FrameLayout",
+                "packageName" : "com.google.android.apps.nexuslauncher",
+                "hintText" : "",
+                "ignoreBoundsFiltering" : "false",
+                "resource-id" : "com.google.android.apps.nexuslauncher:id/drag_layer",
+                "clickable" : "false",
+                "bounds" : "[0,0][1536,2048]",
+                "enabled" : "true",
+                "focused" : "false",
+                "checked" : "false",
+                "selected" : "false"
+              },
+              "children" : [ {
+                "attributes" : {
+                  "text" : "",
+                  "accessibilityText" : "",
+                  "className" : "android.view.View",
+                  "packageName" : "com.google.android.apps.nexuslauncher",
+                  "hintText" : "",
+                  "ignoreBoundsFiltering" : "false",
+                  "resource-id" : "com.google.android.apps.nexuslauncher:id/scrim_view",
+                  "clickable" : "false",
+                  "bounds" : "[0,0][1536,2048]",
+                  "enabled" : "true",
+                  "focused" : "false",
+                  "checked" : "false",
+                  "selected" : "false"
+                },
+                "children" : [ ],
+                "clickable" : false,
+                "enabled" : true,
+                "focused" : false,
+                "checked" : false,
+                "selected" : false
+              }, {
+                "attributes" : {
+                  "text" : "",
+                  "accessibilityText" : "",
+                  "className" : "android.widget.ScrollView",
+                  "packageName" : "com.google.android.apps.nexuslauncher",
+                  "hintText" : "",
+                  "ignoreBoundsFiltering" : "false",
+                  "resource-id" : "com.google.android.apps.nexuslauncher:id/workspace",
+                  "clickable" : "false",
+                  "bounds" : "[0,0][1536,2048]",
+                  "enabled" : "true",
+                  "focused" : "false",
+                  "checked" : "false",
+                  "selected" : "false"
+                },
+                "children" : [ {
+                  "attributes" : {
+                    "text" : "",
+                    "accessibilityText" : "",
+                    "className" : "android.view.ViewGroup",
+                    "packageName" : "com.google.android.apps.nexuslauncher",
+                    "hintText" : "",
+                    "ignoreBoundsFiltering" : "false",
+                    "resource-id" : "",
+                    "clickable" : "false",
+                    "bounds" : "[29,48][1507,1725]",
+                    "enabled" : "true",
+                    "focused" : "false",
+                    "checked" : "false",
+                    "selected" : "false"
+                  },
+                  "children" : [ {
+                    "attributes" : {
+                      "text" : "",
+                      "accessibilityText" : "",
+                      "className" : "android.view.ViewGroup",
+                      "packageName" : "com.google.android.apps.nexuslauncher",
+                      "hintText" : "",
+                      "ignoreBoundsFiltering" : "false",
+                      "resource-id" : "",
+                      "clickable" : "false",
+                      "bounds" : "[102,48][1434,1653]",
+                      "enabled" : "true",
+                      "focused" : "false",
+                      "checked" : "false",
+                      "selected" : "false"
+                    },
+                    "children" : [ {
+                      "attributes" : {
+                        "text" : "",
+                        "accessibilityText" : "",
+                        "className" : "android.widget.FrameLayout",
+                        "packageName" : "com.google.android.apps.nexuslauncher",
+                        "hintText" : "",
+                        "ignoreBoundsFiltering" : "false",
+                        "resource-id" : "com.google.android.apps.nexuslauncher:id/search_container_workspace",
+                        "clickable" : "false",
+                        "bounds" : "[102,48][753,273]",
+                        "enabled" : "true",
+                        "focused" : "false",
+                        "checked" : "false",
+                        "selected" : "false"
+                      },
+                      "children" : [ {
+                        "attributes" : {
+                          "text" : "",
+                          "accessibilityText" : "",
+                          "className" : "android.widget.FrameLayout",
+                          "packageName" : "com.google.android.apps.nexuslauncher",
+                          "hintText" : "",
+                          "ignoreBoundsFiltering" : "false",
+                          "resource-id" : "com.google.android.apps.nexuslauncher:id/bc_smartspace_view",
+                          "clickable" : "false",
+                          "bounds" : "[134,56][753,264]",
+                          "enabled" : "true",
+                          "focused" : "false",
+                          "checked" : "false",
+                          "selected" : "false"
+                        },
+                        "children" : [ {
+                          "attributes" : {
+                            "text" : "",
+                            "accessibilityText" : "",
+                            "className" : "androidx.viewpager.widget.ViewPager",
+                            "packageName" : "com.google.android.apps.nexuslauncher",
+                            "hintText" : "",
+                            "ignoreBoundsFiltering" : "false",
+                            "resource-id" : "com.google.android.apps.nexuslauncher:id/smartspace_card_pager",
+                            "clickable" : "false",
+                            "bounds" : "[134,56][753,264]",
+                            "enabled" : "true",
+                            "focused" : "false",
+                            "checked" : "false",
+                            "selected" : "false"
+                          },
+                          "children" : [ {
+                            "attributes" : {
+                              "text" : "",
+                              "accessibilityText" : "",
+                              "className" : "android.view.ViewGroup",
+                              "packageName" : "com.google.android.apps.nexuslauncher",
+                              "hintText" : "",
+                              "ignoreBoundsFiltering" : "false",
+                              "resource-id" : "",
+                              "clickable" : "true",
+                              "bounds" : "[134,56][753,264]",
+                              "enabled" : "true",
+                              "focused" : "false",
+                              "checked" : "false",
+                              "selected" : "false"
+                            },
+                            "children" : [ {
+                              "attributes" : {
+                                "text" : "",
+                                "accessibilityText" : "",
+                                "className" : "android.widget.RelativeLayout",
+                                "packageName" : "com.google.android.apps.nexuslauncher",
+                                "hintText" : "",
+                                "ignoreBoundsFiltering" : "false",
+                                "resource-id" : "com.google.android.apps.nexuslauncher:id/text_group",
+                                "clickable" : "false",
+                                "bounds" : "[134,109][753,212]",
+                                "enabled" : "true",
+                                "focused" : "false",
+                                "checked" : "false",
+                                "selected" : "false"
+                              },
+                              "children" : [ {
+                                "attributes" : {
+                                  "text" : "Thu, Oct 26",
+                                  "accessibilityText" : "Thu, Oct 26",
+                                  "className" : "android.widget.TextView",
+                                  "packageName" : "com.google.android.apps.nexuslauncher",
+                                  "hintText" : "",
+                                  "ignoreBoundsFiltering" : "false",
+                                  "resource-id" : "com.google.android.apps.nexuslauncher:id/date",
+                                  "clickable" : "true",
+                                  "bounds" : "[134,109][753,156]",
+                                  "enabled" : "true",
+                                  "focused" : "false",
+                                  "checked" : "false",
+                                  "selected" : "false"
+                                },
+                                "children" : [ ],
+                                "clickable" : true,
+                                "enabled" : true,
+                                "focused" : false,
+                                "checked" : false,
+                                "selected" : false
+                              }, {
+                                "attributes" : {
+                                  "text" : "",
+                                  "accessibilityText" : "",
+                                  "className" : "android.view.ViewGroup",
+                                  "packageName" : "com.google.android.apps.nexuslauncher",
+                                  "hintText" : "",
+                                  "ignoreBoundsFiltering" : "false",
+                                  "resource-id" : "com.google.android.apps.nexuslauncher:id/smartspace_subtitle_group",
+                                  "clickable" : "false",
+                                  "bounds" : "[134,174][150,212]",
+                                  "enabled" : "true",
+                                  "focused" : "false",
+                                  "checked" : "false",
+                                  "selected" : "false"
+                                },
+                                "children" : [ ],
+                                "clickable" : false,
+                                "enabled" : true,
+                                "focused" : false,
+                                "checked" : false,
+                                "selected" : false
+                              } ],
+                              "clickable" : false,
+                              "enabled" : true,
+                              "focused" : false,
+                              "checked" : false,
+                              "selected" : false
+                            } ],
+                            "clickable" : true,
+                            "enabled" : true,
+                            "focused" : false,
+                            "checked" : false,
+                            "selected" : false
+                          } ],
+                          "clickable" : false,
+                          "enabled" : true,
+                          "focused" : false,
+                          "checked" : false,
+                          "selected" : false
+                        } ],
+                        "clickable" : false,
+                        "enabled" : true,
+                        "focused" : false,
+                        "checked" : false,
+                        "selected" : false
+                      } ],
+                      "clickable" : false,
+                      "enabled" : true,
+                      "focused" : false,
+                      "checked" : false,
+                      "selected" : false
+                    }, {
+                      "attributes" : {
+                        "text" : "",
+                        "accessibilityText" : "Analog",
+                        "className" : "com.android.launcher3.widget.LauncherAppWidgetHostView",
+                        "packageName" : "com.google.android.apps.nexuslauncher",
+                        "hintText" : "",
+                        "ignoreBoundsFiltering" : "false",
+                        "resource-id" : "",
+                        "clickable" : "false",
+                        "bounds" : "[102,738][526,1308]",
+                        "enabled" : "true",
+                        "focused" : "false",
+                        "checked" : "false",
+                        "selected" : "false"
+                      },
+                      "children" : [ {
+                        "attributes" : {
+                          "text" : "",
+                          "accessibilityText" : "",
+                          "className" : "android.widget.FrameLayout",
+                          "packageName" : "com.google.android.deskclock",
+                          "hintText" : "",
+                          "ignoreBoundsFiltering" : "false",
+                          "resource-id" : "com.google.android.deskclock:id/widget_frame",
+                          "clickable" : "true",
+                          "bounds" : "[102,738][526,1308]",
+                          "enabled" : "true",
+                          "focused" : "false",
+                          "checked" : "false",
+                          "selected" : "false"
+                        },
+                        "children" : [ {
+                          "attributes" : {
+                            "text" : "",
+                            "accessibilityText" : "19:10",
+                            "className" : "android.view.View",
+                            "packageName" : "com.google.android.deskclock",
+                            "hintText" : "",
+                            "ignoreBoundsFiltering" : "false",
+                            "resource-id" : "com.google.android.deskclock:id/base_clock",
+                            "clickable" : "false",
+                            "bounds" : "[102,738][526,1308]",
+                            "enabled" : "true",
+                            "focused" : "false",
+                            "checked" : "false",
+                            "selected" : "false"
+                          },
+                          "children" : [ ],
+                          "clickable" : false,
+                          "enabled" : true,
+                          "focused" : false,
+                          "checked" : false,
+                          "selected" : false
+                        }, {
+                          "attributes" : {
+                            "text" : "",
+                            "accessibilityText" : "19:10",
+                            "className" : "android.view.View",
+                            "packageName" : "com.google.android.deskclock",
+                            "hintText" : "",
+                            "ignoreBoundsFiltering" : "false",
+                            "resource-id" : "com.google.android.deskclock:id/date_clock",
+                            "clickable" : "false",
+                            "bounds" : "[102,738][526,1308]",
+                            "enabled" : "true",
+                            "focused" : "false",
+                            "checked" : "false",
+                            "selected" : "false"
+                          },
+                          "children" : [ ],
+                          "clickable" : false,
+                          "enabled" : true,
+                          "focused" : false,
+                          "checked" : false,
+                          "selected" : false
+                        }, {
+                          "attributes" : {
+                            "text" : "Thursday, Oct 26, 7:10 PM",
+                            "accessibilityText" : "Thursday, Oct 26, 7:10 PM",
+                            "className" : "android.widget.TextView",
+                            "packageName" : "com.google.android.deskclock",
+                            "hintText" : "",
+                            "ignoreBoundsFiltering" : "false",
+                            "resource-id" : "com.google.android.deskclock:id/a11y_clock",
+                            "clickable" : "false",
+                            "bounds" : "[102,738][427,776]",
+                            "enabled" : "true",
+                            "focused" : "false",
+                            "checked" : "false",
+                            "selected" : "false"
+                          },
+                          "children" : [ ],
+                          "clickable" : false,
+                          "enabled" : true,
+                          "focused" : false,
+                          "checked" : false,
+                          "selected" : false
+                        }, {
+                          "attributes" : {
+                            "text" : "",
+                            "accessibilityText" : "",
+                            "className" : "android.widget.FrameLayout",
+                            "packageName" : "com.google.android.deskclock",
+                            "hintText" : "",
+                            "ignoreBoundsFiltering" : "false",
+                            "resource-id" : "android:id/background",
+                            "clickable" : "false",
+                            "bounds" : "[116,825][511,1220]",
+                            "enabled" : "true",
+                            "focused" : "false",
+                            "checked" : "false",
+                            "selected" : "false"
+                          },
+                          "children" : [ ],
+                          "clickable" : false,
+                          "enabled" : true,
+                          "focused" : false,
+                          "checked" : false,
+                          "selected" : false
+                        } ],
+                        "clickable" : true,
+                        "enabled" : true,
+                        "focused" : false,
+                        "checked" : false,
+                        "selected" : false
+                      } ],
+                      "clickable" : false,
+                      "enabled" : true,
+                      "focused" : false,
+                      "checked" : false,
+                      "selected" : false
+                    }, {
+                      "attributes" : {
+                        "text" : "",
+                        "accessibilityText" : "Folder: Google, 4 or more items",
+                        "className" : "android.widget.FrameLayout",
+                        "packageName" : "com.google.android.apps.nexuslauncher",
+                        "hintText" : "",
+                        "ignoreBoundsFiltering" : "false",
+                        "resource-id" : "",
+                        "clickable" : "true",
+                        "bounds" : "[329,1428][526,1653]",
+                        "enabled" : "true",
+                        "focused" : "false",
+                        "checked" : "false",
+                        "selected" : "false"
+                      },
+                      "children" : [ {
+                        "attributes" : {
+                          "text" : "Google",
+                          "accessibilityText" : "",
+                          "className" : "android.widget.TextView",
+                          "packageName" : "com.google.android.apps.nexuslauncher",
+                          "hintText" : "",
+                          "ignoreBoundsFiltering" : "false",
+                          "resource-id" : "com.google.android.apps.nexuslauncher:id/folder_icon_name",
+                          "clickable" : "false",
+                          "bounds" : "[329,1600][526,1653]",
+                          "enabled" : "true",
+                          "focused" : "false",
+                          "checked" : "false",
+                          "selected" : "false"
+                        },
+                        "children" : [ ],
+                        "clickable" : false,
+                        "enabled" : true,
+                        "focused" : false,
+                        "checked" : false,
+                        "selected" : false
+                      } ],
+                      "clickable" : true,
+                      "enabled" : true,
+                      "focused" : false,
+                      "checked" : false,
+                      "selected" : false
+                    }, {
+                      "attributes" : {
+                        "text" : "Settings",
+                        "accessibilityText" : "Settings",
+                        "className" : "android.widget.TextView",
+                        "packageName" : "com.google.android.apps.nexuslauncher",
+                        "hintText" : "",
+                        "ignoreBoundsFiltering" : "false",
+                        "resource-id" : "",
+                        "clickable" : "true",
+                        "bounds" : "[556,1428][753,1653]",
+                        "enabled" : "true",
+                        "focused" : "false",
+                        "checked" : "false",
+                        "selected" : "false"
+                      },
+                      "children" : [ ],
+                      "clickable" : true,
+                      "enabled" : true,
+                      "focused" : false,
+                      "checked" : false,
+                      "selected" : false
+                    } ],
+                    "clickable" : false,
+                    "enabled" : true,
+                    "focused" : false,
+                    "checked" : false,
+                    "selected" : false
+                  } ],
+                  "clickable" : false,
+                  "enabled" : true,
+                  "focused" : false,
+                  "checked" : false,
+                  "selected" : false
+                } ],
+                "clickable" : false,
+                "enabled" : true,
+                "focused" : false,
+                "checked" : false,
+                "selected" : false
+              }, {
+                "attributes" : {
+                  "text" : "",
+                  "accessibilityText" : "Home",
+                  "className" : "android.view.View",
+                  "packageName" : "com.google.android.apps.nexuslauncher",
+                  "hintText" : "",
+                  "ignoreBoundsFiltering" : "false",
+                  "resource-id" : "",
+                  "clickable" : "false",
+                  "bounds" : "[0,48][1536,2048]",
+                  "enabled" : "true",
+                  "focused" : "false",
+                  "checked" : "false",
+                  "selected" : "false"
+                },
+                "children" : [ ],
+                "clickable" : false,
+                "enabled" : true,
+                "focused" : false,
+                "checked" : false,
+                "selected" : false
+              }, {
+                "attributes" : {
+                  "text" : "",
+                  "accessibilityText" : "",
+                  "className" : "android.view.View",
+                  "packageName" : "com.google.android.apps.nexuslauncher",
+                  "hintText" : "",
+                  "ignoreBoundsFiltering" : "false",
+                  "resource-id" : "com.google.android.apps.nexuslauncher:id/page_indicator",
+                  "clickable" : "false",
+                  "bounds" : "[0,1630][1536,1678]",
+                  "enabled" : "true",
+                  "focused" : "false",
+                  "checked" : "false",
+                  "selected" : "false"
+                },
+                "children" : [ ],
+                "clickable" : false,
+                "enabled" : true,
+                "focused" : false,
+                "checked" : false,
+                "selected" : false
+              }, {
+                "attributes" : {
+                  "text" : "",
+                  "accessibilityText" : "",
+                  "className" : "android.widget.FrameLayout",
+                  "packageName" : "com.google.android.apps.nexuslauncher",
+                  "hintText" : "",
+                  "ignoreBoundsFiltering" : "false",
+                  "resource-id" : "com.google.android.apps.nexuslauncher:id/overview_actions_view",
+                  "clickable" : "false",
+                  "bounds" : "[0,1655][1536,2048]",
+                  "enabled" : "true",
+                  "focused" : "false",
+                  "checked" : "false",
+                  "selected" : "false"
+                },
+                "children" : [ ],
+                "clickable" : false,
+                "enabled" : true,
+                "focused" : false,
+                "checked" : false,
+                "selected" : false
+              }, {
+                "attributes" : {
+                  "text" : "",
+                  "accessibilityText" : "",
+                  "className" : "android.view.ViewGroup",
+                  "packageName" : "com.google.android.apps.nexuslauncher",
+                  "hintText" : "",
+                  "ignoreBoundsFiltering" : "false",
+                  "resource-id" : "com.google.android.apps.nexuslauncher:id/hotseat",
+                  "clickable" : "false",
+                  "bounds" : "[0,1678][1536,2048]",
+                  "enabled" : "true",
+                  "focused" : "false",
+                  "checked" : "false",
+                  "selected" : "false"
+                },
+                "children" : [ {
+                  "attributes" : {
+                    "text" : "",
+                    "accessibilityText" : "Search",
+                    "className" : "android.widget.FrameLayout",
+                    "packageName" : "com.google.android.apps.nexuslauncher",
+                    "hintText" : "",
+                    "ignoreBoundsFiltering" : "false",
+                    "resource-id" : "com.google.android.apps.nexuslauncher:id/search_container_hotseat",
+                    "clickable" : "true",
+                    "bounds" : "[134,1678][1401,1792]",
+                    "enabled" : "true",
+                    "focused" : "false",
+                    "checked" : "false",
+                    "selected" : "false"
+                  },
+                  "children" : [ {
+                    "attributes" : {
+                      "text" : "",
+                      "accessibilityText" : "Google app",
+                      "className" : "android.widget.ImageView",
+                      "packageName" : "com.google.android.apps.nexuslauncher",
+                      "hintText" : "",
+                      "ignoreBoundsFiltering" : "false",
+                      "resource-id" : "com.google.android.apps.nexuslauncher:id/g_icon",
+                      "clickable" : "true",
+                      "bounds" : "[142,1681][238,1777]",
+                      "enabled" : "true",
+                      "focused" : "false",
+                      "checked" : "false",
+                      "selected" : "false"
+                    },
+                    "children" : [ ],
+                    "clickable" : true,
+                    "enabled" : true,
+                    "focused" : false,
+                    "checked" : false,
+                    "selected" : false
+                  }, {
+                    "attributes" : {
+                      "text" : "",
+                      "accessibilityText" : "",
+                      "className" : "android.widget.LinearLayout",
+                      "packageName" : "com.google.android.apps.nexuslauncher",
+                      "hintText" : "",
+                      "ignoreBoundsFiltering" : "false",
+                      "resource-id" : "com.google.android.apps.nexuslauncher:id/end_part",
+                      "clickable" : "false",
+                      "bounds" : "[1201,1678][1393,1792]",
+                      "enabled" : "true",
+                      "focused" : "false",
+                      "checked" : "false",
+                      "selected" : "false"
+                    },
+                    "children" : [ {
+                      "attributes" : {
+                        "text" : "",
+                        "accessibilityText" : "Voice search",
+                        "className" : "android.widget.ImageView",
+                        "packageName" : "com.google.android.apps.nexuslauncher",
+                        "hintText" : "",
+                        "ignoreBoundsFiltering" : "false",
+                        "resource-id" : "com.google.android.apps.nexuslauncher:id/mic_icon",
+                        "clickable" : "true",
+                        "bounds" : "[1201,1678][1297,1792]",
+                        "enabled" : "true",
+                        "focused" : "false",
+                        "checked" : "false",
+                        "selected" : "false"
+                      },
+                      "children" : [ ],
+                      "clickable" : true,
+                      "enabled" : true,
+                      "focused" : false,
+                      "checked" : false,
+                      "selected" : false
+                    }, {
+                      "attributes" : {
+                        "text" : "",
+                        "accessibilityText" : "Google Lens",
+                        "className" : "android.widget.ImageButton",
+                        "packageName" : "com.google.android.apps.nexuslauncher",
+                        "hintText" : "",
+                        "ignoreBoundsFiltering" : "false",
+                        "resource-id" : "com.google.android.apps.nexuslauncher:id/lens_icon",
+                        "clickable" : "true",
+                        "bounds" : "[1297,1678][1393,1792]",
+                        "enabled" : "true",
+                        "focused" : "false",
+                        "checked" : "false",
+                        "selected" : "false"
+                      },
+                      "children" : [ ],
+                      "clickable" : true,
+                      "enabled" : true,
+                      "focused" : false,
+                      "checked" : false,
+                      "selected" : false
+                    } ],
+                    "clickable" : false,
+                    "enabled" : true,
+                    "focused" : false,
+                    "checked" : false,
+                    "selected" : false
+                  } ],
+                  "clickable" : true,
+                  "enabled" : true,
+                  "focused" : false,
+                  "checked" : false,
+                  "selected" : false
+                }, {
+                  "attributes" : {
+                    "text" : "",
+                    "accessibilityText" : "",
+                    "className" : "android.view.ViewGroup",
+                    "packageName" : "com.google.android.apps.nexuslauncher",
+                    "hintText" : "",
+                    "ignoreBoundsFiltering" : "false",
+                    "resource-id" : "",
+                    "clickable" : "false",
+                    "bounds" : "[135,1835][1401,1984]",
+                    "enabled" : "true",
+                    "focused" : "false",
+                    "checked" : "false",
+                    "selected" : "false"
+                  },
+                  "children" : [ {
+                    "attributes" : {
+                      "text" : "Gmail",
+                      "accessibilityText" : "Gmail",
+                      "className" : "android.widget.TextView",
+                      "packageName" : "com.google.android.apps.nexuslauncher",
+                      "hintText" : "",
+                      "ignoreBoundsFiltering" : "false",
+                      "resource-id" : "",
+                      "clickable" : "true",
+                      "bounds" : "[135,1835][267,1984]",
+                      "enabled" : "true",
+                      "focused" : "false",
+                      "checked" : "false",
+                      "selected" : "false"
+                    },
+                    "children" : [ ],
+                    "clickable" : true,
+                    "enabled" : true,
+                    "focused" : false,
+                    "checked" : false,
+                    "selected" : false
+                  }, {
+                    "attributes" : {
+                      "text" : "Chrome",
+                      "accessibilityText" : "Chrome",
+                      "className" : "android.widget.TextView",
+                      "packageName" : "com.google.android.apps.nexuslauncher",
+                      "hintText" : "",
+                      "ignoreBoundsFiltering" : "false",
+                      "resource-id" : "",
+                      "clickable" : "true",
+                      "bounds" : "[362,1835][494,1984]",
+                      "enabled" : "true",
+                      "focused" : "false",
+                      "checked" : "false",
+                      "selected" : "false"
+                    },
+                    "children" : [ ],
+                    "clickable" : true,
+                    "enabled" : true,
+                    "focused" : false,
+                    "checked" : false,
+                    "selected" : false
+                  }, {
+                    "attributes" : {
+                      "text" : "YouTube",
+                      "accessibilityText" : "YouTube",
+                      "className" : "android.widget.TextView",
+                      "packageName" : "com.google.android.apps.nexuslauncher",
+                      "hintText" : "",
+                      "ignoreBoundsFiltering" : "false",
+                      "resource-id" : "",
+                      "clickable" : "true",
+                      "bounds" : "[589,1835][721,1984]",
+                      "enabled" : "true",
+                      "focused" : "false",
+                      "checked" : "false",
+                      "selected" : "false"
+                    },
+                    "children" : [ ],
+                    "clickable" : true,
+                    "enabled" : true,
+                    "focused" : false,
+                    "checked" : false,
+                    "selected" : false
+                  }, {
+                    "attributes" : {
+                      "text" : "Photos",
+                      "accessibilityText" : "Photos",
+                      "className" : "android.widget.TextView",
+                      "packageName" : "com.google.android.apps.nexuslauncher",
+                      "hintText" : "",
+                      "ignoreBoundsFiltering" : "false",
+                      "resource-id" : "",
+                      "clickable" : "true",
+                      "bounds" : "[816,1835][948,1984]",
+                      "enabled" : "true",
+                      "focused" : "false",
+                      "checked" : "false",
+                      "selected" : "false"
+                    },
+                    "children" : [ ],
+                    "clickable" : true,
+                    "enabled" : true,
+                    "focused" : false,
+                    "checked" : false,
+                    "selected" : false
+                  }, {
+                    "attributes" : {
+                      "text" : "Messages",
+                      "accessibilityText" : "Predicted app: Messages",
+                      "className" : "android.widget.TextView",
+                      "packageName" : "com.google.android.apps.nexuslauncher",
+                      "hintText" : "",
+                      "ignoreBoundsFiltering" : "false",
+                      "resource-id" : "",
+                      "clickable" : "true",
+                      "bounds" : "[1043,1835][1175,1984]",
+                      "enabled" : "true",
+                      "focused" : "false",
+                      "checked" : "false",
+                      "selected" : "false"
+                    },
+                    "children" : [ ],
+                    "clickable" : true,
+                    "enabled" : true,
+                    "focused" : false,
+                    "checked" : false,
+                    "selected" : false
+                  }, {
+                    "attributes" : {
+                      "text" : "Phone",
+                      "accessibilityText" : "Predicted app: Phone",
+                      "className" : "android.widget.TextView",
+                      "packageName" : "com.google.android.apps.nexuslauncher",
+                      "hintText" : "",
+                      "ignoreBoundsFiltering" : "false",
+                      "resource-id" : "",
+                      "clickable" : "true",
+                      "bounds" : "[1270,1835][1401,1984]",
+                      "enabled" : "true",
+                      "focused" : "false",
+                      "checked" : "false",
+                      "selected" : "false"
+                    },
+                    "children" : [ ],
+                    "clickable" : true,
+                    "enabled" : true,
+                    "focused" : false,
+                    "checked" : false,
+                    "selected" : false
+                  } ],
+                  "clickable" : false,
+                  "enabled" : true,
+                  "focused" : false,
+                  "checked" : false,
+                  "selected" : false
+                } ],
+                "clickable" : false,
+                "enabled" : true,
+                "focused" : false,
+                "checked" : false,
+                "selected" : false
+              } ],
+              "clickable" : false,
+              "enabled" : true,
+              "focused" : false,
+              "checked" : false,
+              "selected" : false
+            } ],
+            "clickable" : false,
+            "enabled" : true,
+            "focused" : false,
+            "checked" : false,
+            "selected" : false
+          } ],
+          "clickable" : false,
+          "enabled" : true,
+          "focused" : false,
+          "checked" : false,
+          "selected" : false
+        } ],
+        "clickable" : false,
+        "enabled" : true,
+        "focused" : false,
+        "checked" : false,
+        "selected" : false
+      } ],
+      "clickable" : false,
+      "enabled" : true,
+      "focused" : false,
+      "checked" : false,
+      "selected" : false
+    } ],
+    "clickable" : false,
+    "enabled" : false,
+    "focused" : false,
+    "checked" : false,
+    "selected" : false
+  } ]
+}

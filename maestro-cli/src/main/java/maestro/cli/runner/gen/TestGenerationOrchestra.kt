@@ -72,7 +72,7 @@ class TestGenerationOrchestra(
         // TODO's: improve active waits
         for (currentIteration in 1..testSize) {
             runBlocking {
-                delay(500L)
+                delay(2000L)
             }
             val hierarchy = maestro.viewHierarchy().run { ViewHierarchy(root = TreeIndexer.addTypeAndIndex(this.root)) }
             if (endTestIfOutsideApp && isOutsideApp(hierarchy) && currentIteration > 1) return
