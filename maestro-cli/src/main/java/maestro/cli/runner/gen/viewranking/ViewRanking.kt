@@ -1,12 +1,13 @@
 package maestro.cli.runner.gen.viewranking
 
 import maestro.TreeNode
+import maestro.cli.runner.gen.commandselection.CommandInformation
 import maestro.cli.runner.gen.commandselection.CommandSelectionStrategy
 import maestro.cli.runner.gen.viewranking.actionhash.TreeDirectionHasher
 import maestro.orchestra.LaunchAppCommand
 import maestro.orchestra.MaestroCommand
 
-class ViewRanking : CommandSelectionStrategy {
+class ViewRanking(override val onPreviousCommandUpdated: (CommandInformation) -> Unit) : CommandSelectionStrategy {
 
     private val model: MutableMap<String, ActionInformation> = mutableMapOf()
 
@@ -76,6 +77,13 @@ class ViewRanking : CommandSelectionStrategy {
 
     private fun addEdgesToPreviousAction(hashedActions: List<Pair<String, MaestroCommand>>) {
         if (!isEmpty()) {
+            onPreviousCommandUpdated(
+                CommandInformation(
+                    previousActionCommand,
+                    previousAction,
+                    hashedActions
+                )
+            )
             val usages = model[previousAction]?.second ?: 1
             model[previousAction] =
                 hashedActions.map { (hash, _) -> hash } to usages

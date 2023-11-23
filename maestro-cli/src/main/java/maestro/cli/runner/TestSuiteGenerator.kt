@@ -12,6 +12,7 @@ import maestro.cli.runner.gen.TestGenerationOrchestra
 import maestro.cli.runner.gen.commandselection.CommandSelectionStrategy
 import maestro.cli.runner.gen.hierarchyanalyzer.AndroidHierarchyAnalyzer
 import maestro.cli.runner.gen.hierarchyanalyzer.IOSHierarchyAnalyzer
+import maestro.cli.runner.gen.model.SearchModel
 import maestro.cli.runner.gen.viewdisambiguator.SequentialDisambiguation
 import maestro.cli.runner.gen.viewranking.ViewRanking
 import maestro.debuglog.LogConfig
@@ -45,7 +46,10 @@ class TestSuiteGenerator(
     data class ConfigHeader(val appId: String)
 
     fun generate() {
-        val strategy = CommandSelectionStrategy.strategyFor(strategy)
+        val searchModel = SearchModel()
+        val strategy = CommandSelectionStrategy.strategyFor(strategy) {
+            searchModel.updateModel(it)
+        }
         val disambiguationRule =
             SequentialDisambiguation.sequentialRuleForIdTextAccTextAndAllTogether()
         val analyzer = when (device?.platform) {
@@ -77,8 +81,8 @@ class TestSuiteGenerator(
                     testId
                 )
             }
-
         }
+        searchModel.outputModel()
     }
 
 

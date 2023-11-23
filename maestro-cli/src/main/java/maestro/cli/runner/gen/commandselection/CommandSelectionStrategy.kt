@@ -12,15 +12,26 @@ interface CommandSelectionStrategy {
         newTest: Boolean
     ): MaestroCommand
 
+    val onPreviousCommandUpdated: (CommandInformation) -> Unit
+
     object UnableToPickCommand : Exception()
 
     companion object {
-        fun strategyFor(strategy: String): CommandSelectionStrategy {
+        fun strategyFor(
+            strategy: String,
+            onPreviousCommandUpdated: (CommandInformation) -> Unit
+        ): CommandSelectionStrategy {
             return when (strategy.lowercase()) {
                 "random" -> RandomCommandSelection()
-                "viewranking" -> ViewRanking()
+                "viewranking" -> ViewRanking(onPreviousCommandUpdated)
                 else -> RandomCommandSelection()
             }
         }
     }
 }
+
+data class CommandInformation(
+    val commandExecuted: MaestroCommand,
+    val hash: String,
+    val destinations: List<Pair<String, MaestroCommand>>
+)

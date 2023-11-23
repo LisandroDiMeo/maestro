@@ -10,6 +10,7 @@ import maestro.FindElementResult
 import maestro.Maestro
 import maestro.MaestroException
 import maestro.ViewHierarchy
+import maestro.cli.runner.gen.commandselection.CommandInformation
 import maestro.cli.runner.gen.hierarchyanalyzer.HierarchyAnalyzer
 import maestro.cli.runner.gen.viewranking.actionhash.TreeIndexer
 import maestro.js.GraalJsEngine
@@ -42,7 +43,7 @@ class TestGenerationOrchestra(
     private val hierarchyAnalyzer: HierarchyAnalyzer,
     private val httpClient: OkHttpClient? = null,
     private val testSize: Int = 5,
-    private val endTestIfOutsideApp: Boolean = false
+    private val endTestIfOutsideApp: Boolean = false,
 ) {
     private var copiedText: String? = null
 

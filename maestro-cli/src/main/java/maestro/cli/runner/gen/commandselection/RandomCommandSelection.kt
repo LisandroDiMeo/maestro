@@ -14,4 +14,8 @@ class RandomCommandSelection(private val random: Random = Random(1234)) : Comman
         if (availableCommands.isEmpty()) throw CommandSelectionStrategy.UnableToPickCommand
         return availableCommands.map { it.first }.random(random)
     }
+
+    override val onPreviousCommandUpdated: (CommandInformation) -> Unit
+        get() = TODO("Not yet implemented")
+
 }

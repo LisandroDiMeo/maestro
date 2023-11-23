@@ -2,6 +2,7 @@ package maestro.cli.runner.gen.hierarchyanalyzer
 
 import maestro.TreeNode
 import maestro.ViewHierarchy
+import maestro.cli.runner.gen.commandselection.CommandSelectionStrategy
 import maestro.cli.runner.gen.viewdisambiguator.DisambiguationRule
 import maestro.orchestra.Command
 import maestro.orchestra.ElementSelector
@@ -13,6 +14,7 @@ import maestro.orchestra.ScrollCommand
 
 abstract class HierarchyAnalyzer(
     open val viewDisambiguator: DisambiguationRule,
+    open val selectionStrategy: CommandSelectionStrategy,
 ) {
 
     protected var previousAction: Pair<MaestroCommand,TreeNode>? = null

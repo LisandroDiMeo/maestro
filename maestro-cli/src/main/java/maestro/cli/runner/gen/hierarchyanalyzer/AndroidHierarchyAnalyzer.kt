@@ -10,9 +10,9 @@ import maestro.orchestra.MaestroCommand
 import maestro.orchestra.TapOnElementCommand
 
 class AndroidHierarchyAnalyzer(
-    private val selectionStrategy: CommandSelectionStrategy,
+    override val selectionStrategy: CommandSelectionStrategy,
     override val viewDisambiguator: DisambiguationRule,
-) : HierarchyAnalyzer(viewDisambiguator) {
+) : HierarchyAnalyzer(viewDisambiguator, selectionStrategy) {
     override fun fetchCommandFrom(
         hierarchy: ViewHierarchy,
         newTest: Boolean
