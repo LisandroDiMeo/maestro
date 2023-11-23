@@ -77,21 +77,7 @@ class TestSuiteGenerator(
                     testId
                 )
             }
-            if (strategy is ViewRanking) {
-                outputModel(strategy.exploration)
-            }
 
-        }
-    }
-
-    private fun outputModel(model: Map<String, TreeNode>) {
-        FileOutputStream("output.txt", true).use {
-            model.forEach { t, u ->
-                val s = "$t -> $u"
-                s.toByteArray(charset = Charsets.UTF_8).apply {
-                    it.write(this)
-                }
-            }
         }
     }
 

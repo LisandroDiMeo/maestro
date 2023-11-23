@@ -15,15 +15,11 @@ class ViewRanking : CommandSelectionStrategy {
     private var previousAction: String = ""
     private var previousActionCommand: MaestroCommand = MaestroCommand(launchAppCommand = LaunchAppCommand(""))
 
-    val exploration = mutableMapOf<String, TreeNode>()
-    var actionNumber = 0
-
     override fun pickFrom(
         availableCommands: List<Pair<MaestroCommand, TreeNode?>>,
         root: TreeNode,
         newTest: Boolean
     ): MaestroCommand {
-        exploration[previousActionCommand.description() + "_${actionNumber++}"] = root
         val hashedActions = availableCommands.map { (command, node) ->
             actionHasher.hashAction(
                 root,

@@ -10,3 +10,13 @@ interface DisambiguationRule {
         flattenNodes: List<TreeNode>
     ): ElementSelector
 }
+
+class HasChildren : DisambiguationRule {
+    override fun disambiguate(
+        root: TreeNode,
+        view: TreeNode,
+        flattenNodes: List<TreeNode>
+    ): ElementSelector {
+        TODO("Not yet implemented")
+    }
+}

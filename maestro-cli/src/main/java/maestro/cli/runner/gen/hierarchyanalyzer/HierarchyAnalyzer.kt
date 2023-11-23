@@ -23,16 +23,15 @@ abstract class HierarchyAnalyzer(
         flattenNodes: List<TreeNode>
     ): List<Pair<TreeNode, ElementSelector>> {
         val root = hierarchy.root
-        val visibleNodes = flattenNodes.filter { hierarchy.isVisible(it) }
 
-        return visibleNodes
+        return flattenNodes
             .map {
                 it to viewDisambiguator.disambiguate(
                     root,
                     it,
                     flattenNodes
                 )
-            }
+            }.filter { it.second != ElementSelector() }
     }
 
     open fun keyboardOpenCommands(): List<Command> {
