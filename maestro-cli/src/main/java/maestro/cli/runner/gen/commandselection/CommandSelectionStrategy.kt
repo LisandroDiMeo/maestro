@@ -22,9 +22,9 @@ interface CommandSelectionStrategy {
             onPreviousCommandUpdated: (CommandInformation) -> Unit
         ): CommandSelectionStrategy {
             return when (strategy.lowercase()) {
-                "random" -> RandomCommandSelection()
+                "random" -> RandomCommandSelection(onPreviousCommandUpdated)
                 "viewranking" -> ViewRanking(onPreviousCommandUpdated)
-                else -> RandomCommandSelection()
+                else -> RandomCommandSelection(onPreviousCommandUpdated)
             }
         }
     }

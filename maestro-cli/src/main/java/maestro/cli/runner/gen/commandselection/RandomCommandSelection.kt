@@ -4,7 +4,10 @@ import maestro.TreeNode
 import maestro.orchestra.MaestroCommand
 import kotlin.random.Random
 
-class RandomCommandSelection(private val random: Random = Random(1234)) : CommandSelectionStrategy {
+class RandomCommandSelection(
+    override val onPreviousCommandUpdated: (CommandInformation) -> Unit,
+    private val random: Random = Random(1234)
+) : CommandSelectionStrategy {
 
     override fun pickFrom(
         availableCommands: List<Pair<MaestroCommand, TreeNode?>>,
@@ -15,7 +18,5 @@ class RandomCommandSelection(private val random: Random = Random(1234)) : Comman
         return availableCommands.map { it.first }.random(random)
     }
 
-    override val onPreviousCommandUpdated: (CommandInformation) -> Unit
-        get() = TODO("Not yet implemented")
 
 }

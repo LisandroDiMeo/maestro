@@ -1,6 +1,5 @@
 package maestro.cli.runner.gen.model
 
-import maestro.orchestra.MaestroCommand
 import java.io.FileOutputStream
 
 class GraphModel<T> {
@@ -21,14 +20,13 @@ class GraphModel<T> {
 
     }
 
-    fun toDOT() {
+    fun toDotFile(labelProducer: (T) -> String) {
         val graphFile = mutableListOf<String>()
         graphFile.add(
             "digraph {\n"
         )
         graph.forEach { (node, edges) ->
-            // TODO: FIX THIS TO NOT USE AS MAESTRO COMMAND !
-            val label = "${node.hashCode()} [label=\"${(edges.first as MaestroCommand).description()}\"]\n"
+            val label = "${node.hashCode()} [label=\"${labelProducer(edges.first)}\"]\n"
             graphFile.add(label)
         }
         graph.forEach { (node, edges) ->

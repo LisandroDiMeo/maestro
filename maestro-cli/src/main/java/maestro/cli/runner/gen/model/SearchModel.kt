@@ -5,17 +5,20 @@ import maestro.orchestra.MaestroCommand
 
 class SearchModel {
     private val graphModel = GraphModel<MaestroCommand>()
+    private val labelProducer: (MaestroCommand) -> String = {
+        it.description()
+    }
 
     fun updateModel(
-        action: CommandInformation
+        commandInformation: CommandInformation
     ) {
         val vtx = Vertex(
-            action.commandExecuted,
-            action.hash
+            commandInformation.commandExecuted,
+            commandInformation.hash
         )
         graphModel.addNeighborsToVertex(
             vtx,
-            action.destinations.map { (hash, command) ->
+            commandInformation.destinations.map { (hash, command) ->
                 Vertex(
                     command,
                     hash
@@ -23,6 +26,6 @@ class SearchModel {
             })
     }
 
-    fun outputModel() = graphModel.toDOT()
+    fun outputModel() = graphModel.toDotFile(labelProducer)
 }
 
