@@ -18,7 +18,11 @@ abstract class HierarchyAnalyzer(
 ) {
 
     protected var previousAction: Pair<MaestroCommand,TreeNode>? = null
-    abstract fun fetchCommandFrom(hierarchy: ViewHierarchy, newTest: Boolean): MaestroCommand
+    abstract fun fetchCommandFrom(
+        hierarchy: ViewHierarchy,
+        newTest: Boolean,
+        wasLastActionForTest: Boolean
+    ): MaestroCommand
 
     open fun extractWidgets(
         hierarchy: ViewHierarchy,

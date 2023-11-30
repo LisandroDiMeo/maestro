@@ -12,7 +12,8 @@ class RandomCommandSelection(
     override fun pickFrom(
         availableCommands: List<Pair<MaestroCommand, TreeNode?>>,
         root: TreeNode,
-        newTest: Boolean
+        newTest: Boolean,
+        wasLastActionForTest: Boolean
     ): MaestroCommand {
         if (availableCommands.isEmpty()) throw CommandSelectionStrategy.UnableToPickCommand
         return availableCommands.map { it.first }.random(random)

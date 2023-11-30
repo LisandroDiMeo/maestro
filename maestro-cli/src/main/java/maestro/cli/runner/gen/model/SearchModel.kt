@@ -6,7 +6,7 @@ import maestro.orchestra.MaestroCommand
 class SearchModel {
     private val graphModel = GraphModel<MaestroCommand>()
     private val labelProducer: (MaestroCommand) -> String = {
-        it.description()
+        it.description().replace("\"","")
     }
 
     fun updateModel(

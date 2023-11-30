@@ -13,7 +13,6 @@ import maestro.orchestra.InputRandomCommand
 import maestro.orchestra.MaestroCommand
 import maestro.orchestra.ScrollCommand
 import maestro.orchestra.TapOnElementCommand
-import org.junit.Ignore
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -390,14 +389,17 @@ class ViewRankingTest {
         )
         val a = androidViewAnalyzer.fetchCommandFrom(
             contactsMainScreen,
-            true
+            true,
+            false
         )
         val b = androidViewAnalyzer.fetchCommandFrom(
             contactsMainScreenWithPhoneFilter,
+            false,
             false
         )
         val c = androidViewAnalyzer.fetchCommandFrom(
             contactsMainScreenWithPhoneFilter,
+            false,
             false
         )
         Assertions.assertEquals(

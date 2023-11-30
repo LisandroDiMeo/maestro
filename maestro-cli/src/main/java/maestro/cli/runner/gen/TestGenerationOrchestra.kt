@@ -10,7 +10,6 @@ import maestro.FindElementResult
 import maestro.Maestro
 import maestro.MaestroException
 import maestro.ViewHierarchy
-import maestro.cli.runner.gen.commandselection.CommandInformation
 import maestro.cli.runner.gen.hierarchyanalyzer.HierarchyAnalyzer
 import maestro.cli.runner.gen.viewranking.actionhash.TreeIndexer
 import maestro.js.GraalJsEngine
@@ -71,16 +70,19 @@ class TestGenerationOrchestra(
         commandsGenerated.clear()
         openApplication()
         // TODO's: improve active waits
-        for (currentIteration in 1..testSize) {
+        for (currentIteration in 1..testSize + 1) {
             runBlocking {
                 delay(2000L)
             }
             val hierarchy = maestro.viewHierarchy().run { ViewHierarchy(root = TreeIndexer.addTypeAndIndex(this.root)) }
             if (endTestIfOutsideApp && isOutsideApp(hierarchy) && currentIteration > 1) return
+            val wasLastActionForTest = currentIteration == (testSize + 1)
             val command = hierarchyAnalyzer.fetchCommandFrom(
                 hierarchy,
-                currentIteration == 1
+                currentIteration == 1,
+                wasLastActionForTest
             )
+            if (wasLastActionForTest) continue
             commandsGenerated.add(command)
 
             runCycle.onCommandStart(currentIteration, command)

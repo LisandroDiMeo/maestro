@@ -9,7 +9,8 @@ interface CommandSelectionStrategy {
     fun pickFrom(
         availableCommands: List<Pair<MaestroCommand, TreeNode?>>,
         root: TreeNode,
-        newTest: Boolean
+        newTest: Boolean,
+        wasLastActionForTest: Boolean
     ): MaestroCommand
 
     val onPreviousCommandUpdated: (CommandInformation) -> Unit

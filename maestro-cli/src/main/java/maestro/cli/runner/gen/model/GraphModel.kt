@@ -21,15 +21,20 @@ class GraphModel<T> {
     }
 
     fun toDotFile(labelProducer: (T) -> String) {
+        val prunedGraph = graph.mapValues { (key, value) ->
+            val usedVertices = value.second.filter { it.id in graph.keys }
+            value.first to usedVertices
+        }
+
         val graphFile = mutableListOf<String>()
         graphFile.add(
             "digraph {\n"
         )
-        graph.forEach { (node, edges) ->
+        prunedGraph.forEach { (node, edges) ->
             val label = "${node.hashCode()} [label=\"${labelProducer(edges.first)}\"]\n"
             graphFile.add(label)
         }
-        graph.forEach { (node, edges) ->
+        prunedGraph.forEach { (node, edges) ->
             edges.second.forEach { neighbor ->
                 graphFile.add("${node.hashCode()} -> ${neighbor.id.hashCode()}\n")
             }

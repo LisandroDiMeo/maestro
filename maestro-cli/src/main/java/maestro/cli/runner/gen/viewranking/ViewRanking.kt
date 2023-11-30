@@ -19,7 +19,8 @@ class ViewRanking(override val onPreviousCommandUpdated: (CommandInformation) ->
     override fun pickFrom(
         availableCommands: List<Pair<MaestroCommand, TreeNode?>>,
         root: TreeNode,
-        newTest: Boolean
+        newTest: Boolean,
+        wasLastActionForTest: Boolean
     ): MaestroCommand {
         val hashedActions = availableCommands.map { (command, node) ->
             actionHasher.hashAction(
@@ -30,6 +31,7 @@ class ViewRanking(override val onPreviousCommandUpdated: (CommandInformation) ->
         }
         if (!newTest) addEdgesToPreviousAction(hashedActions)
         updateModelWithIncomingActions(hashedActions)
+        if(wasLastActionForTest) return MaestroCommand()
 
         val (bestRankedActionHash, bestRankedAction) = hashedActions.map { (hash, command) ->
             val rank = rank(

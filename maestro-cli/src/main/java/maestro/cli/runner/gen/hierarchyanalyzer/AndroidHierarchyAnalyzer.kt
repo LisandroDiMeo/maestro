@@ -15,7 +15,8 @@ class AndroidHierarchyAnalyzer(
 ) : HierarchyAnalyzer(viewDisambiguator, selectionStrategy) {
     override fun fetchCommandFrom(
         hierarchy: ViewHierarchy,
-        newTest: Boolean
+        newTest: Boolean,
+        wasLastActionForTest: Boolean
     ): MaestroCommand {
         val flattenNodes = hierarchy.aggregate()
         val availableWidgets = extractWidgets(
@@ -41,7 +42,8 @@ class AndroidHierarchyAnalyzer(
         val commandToExecute = selectionStrategy.pickFrom(
             commands.map { (command, node) -> MaestroCommand(command) to node },
             hierarchy.root,
-            newTest
+            newTest,
+            wasLastActionForTest
         )
         val nodeForCommand =
             availableWidgets.firstOrNull { (it.second == commandToExecute.tapOnElement?.selector) }?.first
