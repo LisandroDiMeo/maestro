@@ -7,7 +7,7 @@ import maestro.cli.runner.gen.viewranking.actionhash.TreeDirectionHasher
 import maestro.orchestra.LaunchAppCommand
 import maestro.orchestra.MaestroCommand
 
-class ViewRanking(override val onPreviousCommandUpdated: (CommandInformation) -> Unit) : CommandSelectionStrategy {
+class ViewRanking(override val onPreviousCommandUpdated: (CommandInformation) -> Unit = {}) : CommandSelectionStrategy {
 
     private val model: MutableMap<String, ActionInformation> = mutableMapOf()
 

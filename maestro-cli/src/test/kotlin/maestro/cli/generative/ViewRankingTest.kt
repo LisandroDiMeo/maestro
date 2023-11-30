@@ -59,6 +59,7 @@ class ViewRankingTest {
         viewRanking.pickFrom(
             commandsFetchedForTheFirstTime,
             root,
+            false,
             false
         )
         Assertions.assertFalse(viewRanking.isEmpty())
@@ -84,6 +85,7 @@ class ViewRankingTest {
         val action = viewRanking.pickFrom(
             commandsFetchedForTheFirstTime,
             root,
+            false,
             false
         )
         Assertions.assertTrue(action in commandsFetchedForTheFirstTime.map { it.first })
@@ -109,6 +111,7 @@ class ViewRankingTest {
         val action = viewRanking.pickFrom(
             commandsFetchedForTheFirstTime,
             root,
+            false,
             false
         )
         Assertions.assertEquals(
@@ -137,11 +140,13 @@ class ViewRankingTest {
         val action1 = viewRanking.pickFrom(
             commandsFetchedForTheFirstTime,
             root,
+            false,
             false
         )
         val action2 = viewRanking.pickFrom(
             commandsFetchedForTheFirstTime,
             root,
+            false,
             false
         )
         Assertions.assertNotEquals(
@@ -176,6 +181,7 @@ class ViewRankingTest {
         val action = viewRanking.pickFrom(
             commandsFetchedForTheFirstTime,
             root,
+            false,
             false
         )
         Assertions.assertEquals(
@@ -204,16 +210,19 @@ class ViewRankingTest {
         val action1 = viewRanking.pickFrom(
             commandsFetchedForTheFirstTime,
             root,
+            false,
             false
         )
         val action2 = viewRanking.pickFrom(
             commandsFetchedForTheFirstTime,
             root,
+            false,
             false
         )
         val action3 = viewRanking.pickFrom(
             commandsFetchedForTheFirstTime,
             root,
+            false,
             false
         )
         Assertions.assertEquals(
@@ -260,11 +269,13 @@ class ViewRankingTest {
         val a = viewRanking.pickFrom(
             commandsFetchedForTheFirstTime,
             rootOrigin,
+            false,
             false
         )
         val b = viewRanking.pickFrom(
             commandsForNewScreen,
             rootDestination,
+            false,
             false
         )
         Assertions.assertTrue(a in commandsFetchedForTheFirstTime.map { it.first })
@@ -310,23 +321,27 @@ class ViewRankingTest {
         viewRanking.pickFrom(
             commandsFetchedForTheFirstTime,
             root,
-            true
-        )
-        viewRanking.pickFrom(
-            commandsFetchedForTheFirstTime,
-            root,
+            true,
             false
         )
         viewRanking.pickFrom(
             commandsFetchedForTheFirstTime,
             root,
+            false,
+            false
+        )
+        viewRanking.pickFrom(
+            commandsFetchedForTheFirstTime,
+            root,
+            false,
             false
         )
         // New test start here
         viewRanking.pickFrom(
             commandsFetchedForTheFirstTime,
             root,
-            true
+            true,
+            false
         )
 
         val edges = viewRanking.edgesFor(
