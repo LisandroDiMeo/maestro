@@ -13,8 +13,14 @@ class ViewRanking(override val onPreviousCommandUpdated: (CommandInformation) ->
 
     private val actionHasher = TreeDirectionHasher()
 
+    private val launchAppCommand = MaestroCommand(launchAppCommand = LaunchAppCommand(""))
+    private val launchAppCommandHash = actionHasher.hashAction(TreeNode(), launchAppCommand, null)
     private var previousAction: String = ""
-    private var previousActionCommand: MaestroCommand = MaestroCommand(launchAppCommand = LaunchAppCommand(""))
+    private var previousActionCommand: MaestroCommand = launchAppCommand
+
+    init {
+        model[launchAppCommandHash] = ActionInformation(emptyList(), 0)
+    }
 
     override fun pickFrom(
         availableCommands: List<Pair<MaestroCommand, TreeNode?>>,
@@ -29,7 +35,11 @@ class ViewRanking(override val onPreviousCommandUpdated: (CommandInformation) ->
                 node
             ) to command
         }
-        if (!newTest) addEdgesToPreviousAction(hashedActions)
+        if (newTest) {
+            previousAction = launchAppCommandHash
+            previousActionCommand = launchAppCommand
+        }
+        addEdgesToPreviousAction(hashedActions)
         updateModelWithIncomingActions(hashedActions)
         if(wasLastActionForTest) return MaestroCommand()
 

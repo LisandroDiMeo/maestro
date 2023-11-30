@@ -1,11 +1,13 @@
 package maestro.cli.runner.gen.model
 
+import maestro.cli.runner.gen.TestSuiteGeneratorLogger
 import java.io.File
 import java.io.FileOutputStream
 
 class GraphModel<T> {
 
     private val graph: MutableMap<String, Pair<T, List<Vertex<T>>>> = mutableMapOf()
+    private val logger = TestSuiteGeneratorLogger.logger
 
     fun addNeighborsToVertex(
         vertex: Vertex<T>,
@@ -22,6 +24,7 @@ class GraphModel<T> {
     }
 
     fun toDotFile(labelProducer: (T) -> String) {
+        logger.info("Building visual graph model 🖼️")
         val prunedGraph = graph.mapValues { (_, value) ->
             val usedVertices = value.second.filter { it.id in graph.keys }
             value.first to usedVertices
@@ -66,5 +69,8 @@ class GraphModel<T> {
         processBuilder.redirectOutput(outputFile)
         val startedProcess = processBuilder.start()
         startedProcess.waitFor()
+        if (startedProcess.exitValue() == 0) {
+            logger.info("Successfully generated visual graph model ✅")
+        }
     }
 }

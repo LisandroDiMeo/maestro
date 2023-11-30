@@ -9,6 +9,7 @@ import maestro.TreeNode
 import maestro.cli.device.Device
 import maestro.cli.device.Platform
 import maestro.cli.runner.gen.TestGenerationOrchestra
+import maestro.cli.runner.gen.TestSuiteGeneratorLogger
 import maestro.cli.runner.gen.commandselection.CommandSelectionStrategy
 import maestro.cli.runner.gen.hierarchyanalyzer.AndroidHierarchyAnalyzer
 import maestro.cli.runner.gen.hierarchyanalyzer.IOSHierarchyAnalyzer
@@ -35,13 +36,7 @@ class TestSuiteGenerator(
     private val strategy: String,
 ) {
 
-    private val logger = LoggerFactory.getLogger(TestSuiteGenerator::class.java)
-
-    init {
-        LogConfig.switchLogbackConfiguration(
-            "maestro-cli/src/main/resources/logback-generative.xml"
-        )
-    }
+    private val logger = TestSuiteGeneratorLogger.logger
 
     data class ConfigHeader(val appId: String)
 
@@ -136,12 +131,6 @@ class TestSuiteGenerator(
 }
 
 class TestSuiteGeneratorCycle(private val logger: Logger) : RunCycle() {
-
-    init {
-        LogConfig.switchLogbackConfiguration(
-            "maestro-cli/src/main/resources/logback-generative.xml"
-        )
-    }
 
     override fun onCommandStart(
         commandId: Int,
