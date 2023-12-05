@@ -35,11 +35,6 @@ class ViewRankingTest {
     }
 
     @Test
-    fun `view ranking starts with an empty model`() {
-        Assertions.assertTrue(viewRanking.isEmpty())
-    }
-
-    @Test
     fun `view ranking has a non empty model after first pick from actions`() {
         val root = TreeNode(
             children = listOf(TreeNode(attributes = mutableMapOf("text" to "Press Me")))

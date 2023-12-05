@@ -1,6 +1,7 @@
 package maestro.cli.runner.gen.viewranking
 
 import maestro.TreeNode
+import maestro.cli.runner.gen.TestSuiteGeneratorLogger
 import maestro.cli.runner.gen.commandselection.CommandInformation
 import maestro.cli.runner.gen.commandselection.CommandSelectionStrategy
 import maestro.cli.runner.gen.viewranking.actionhash.TreeDirectionHasher
@@ -10,6 +11,7 @@ import maestro.orchestra.MaestroCommand
 class ViewRanking(override val onPreviousCommandUpdated: (CommandInformation) -> Unit = {}) : CommandSelectionStrategy {
 
     private val model: MutableMap<String, ActionInformation> = mutableMapOf()
+    private val screens: MutableMap<String, List<String>> = mutableMapOf()
 
     private val actionHasher = TreeDirectionHasher()
 
@@ -35,6 +37,8 @@ class ViewRanking(override val onPreviousCommandUpdated: (CommandInformation) ->
                 node
             ) to command
         }
+        screens["${hashedActions.hashCode()}"] = hashedActions.map { it.first }
+        detectCollisions()
         if (newTest) {
             previousAction = launchAppCommandHash
             previousActionCommand = launchAppCommand
@@ -85,6 +89,12 @@ class ViewRanking(override val onPreviousCommandUpdated: (CommandInformation) ->
             usages,
             hopsToUnusedActions
         )
+    }
+
+    private fun detectCollisions() {
+        val flattenValues = screens.values.flatten()
+        val collisions = flattenValues.toSet().size != flattenValues.size
+        TestSuiteGeneratorLogger.logger.info("Collisions detected in screens: $collisions")
     }
 
     private fun addEdgesToPreviousAction(hashedActions: List<Pair<String, MaestroCommand>>) {
