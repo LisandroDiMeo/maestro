@@ -50,7 +50,7 @@ class GraphModel<T> {
 
     private fun writeDotFile(graphFile: MutableList<String>) {
         FileOutputStream("graph.dot").use {
-            graphFile.forEach { line ->
+            graphFile.toSet().forEach { line ->
                 it.write(line.toByteArray())
             }
         }

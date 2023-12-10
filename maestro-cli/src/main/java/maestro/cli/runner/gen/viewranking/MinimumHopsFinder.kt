@@ -12,11 +12,11 @@ object MinimumHopsFinder {
         model: Map<String, ActionInformation>,
         sources: List<String>,
         targets: List<String>
-    ): MutableMap<String, List<String>> {
+    ): Map<String, List<String>> {
         // We keep a modified model that only holds
         // the relationships between nodes, and add a final vertex
         // that will be linked from all the targets
-        // so we can run Dijkstra from each source to only one target
+        // so we can run BFS from each source to only one target
         val adjacencyList = mutableMapOf<String, List<String>>()
         adjacencyList["target"] = emptyList()
         model.forEach { (action, actionInformation) ->
@@ -67,62 +67,4 @@ object MinimumHopsFinder {
         path.reverse()
         return path.toList()
     }
-}
-
-fun main() {
-    val m = mapOf(
-        "1" to ActionInformation(
-            listOf(
-                "4",
-                "5"
-            ),
-            1
-        ),
-        "2" to ActionInformation(
-            listOf(
-                "3",
-                "4"
-            ),
-            1
-        ),
-        "9" to ActionInformation(
-            listOf(),
-            1
-        ),
-        "3" to ActionInformation(
-            listOf("4"),
-            1
-        ),
-        "4" to ActionInformation(
-            listOf("5"),
-            1
-        ),
-        "5" to ActionInformation(
-            listOf("6"),
-            1
-        ),
-        "6" to ActionInformation(
-            listOf("7"),
-            1
-        ),
-        "7" to ActionInformation(
-            listOf(),
-            1
-        ),
-    )
-
-    val hops = MinimumHopsFinder.minimumHopsForSources(
-        m,
-        listOf(
-            "1",
-            "2",
-            "3",
-            "9"
-        ),
-        listOf(
-            "6",
-            "7"
-        )
-    )
-    hops.forEach { (k, v) -> println("Path from $k is $v") }
 }

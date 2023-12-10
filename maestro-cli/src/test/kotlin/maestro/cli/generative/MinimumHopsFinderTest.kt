@@ -53,7 +53,7 @@ class MinimumHopsFinderTest {
     }
 
     @Test
-    fun `given a model where an action A can reach B after more than one hop, the path can reach to B`() {
+    fun `given a model where an action A can reach B after more than one hop, returned path can reach to B`() {
         val model = mapOf(
             "A" to ActionInformation(
                 listOf("A1"),

@@ -74,8 +74,13 @@ class TestGenerationOrchestra(
             runBlocking {
                 delay(2000L)
             }
-            val hierarchy = maestro.viewHierarchy().run { ViewHierarchy(root = TreeIndexer.addTypeAndIndex(this.root)) }
-            if (endTestIfOutsideApp && isOutsideApp(hierarchy) && currentIteration > 1) return
+            var hierarchy = maestro.viewHierarchy().run { ViewHierarchy(root = TreeIndexer.addTypeAndIndex(this.root)) }
+            if (endTestIfOutsideApp && isOutsideApp(hierarchy) && currentIteration > 1) {
+                executeCommand(MaestroCommand(backPressCommand = BackPressCommand()))
+                runBlocking { delay(2000L) }
+                hierarchy = maestro.viewHierarchy().run { ViewHierarchy(root = TreeIndexer.addTypeAndIndex(this.root)) }
+                if(isOutsideApp(hierarchy)) return
+            }
             val wasLastActionForTest = currentIteration == (testSize + 1)
             val command = hierarchyAnalyzer.fetchCommandFrom(
                 hierarchy,

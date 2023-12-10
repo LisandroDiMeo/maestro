@@ -38,7 +38,6 @@ class ViewRanking(override val onPreviousCommandUpdated: (CommandInformation) ->
             ) to command
         }
         screens["${hashedActions.hashCode()}"] = hashedActions.map { it.first }
-        detectCollisions()
         if (newTest) {
             previousAction = launchAppCommandHash
             previousActionCommand = launchAppCommand
@@ -46,18 +45,19 @@ class ViewRanking(override val onPreviousCommandUpdated: (CommandInformation) ->
         addEdgesToPreviousAction(hashedActions)
         updateModelWithIncomingActions(hashedActions)
         if(wasLastActionForTest) return MaestroCommand()
-
+        val shortestPathMap = minimumHopsToUnusedActions(hashedActions.map { it.first })
         val (bestRankedActionHash, bestRankedAction) = hashedActions.map { (hash, command) ->
             val rank = rank(
                 hash,
-                command
+                command,
+                shortestPathMap
             )
             hash to (command to rank)
         }.sortedWith(
             compareBy(
                 { it.second.second.second },
-                { it.second.second.first },
-                { it.second.second.third }
+                { it.second.second.third },
+                { it.second.second.first }
             )
         ).map { it.first to it.second.first }.first()
 
@@ -79,11 +79,12 @@ class ViewRanking(override val onPreviousCommandUpdated: (CommandInformation) ->
 
     private fun rank(
         actionHashed: String,
-        command: MaestroCommand
+        command: MaestroCommand,
+        minimumHopsMap: Map<String, List<String>>
     ): ActionRank {
         val priority = priority(command)
         val usages = model[actionHashed]!!.second
-        val hopsToUnusedActions = Int.MAX_VALUE
+        val hopsToUnusedActions = minimumHopsMap[actionHashed]?.size ?: Int.MAX_VALUE
         return Triple(
             priority,
             usages,
@@ -91,10 +92,11 @@ class ViewRanking(override val onPreviousCommandUpdated: (CommandInformation) ->
         )
     }
 
-    private fun detectCollisions() {
-        val flattenValues = screens.values.flatten()
-        val collisions = flattenValues.toSet().size != flattenValues.size
-        TestSuiteGeneratorLogger.logger.info("Collisions detected in screens: $collisions")
+    private fun minimumHopsToUnusedActions(from: List<String>): Map<String, List<String>> {
+        val to = model.filter { (_, value) ->
+            value.second == 0
+        }.keys.toList()
+        return MinimumHopsFinder.minimumHopsForSources(model, from, to)
     }
 
     private fun addEdgesToPreviousAction(hashedActions: List<Pair<String, MaestroCommand>>) {
