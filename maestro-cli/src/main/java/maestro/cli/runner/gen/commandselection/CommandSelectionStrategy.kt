@@ -24,7 +24,7 @@ interface CommandSelectionStrategy {
         ): CommandSelectionStrategy {
             return when (strategy.lowercase()) {
                 "random" -> RandomCommandSelection(onPreviousCommandUpdated)
-                "viewranking" -> ViewRanking(onPreviousCommandUpdated)
+                "viewranking" -> ViewRanking(onPreviousCommandUpdated = onPreviousCommandUpdated)
                 else -> RandomCommandSelection(onPreviousCommandUpdated)
             }
         }

@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator
 import maestro.Maestro
-import maestro.TreeNode
 import maestro.cli.device.Device
 import maestro.cli.device.Platform
 import maestro.cli.runner.gen.TestGenerationOrchestra
@@ -15,14 +14,11 @@ import maestro.cli.runner.gen.hierarchyanalyzer.AndroidHierarchyAnalyzer
 import maestro.cli.runner.gen.hierarchyanalyzer.IOSHierarchyAnalyzer
 import maestro.cli.runner.gen.model.SearchModel
 import maestro.cli.runner.gen.viewdisambiguator.SequentialDisambiguation
-import maestro.cli.runner.gen.viewranking.ViewRanking
-import maestro.debuglog.LogConfig
 import maestro.orchestra.MaestroCommand
 import maestro.orchestra.Orchestra
 import maestro.orchestra.runcycle.RunCycle
 import maestro.orchestra.yaml.YamlFluentCommand
 import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import java.io.File
 import java.io.FileOutputStream
 
@@ -45,8 +41,11 @@ class TestSuiteGenerator(
         val strategy = CommandSelectionStrategy.strategyFor(strategy) {
             searchModel.updateModel(it)
         }
+        val shouldUseFallbackMechanism = device?.platform == Platform.IOS
         val disambiguationRule =
-            SequentialDisambiguation.sequentialRuleForIdTextAccTextAndAllTogether()
+            SequentialDisambiguation.sequentialRuleForIdTextAccTextAndAllTogether(
+                shouldUseFallbackMechanism
+            )
         val analyzer = when (device?.platform) {
             Platform.ANDROID -> AndroidHierarchyAnalyzer(
                 strategy,

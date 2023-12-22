@@ -6,52 +6,28 @@ import maestro.cli.runner.gen.commandselection.CommandSelectionStrategy
 import maestro.cli.runner.gen.viewdisambiguator.DisambiguationRule
 import maestro.orchestra.BackPressCommand
 import maestro.orchestra.Command
+import maestro.orchestra.ElementSelector
 import maestro.orchestra.MaestroCommand
 import maestro.orchestra.TapOnElementCommand
 
 class AndroidHierarchyAnalyzer(
     override val selectionStrategy: CommandSelectionStrategy,
-    override val viewDisambiguator: DisambiguationRule,
-) : HierarchyAnalyzer(viewDisambiguator, selectionStrategy) {
-    override fun fetchCommandFrom(
-        hierarchy: ViewHierarchy,
-        newTest: Boolean,
-        wasLastActionForTest: Boolean
-    ): MaestroCommand {
-        val flattenNodes = hierarchy.aggregate()
-        val availableWidgets = extractWidgets(
-            hierarchy,
-            flattenNodes
-        )
-        val commands = mutableListOf<Pair<Command, TreeNode?>>()
-        commands.addAll(keyboardOpenCommandsIfOpen(flattenNodes).map { it to hierarchy.root })
-        commands.add(BackPressCommand() to hierarchy.root)
-        scrollCommandIfScrollable(flattenNodes)?.let { commands.add(it to hierarchy.root) }
+    override val disambiguationRule: DisambiguationRule,
+) : HierarchyAnalyzer(disambiguationRule, selectionStrategy) {
 
-        // Generate Tap commands
-        availableWidgets.forEach { (node, selector) ->
+    override fun extractClickableActions(selectors: List<Pair<TreeNode, ElementSelector>>): List<Pair<Command, TreeNode?>> {
+        val resultingCommands = mutableListOf<Pair<Command, TreeNode>>()
+        selectors.forEach { (node, selector) ->
             node.clickable?.let { isClickable ->
                 if (isClickable) {
                     val resourceAndPackage =
                         node.attributes["resource-id"] + "-" + node.attributes["packageName"]
                     if (ignoredResources.all { res -> !resourceAndPackage.contains(res) })
-                        commands.add(TapOnElementCommand(selector) to node)
+                        resultingCommands.add(TapOnElementCommand(selector) to node)
                 }
             }
         }
-        val commandToExecute = selectionStrategy.pickFrom(
-            commands.map { (command, node) -> MaestroCommand(command) to node },
-            hierarchy.root,
-            newTest,
-            wasLastActionForTest
-        )
-        val nodeForCommand =
-            availableWidgets.firstOrNull { (it.second == commandToExecute.tapOnElement?.selector) }?.first
-                ?: TreeNode()
-        if((previousAction != null && previousAction!!.first.inputRandomTextCommand == null) || previousAction == null) {
-            previousAction = commandToExecute to nodeForCommand
-        }
-        return commandToExecute
+        return resultingCommands.toList()
     }
 
     override fun isScrollable(nodes: List<TreeNode>): Boolean {

@@ -1,17 +1,19 @@
 package maestro.cli.runner.gen.viewranking
 
 import maestro.TreeNode
-import maestro.cli.runner.gen.TestSuiteGeneratorLogger
 import maestro.cli.runner.gen.commandselection.CommandInformation
 import maestro.cli.runner.gen.commandselection.CommandSelectionStrategy
 import maestro.cli.runner.gen.viewranking.actionhash.TreeDirectionHasher
 import maestro.orchestra.LaunchAppCommand
 import maestro.orchestra.MaestroCommand
+import kotlin.random.Random
 
-class ViewRanking(override val onPreviousCommandUpdated: (CommandInformation) -> Unit = {}) : CommandSelectionStrategy {
+class ViewRanking(
+    private val random: Random = Random(4242),
+    override val onPreviousCommandUpdated: (CommandInformation) -> Unit = {}
+) : CommandSelectionStrategy {
 
     private val model: MutableMap<String, ActionInformation> = mutableMapOf()
-    private val screens: MutableMap<String, List<String>> = mutableMapOf()
 
     private val actionHasher = TreeDirectionHasher()
 
@@ -37,7 +39,6 @@ class ViewRanking(override val onPreviousCommandUpdated: (CommandInformation) ->
                 node
             ) to command
         }
-        screens["${hashedActions.hashCode()}"] = hashedActions.map { it.first }
         if (newTest) {
             previousAction = launchAppCommandHash
             previousActionCommand = launchAppCommand
@@ -46,6 +47,11 @@ class ViewRanking(override val onPreviousCommandUpdated: (CommandInformation) ->
         updateModelWithIncomingActions(hashedActions)
         if(wasLastActionForTest) return MaestroCommand()
         val shortestPathMap = minimumHopsToUnusedActions(hashedActions.map { it.first })
+        val comparator = compareBy<Pair<String, Pair<MaestroCommand, ActionRank>>>(
+            { it.second.second.second },
+            { it.second.second.third },
+            { it.second.second.first }
+        )
         val (bestRankedActionHash, bestRankedAction) = hashedActions.map { (hash, command) ->
             val rank = rank(
                 hash,
@@ -53,13 +59,9 @@ class ViewRanking(override val onPreviousCommandUpdated: (CommandInformation) ->
                 shortestPathMap
             )
             hash to (command to rank)
-        }.sortedWith(
-            compareBy(
-                { it.second.second.second },
-                { it.second.second.third },
-                { it.second.second.first }
-            )
-        ).map { it.first to it.second.first }.first()
+        }.run { minimumValuesBy(comparator, this) }
+            .map { it.first to it.second.first }
+            .random(random)
 
         previousAction = bestRankedActionHash
         if (previousAction in model.keys) {
@@ -150,3 +152,4 @@ class ViewRanking(override val onPreviousCommandUpdated: (CommandInformation) ->
 
 typealias ActionInformation = Pair<List<String>, Int>
 typealias ActionRank = Triple<Int, Int, Int>
+
