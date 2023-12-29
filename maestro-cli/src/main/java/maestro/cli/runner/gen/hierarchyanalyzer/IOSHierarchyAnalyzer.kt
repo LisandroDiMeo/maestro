@@ -1,15 +1,12 @@
 package maestro.cli.runner.gen.hierarchyanalyzer
 
-import com.oracle.truffle.js.nodes.unary.FlattenNode
 import hierarchy.AXElement.Companion.ELEMENT_TYPES
 import maestro.TreeNode
 import maestro.ViewHierarchy
 import maestro.cli.runner.gen.commandselection.CommandSelectionStrategy
 import maestro.cli.runner.gen.viewdisambiguator.DisambiguationRule
-import maestro.orchestra.BackPressCommand
 import maestro.orchestra.Command
 import maestro.orchestra.ElementSelector
-import maestro.orchestra.MaestroCommand
 import maestro.orchestra.TapOnElementCommand
 
 class IOSHierarchyAnalyzer(
@@ -26,7 +23,7 @@ class IOSHierarchyAnalyzer(
         return resultingCommands.toList()
     }
 
-    override fun isScrollable(nodes: List<TreeNode>): Boolean = false
+    override fun isScrollable(nodes: List<TreeNode>): Boolean = true
 
     override fun isKeyboardOpen(nodes: List<TreeNode>): Boolean =
         nodes.any { ELEMENT_TYPES[it.attributes["elementType"]] == "key" }

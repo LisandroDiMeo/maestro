@@ -44,7 +44,6 @@ class TestGenerationOrchestra(
     private val testSize: Int = 5,
     private val endTestIfOutsideApp: Boolean = false,
 ) {
-    private var copiedText: String? = null
 
     private var timeMsOfLastInteraction = System.currentTimeMillis()
     private var deviceInfo: DeviceInfo? = null
@@ -69,7 +68,6 @@ class TestGenerationOrchestra(
         initJsEngine()
         commandsGenerated.clear()
         openApplication()
-        // TODO's: improve active waits
         for (currentIteration in 1..testSize + 1) {
             runBlocking {
                 delay(2000L)
@@ -117,7 +115,7 @@ class TestGenerationOrchestra(
     private fun openApplication() {
         val launchAppCommand = LaunchAppCommand(
             appId = packageName,
-            clearState = false,
+            clearState = true,
             clearKeychain = null,
             stopApp = true,
         )
@@ -125,7 +123,6 @@ class TestGenerationOrchestra(
         commandsGenerated.add(maestroCommand)
         runCycle.onCommandStart(0, maestroCommand)
         launchAppCommand(launchAppCommand)
-        // TODO: Why I Need to wait the app to settle ?
         runBlocking {
             delay(2000L)
         }
