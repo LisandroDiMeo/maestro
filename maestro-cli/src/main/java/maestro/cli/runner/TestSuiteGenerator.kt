@@ -12,7 +12,7 @@ import maestro.cli.runner.gen.TestSuiteGeneratorLogger
 import maestro.cli.runner.gen.commandselection.CommandSelectionStrategy
 import maestro.cli.runner.gen.hierarchyanalyzer.AndroidHierarchyAnalyzer
 import maestro.cli.runner.gen.hierarchyanalyzer.IOSHierarchyAnalyzer
-import maestro.cli.runner.gen.model.SearchModel
+import maestro.cli.runner.gen.model.ExploredAppModel
 import maestro.cli.runner.gen.viewdisambiguator.SequentialDisambiguation
 import maestro.orchestra.MaestroCommand
 import maestro.orchestra.Orchestra
@@ -37,9 +37,9 @@ class TestSuiteGenerator(
     data class ConfigHeader(val appId: String)
 
     fun generate() {
-        val searchModel = SearchModel()
+        val exploredAppModel = ExploredAppModel()
         val strategy = CommandSelectionStrategy.strategyFor(strategy) {
-            searchModel.updateModel(it)
+            exploredAppModel.updateModel(it)
         }
         val shouldUseFallbackMechanism = device?.platform == Platform.IOS
         val disambiguationRule =
@@ -76,7 +76,7 @@ class TestSuiteGenerator(
                 )
             }
         }
-        searchModel.outputModel()
+        exploredAppModel.outputModel()
     }
 
 

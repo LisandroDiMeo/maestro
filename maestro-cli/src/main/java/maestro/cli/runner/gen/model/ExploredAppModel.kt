@@ -7,7 +7,7 @@ import maestro.orchestra.TapOnElementCommand
 import okhttp3.internal.toHexString
 import kotlin.math.roundToInt
 
-class SearchModel {
+class ExploredAppModel {
     private val graphModel = GraphModel<MaestroCommand>()
     private val labelProducer: (MaestroCommand) -> String = {
         val description = it.description().replace(
@@ -34,13 +34,15 @@ class SearchModel {
             commandInformation.commandExecuted,
             commandInformation.hash
         )
-        graphModel.addNeighborsToVertex(vtx,
-                                        commandInformation.destinations.map { (hash, command) ->
-                                            Vertex(
-                                                command,
-                                                hash
-                                            )
-                                        })
+        graphModel.addNeighborsToVertex(
+            vtx,
+            commandInformation.destinations.map { (hash, command) ->
+                Vertex(
+                    command,
+                    hash
+                )
+            }
+        )
     }
 
     fun outputModel() = graphModel.toDotFile(
@@ -61,7 +63,7 @@ private fun lightenRedColor(percentage: Int): String {
 }
 
 private fun generateMockModel() {
-    val model = SearchModel()
+    val model = ExploredAppModel()
     model.updateModel(
         CommandInformation(
             commandExecuted = MaestroCommand(
