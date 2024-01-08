@@ -107,7 +107,8 @@ class ViewRanking(
                 CommandInformation(
                     previousActionCommand,
                     previousAction,
-                    hashedActions
+                    hashedActions,
+                    usages = model[previousAction]?.second ?: 0
                 )
             )
             val usages = model[previousAction]?.second ?: 1

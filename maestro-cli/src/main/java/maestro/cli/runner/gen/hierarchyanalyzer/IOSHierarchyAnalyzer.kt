@@ -12,7 +12,10 @@ import maestro.orchestra.TapOnElementCommand
 class IOSHierarchyAnalyzer(
     override val selectionStrategy: CommandSelectionStrategy,
     override val disambiguationRule: DisambiguationRule,
-) : HierarchyAnalyzer(disambiguationRule, selectionStrategy) {
+) : HierarchyAnalyzer(
+    disambiguationRule,
+    selectionStrategy
+) {
     override fun extractClickableActions(selectors: List<Pair<TreeNode, ElementSelector>>): List<Pair<Command, TreeNode?>> {
         val resultingCommands = mutableListOf<Pair<Command, TreeNode?>>()
         selectors.forEach { (node, selector) ->
@@ -35,11 +38,22 @@ class IOSHierarchyAnalyzer(
         return hierarchy.aggregate().none { it.attributes.values.toString().contains(packageName) }
     }
 
-    override fun removeIgnoredNodes(flattenNodes: List<TreeNode>): List<TreeNode>{
+    override fun removeIgnoredNodes(flattenNodes: List<TreeNode>): List<TreeNode> {
         val topContainerNodes = flattenNodes
             .first { it.attributes["resource-id"] == TOP_CONTAINER_RES_ID }
             .aggregate()
-        return flattenNodes.filter { it !in topContainerNodes }
+        val keyElementCode = ELEMENT_TYPES.keys.first { ELEMENT_TYPES[it] == "key" }
+        val keyboardNodes = flattenNodes.firstOrNull { node ->
+            node.children.any { childNode ->
+                childNode.attributes["elementType"] == keyElementCode
+            }
+        }?.aggregate() ?: emptyList()
+        val predictiveInput = flattenNodes.firstOrNull { node ->
+            node.attributes["resource-id"] == "SystemInputAssistantView"
+        }?.aggregate() ?: emptyList()
+        return flattenNodes.filter {
+                it !in (topContainerNodes + predictiveInput + keyboardNodes)
+            }
     }
 
     companion object {

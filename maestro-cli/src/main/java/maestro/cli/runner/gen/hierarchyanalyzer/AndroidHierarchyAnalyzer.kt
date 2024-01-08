@@ -7,7 +7,6 @@ import maestro.cli.runner.gen.viewdisambiguator.DisambiguationRule
 import maestro.orchestra.BackPressCommand
 import maestro.orchestra.Command
 import maestro.orchestra.ElementSelector
-import maestro.orchestra.MaestroCommand
 import maestro.orchestra.TapOnElementCommand
 
 class AndroidHierarchyAnalyzer(
@@ -46,6 +45,10 @@ class AndroidHierarchyAnalyzer(
             val resourceId = it.attributes["resource-id"] ?: ""
             resourceId.contains("com.google.android.inputmethod.latin")
         }
+    }
+
+    override fun backPressCommand(): Command? {
+        return BackPressCommand()
     }
 
     override fun isOutsideApp(

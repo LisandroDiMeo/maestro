@@ -23,7 +23,10 @@ class GraphModel<T> {
 
     }
 
-    fun toDotFile(labelProducer: (T) -> String) {
+    fun toDotFile(
+        labelProducer: (T) -> String,
+        colorProducer: (String) -> String
+    ) {
         logger.info("Building visual graph model 🖼️")
         val prunedGraph = graph.mapValues { (_, value) ->
             val usedVertices = value.second.filter { it.id in graph.keys }
@@ -35,7 +38,8 @@ class GraphModel<T> {
             "digraph {\n"
         )
         prunedGraph.forEach { (node, edges) ->
-            val label = "${node.hashCode()} [label=\"${labelProducer(edges.first)}\"]\n"
+            val label =
+                "${node.hashCode()} [style=filled, fillcolor=\"${colorProducer(node)}\", label=\"${labelProducer(edges.first)}\"]\n"
             graphFile.add(label)
         }
         prunedGraph.forEach { (node, edges) ->
@@ -74,3 +78,4 @@ class GraphModel<T> {
         }
     }
 }
+

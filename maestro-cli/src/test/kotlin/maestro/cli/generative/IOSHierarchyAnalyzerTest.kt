@@ -9,8 +9,10 @@ import org.junit.jupiter.api.Test
 
 class IOSHierarchyAnalyzerTest {
     private val contactsMainScreenJson = "generative-test-resources/ios_contacts.json"
+    private val aaa = "generative-test-resources/bla.json"
 
     private val contactsMainScreen = TreeNodeReader.read(contactsMainScreenJson)
+    private val aaaTree = TreeNodeReader.read(aaa)
 
     @Test
     fun health_check() {
@@ -21,7 +23,7 @@ class IOSHierarchyAnalyzerTest {
             disambiguationRule
         )
         var hierarchy =
-            contactsMainScreen.run { ViewHierarchy(root = TreeIndexer.addTypeAndIndex(this)) }
+            aaaTree.run { ViewHierarchy(root = TreeIndexer.addTypeAndIndex(this)) }
         val command = analyzer.fetchCommandFrom(
             hierarchy,
             true,

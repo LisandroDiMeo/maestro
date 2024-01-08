@@ -4,7 +4,6 @@ import maestro.TreeNode
 import maestro.ViewHierarchy
 import maestro.cli.runner.gen.commandselection.CommandSelectionStrategy
 import maestro.cli.runner.gen.viewdisambiguator.DisambiguationRule
-import maestro.orchestra.BackPressCommand
 import maestro.orchestra.Command
 import maestro.orchestra.ElementSelector
 import maestro.orchestra.EraseTextCommand
@@ -12,7 +11,6 @@ import maestro.orchestra.HideKeyboardCommand
 import maestro.orchestra.InputRandomCommand
 import maestro.orchestra.MaestroCommand
 import maestro.orchestra.ScrollCommand
-import maestro.orchestra.TapOnElementCommand
 
 abstract class HierarchyAnalyzer(
     open val disambiguationRule: DisambiguationRule,
@@ -31,7 +29,9 @@ abstract class HierarchyAnalyzer(
         )
         val commands = mutableListOf<Pair<Command, TreeNode?>>()
         commands.addAll(keyboardOpenCommandsIfOpen(flattenNodes).map { it to hierarchy.root })
-        commands.add(BackPressCommand() to hierarchy.root)
+        backPressCommand()?.let {
+            commands.add(it to hierarchy.root)
+        }
         scrollCommandIfScrollable(flattenNodes)?.let { commands.add(it to hierarchy.root) }
         commands.addAll(extractClickableActions(availableWidgets))
 
@@ -78,15 +78,9 @@ abstract class HierarchyAnalyzer(
                 otherSelector == selector
             } == 1
         }
-//        return flattenNodes
-//            .map {
-//                it to disambiguationRule.disambiguate(
-//                    root,
-//                    it,
-//                    flattenNodes
-//                )
-//            }.filter { it.second !in invalidSelectors }
     }
+
+    open fun backPressCommand(): Command? = null
 
     open fun keyboardOpenCommands(): List<Command> {
         return listOf(
