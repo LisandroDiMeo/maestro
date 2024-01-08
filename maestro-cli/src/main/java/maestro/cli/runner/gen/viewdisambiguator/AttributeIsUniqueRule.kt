@@ -3,6 +3,10 @@ package maestro.cli.runner.gen.viewdisambiguator
 import maestro.TreeNode
 import maestro.orchestra.ElementSelector
 
+/**
+ * Rule to attempt disambiguation by checking if certain value for attribute is unique
+ * along the current view tree.
+ */
 abstract class AttributeIsUniqueRule : DisambiguationRule {
 
     abstract fun selector(view: TreeNode): ElementSelector

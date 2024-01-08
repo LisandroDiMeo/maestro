@@ -3,6 +3,10 @@ package maestro.cli.runner.gen.viewdisambiguator
 import maestro.TreeNode
 import maestro.orchestra.ElementSelector
 
+/**
+ * Rule that attempts to disambiguate by applying given [rules] sequentially
+ * until it can produces a non empty selector.
+ */
 class SequentialDisambiguation(
     private val rules: List<DisambiguationRule>
 ) : DisambiguationRule {

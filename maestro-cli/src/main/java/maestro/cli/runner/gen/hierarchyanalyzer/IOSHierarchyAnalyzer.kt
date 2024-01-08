@@ -3,7 +3,7 @@ package maestro.cli.runner.gen.hierarchyanalyzer
 import hierarchy.AXElement.Companion.ELEMENT_TYPES
 import maestro.TreeNode
 import maestro.ViewHierarchy
-import maestro.cli.runner.gen.commandselection.CommandSelectionStrategy
+import maestro.cli.runner.gen.commandselection.strategies.CommandSelectionStrategy
 import maestro.cli.runner.gen.viewdisambiguator.DisambiguationRule
 import maestro.orchestra.Command
 import maestro.orchestra.ElementSelector

@@ -2,20 +2,26 @@ package maestro.cli.runner.gen.viewranking
 
 import maestro.TreeNode
 import maestro.cli.runner.gen.commandselection.CommandInformation
-import maestro.cli.runner.gen.commandselection.CommandSelectionStrategy
+import maestro.cli.runner.gen.commandselection.strategies.CommandSelectionStrategy
+import maestro.cli.runner.gen.viewranking.actionhash.ActionHasher
 import maestro.cli.runner.gen.viewranking.actionhash.TreeDirectionHasher
 import maestro.orchestra.LaunchAppCommand
 import maestro.orchestra.MaestroCommand
 import kotlin.random.Random
 
+/**
+ * Strategy that attempts to pick unused actions or actions that can
+ * lead to screens with unused actions. It's strongly inspired by
+ * ISSTA 2020 Talk by Nadia Alshahwan.
+ * @see <a href="https://www.youtube.com/watch?v=BM89PFDwZuU">ISSTA 2020 Talk</a>
+ */
 class ViewRanking(
     private val random: Random = Random(4242),
-    override val onPreviousCommandUpdated: (CommandInformation) -> Unit = {}
-) : CommandSelectionStrategy {
+    override val actionHasher: ActionHasher = TreeDirectionHasher(),
+    override val onPreviousCommandExecuted: (CommandInformation) -> Unit = {},
+) : CommandSelectionStrategy(actionHasher) {
 
     private val model: MutableMap<String, ActionInformation> = mutableMapOf()
-
-    private val actionHasher = TreeDirectionHasher()
 
     private val launchAppCommand = MaestroCommand(launchAppCommand = LaunchAppCommand(""))
     private val launchAppCommandHash = actionHasher.hashAction(TreeNode(), launchAppCommand, null)
@@ -103,7 +109,7 @@ class ViewRanking(
 
     private fun addEdgesToPreviousAction(hashedActions: List<Pair<String, MaestroCommand>>) {
         if (!isEmpty()) {
-            onPreviousCommandUpdated(
+            onPreviousCommandExecuted(
                 CommandInformation(
                     previousActionCommand,
                     previousAction,

@@ -9,7 +9,7 @@ import maestro.cli.device.Device
 import maestro.cli.device.Platform
 import maestro.cli.runner.gen.TestGenerationOrchestra
 import maestro.cli.runner.gen.TestSuiteGeneratorLogger
-import maestro.cli.runner.gen.commandselection.CommandSelectionStrategy
+import maestro.cli.runner.gen.commandselection.strategies.CommandSelectionStrategy
 import maestro.cli.runner.gen.hierarchyanalyzer.AndroidHierarchyAnalyzer
 import maestro.cli.runner.gen.hierarchyanalyzer.IOSHierarchyAnalyzer
 import maestro.cli.runner.gen.model.ExploredAppModel

@@ -3,6 +3,12 @@ package maestro.cli.runner.gen.viewranking.actionhash
 import maestro.TreeNode
 import maestro.orchestra.MaestroCommand
 
+/**
+ * Hasher that produces a hash by checking:
+ * - The directions for the view in the tree (how to traverse the tree to reach the action)
+ * - The element type
+ * - If the actions is not executed on a view (it's not Tap command) uses its action type.
+ */
 class TreeDirectionHasher : ActionHasher {
 
     override fun hashAction(
