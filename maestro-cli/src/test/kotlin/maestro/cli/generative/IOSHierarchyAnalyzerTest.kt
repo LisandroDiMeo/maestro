@@ -19,7 +19,7 @@ class IOSHierarchyAnalyzerTest {
         val disambiguationRule =
             SequentialDisambiguation.sequentialRuleForIdTextAccTextAndAllTogether(true)
         val analyzer = IOSHierarchyAnalyzer(
-            ViewRanking {},
+            ViewRanking(),
             disambiguationRule
         )
         var hierarchy =

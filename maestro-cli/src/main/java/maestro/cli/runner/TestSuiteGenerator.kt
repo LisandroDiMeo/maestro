@@ -4,6 +4,10 @@ import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 import maestro.Maestro
 import maestro.cli.device.Device
 import maestro.cli.device.Platform
@@ -14,6 +18,7 @@ import maestro.cli.runner.gen.hierarchyanalyzer.AndroidHierarchyAnalyzer
 import maestro.cli.runner.gen.hierarchyanalyzer.IOSHierarchyAnalyzer
 import maestro.cli.runner.gen.model.ExploredAppModel
 import maestro.cli.runner.gen.viewdisambiguator.SequentialDisambiguation
+import maestro.cli.runner.gen.model.ExecutedCommandsObservable
 import maestro.orchestra.MaestroCommand
 import maestro.orchestra.Orchestra
 import maestro.orchestra.runcycle.RunCycle
@@ -38,8 +43,18 @@ class TestSuiteGenerator(
 
     fun generate() {
         val exploredAppModel = ExploredAppModel()
-        val strategy = CommandSelectionStrategy.strategyFor(strategy) {
-            exploredAppModel.updateModel(it)
+        val executedCommandsObservable = ExecutedCommandsObservable()
+        val strategy = CommandSelectionStrategy.strategyFor(
+            strategy,
+            executedCommandsObservable
+        )
+        CoroutineScope(Dispatchers.IO).launch {
+            executedCommandsObservable.commandInformationState.collect {
+                it?.let {
+                    if (it.commandExecuted.stopAppCommand != null) cancel()
+                    exploredAppModel.updateModel(it)
+                }
+            }
         }
         val shouldUseFallbackMechanism = device?.platform == Platform.IOS
         val disambiguationRule =
@@ -75,6 +90,7 @@ class TestSuiteGenerator(
                     testId
                 )
             }
+            executedCommandsObservable.close()
         }
         exploredAppModel.outputModel()
     }

@@ -3,9 +3,9 @@ package maestro.cli.runner.gen.viewranking
 import maestro.TreeNode
 import maestro.cli.runner.gen.commandselection.CommandInformation
 import maestro.cli.runner.gen.commandselection.strategies.CommandSelectionStrategy
+import maestro.cli.runner.gen.model.ExecutedCommandsObservable
 import maestro.cli.runner.gen.viewranking.actionhash.ActionHasher
 import maestro.cli.runner.gen.viewranking.actionhash.TreeDirectionHasher
-import maestro.orchestra.LaunchAppCommand
 import maestro.orchestra.MaestroCommand
 import kotlin.random.Random
 
@@ -18,18 +18,24 @@ import kotlin.random.Random
 class ViewRanking(
     private val random: Random = Random(4242),
     override val actionHasher: ActionHasher = TreeDirectionHasher(),
-    override val onPreviousCommandExecuted: (CommandInformation) -> Unit = {},
-) : CommandSelectionStrategy(actionHasher) {
+    val executedCommandsObservable: ExecutedCommandsObservable = ExecutedCommandsObservable(),
+) : CommandSelectionStrategy(
+    actionHasher,
+    executedCommandsObservable
+) {
 
     private val model: MutableMap<String, ActionInformation> = mutableMapOf()
-
-    private val launchAppCommand = MaestroCommand(launchAppCommand = LaunchAppCommand(""))
-    private val launchAppCommandHash = actionHasher.hashAction(TreeNode(), launchAppCommand, null)
-    private var previousAction: String = ""
-    private var previousActionCommand: MaestroCommand = launchAppCommand
+    private val actionComparator = compareBy<Pair<String, Pair<MaestroCommand, ActionRank>>>(
+        { it.second.second.second },
+        { it.second.second.third },
+        { it.second.second.first }
+    )
 
     init {
-        model[launchAppCommandHash] = ActionInformation(emptyList(), 0)
+        model[launchAppCommandHash] = ActionInformation(
+            emptyList(),
+            0
+        )
     }
 
     override fun pickFrom(
@@ -49,27 +55,51 @@ class ViewRanking(
             previousAction = launchAppCommandHash
             previousActionCommand = launchAppCommand
         }
+        executedCommandsObservable.performUpdate(
+            CommandInformation(
+                previousActionCommand,
+                previousAction,
+                hashedActions,
+                usages = model[previousAction]?.second ?: 1
+            )
+        )
         addEdgesToPreviousAction(hashedActions)
         updateModelWithIncomingActions(hashedActions)
-        if(wasLastActionForTest) return MaestroCommand()
+        if (wasLastActionForTest) return MaestroCommand()
         val shortestPathMap = minimumHopsToUnusedActions(hashedActions.map { it.first })
-        val comparator = compareBy<Pair<String, Pair<MaestroCommand, ActionRank>>>(
-            { it.second.second.second },
-            { it.second.second.third },
-            { it.second.second.first }
+        val (bestRankedActionHash, bestRankedAction) = pairBestRankedHashAction(
+            hashedActions,
+            shortestPathMap,
+            actionComparator
         )
-        val (bestRankedActionHash, bestRankedAction) = hashedActions.map { (hash, command) ->
-            val rank = rank(
-                hash,
-                command,
-                shortestPathMap
-            )
-            hash to (command to rank)
-        }.run { minimumValuesBy(comparator, this) }
-            .map { it.first to it.second.first }
-            .random(random)
 
         previousAction = bestRankedActionHash
+        updateModelWithPreviousAction()
+        previousActionCommand = bestRankedAction
+        return bestRankedAction
+    }
+
+    private fun pairBestRankedHashAction(
+        hashedActions: List<Pair<String, MaestroCommand>>,
+        shortestPathMap: Map<String, List<String>>,
+        comparator: Comparator<Pair<String, Pair<MaestroCommand, ActionRank>>>
+    ) = hashedActions.map { (hash, command) ->
+        val rank = rank(
+            hash,
+            command,
+            shortestPathMap
+        )
+        hash to (command to rank)
+    }.run {
+        minimumValuesBy(
+            comparator,
+            this
+        )
+    }
+        .map { it.first to it.second.first }
+        .random(random)
+
+    private fun updateModelWithPreviousAction() {
         if (previousAction in model.keys) {
             model[previousAction] = ActionInformation(
                 emptyList(),
@@ -81,8 +111,6 @@ class ViewRanking(
                 1
             )
         }
-        previousActionCommand = bestRankedAction
-        return bestRankedAction
     }
 
     private fun rank(
@@ -104,19 +132,15 @@ class ViewRanking(
         val to = model.filter { (_, value) ->
             value.second == 0
         }.keys.toList()
-        return MinimumHopsFinder.minimumHopsForSources(model, from, to)
+        return MinimumHopsFinder.minimumHopsForSources(
+            model,
+            from,
+            to
+        )
     }
 
     private fun addEdgesToPreviousAction(hashedActions: List<Pair<String, MaestroCommand>>) {
         if (!isEmpty()) {
-            onPreviousCommandExecuted(
-                CommandInformation(
-                    previousActionCommand,
-                    previousAction,
-                    hashedActions,
-                    usages = model[previousAction]?.second ?: 0
-                )
-            )
             val usages = model[previousAction]?.second ?: 1
             model[previousAction] =
                 hashedActions.map { (hash, _) -> hash } to usages
