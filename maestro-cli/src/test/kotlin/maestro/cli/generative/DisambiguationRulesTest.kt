@@ -21,14 +21,7 @@ class DisambiguationRulesTest {
     private val uniqueTextRule = HasUniqueText()
     private val uniqueAccessibilityTextRule = HasUniqueAccessibilityText()
     private val uniqueIdAndText = HasUniqueIdAndText()
-    private val allRules = SequentialDisambiguation(
-        listOf(
-            uniqueIdRule,
-            uniqueTextRule,
-            uniqueAccessibilityTextRule,
-            uniqueIdAndText
-        )
-    )
+    private val allRules = SequentialDisambiguation.sequentialRuleForIdTextAccTextAndAllTogether()
 
     @Test
     fun `resource id disambiguator disambiguate all elements with unique id`() {

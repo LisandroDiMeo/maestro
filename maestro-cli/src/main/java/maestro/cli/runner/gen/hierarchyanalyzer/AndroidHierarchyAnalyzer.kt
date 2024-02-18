@@ -6,27 +6,17 @@ import maestro.cli.runner.gen.commandselection.strategies.CommandSelectionStrate
 import maestro.cli.runner.gen.viewdisambiguator.DisambiguationRule
 import maestro.orchestra.BackPressCommand
 import maestro.orchestra.Command
-import maestro.orchestra.ElementSelector
-import maestro.orchestra.TapOnElementCommand
 
 class AndroidHierarchyAnalyzer(
     override val selectionStrategy: CommandSelectionStrategy,
     override val disambiguationRule: DisambiguationRule,
 ) : HierarchyAnalyzer(disambiguationRule, selectionStrategy) {
 
-    override fun extractClickableActions(selectors: List<Pair<TreeNode, ElementSelector>>): List<Pair<Command, TreeNode?>> {
-        val resultingCommands = mutableListOf<Pair<Command, TreeNode>>()
-        selectors.forEach { (node, selector) ->
-            node.clickable?.let { isClickable ->
-                if (isClickable) {
-                    val resourceAndPackage =
-                        node.attributes["resource-id"] + "-" + node.attributes["packageName"]
-                    if (ignoredResources.all { res -> !resourceAndPackage.contains(res) })
-                        resultingCommands.add(TapOnElementCommand(selector) to node)
-                }
-            }
+    override fun removeIgnoredNodes(flattenNodes: List<TreeNode>): List<TreeNode> {
+        return flattenNodes.filter {
+            val resourceAndPackage = "${it.attributes["resource-id"]}-${it.attributes["packageName"]}"
+            ANDROID_IGNORED_RESOURCES.all { res -> !resourceAndPackage.contains(res) }
         }
-        return resultingCommands.toList()
     }
 
     override fun isScrollable(nodes: List<TreeNode>): Boolean {
@@ -61,7 +51,7 @@ class AndroidHierarchyAnalyzer(
     }
 
     companion object {
-        val ignoredResources = listOf(
+        val ANDROID_IGNORED_RESOURCES = listOf(
             "com.android.systemui",
             "com.google.android.inputmethod.latin"
         )

@@ -1,0 +1,1794 @@
+{
+  "attributes": {},
+  "children": [
+    {
+      "attributes": {
+        "ignoreBoundsFiltering": "false"
+      },
+      "children": [
+        {
+          "attributes": {
+            "text": "",
+            "accessibilityText": "",
+            "className": "android.widget.FrameLayout",
+            "packageName": "com.android.systemui",
+            "hintText": "",
+            "ignoreBoundsFiltering": "false",
+            "resource-id": "",
+            "clickable": "false",
+            "bounds": "[0,0][1080,66]",
+            "enabled": "true",
+            "focused": "false",
+            "checked": "false",
+            "selected": "false"
+          },
+          "children": [
+            {
+              "attributes": {
+                "text": "",
+                "accessibilityText": "",
+                "className": "android.widget.FrameLayout",
+                "packageName": "com.android.systemui",
+                "hintText": "",
+                "ignoreBoundsFiltering": "false",
+                "resource-id": "com.android.systemui:id/status_bar_launch_animation_container",
+                "clickable": "false",
+                "bounds": "[0,0][1080,66]",
+                "enabled": "true",
+                "focused": "false",
+                "checked": "false",
+                "selected": "false"
+              },
+              "children": [],
+              "clickable": false,
+              "enabled": true,
+              "focused": false,
+              "checked": false,
+              "selected": false
+            },
+            {
+              "attributes": {
+                "text": "",
+                "accessibilityText": "",
+                "className": "android.widget.FrameLayout",
+                "packageName": "com.android.systemui",
+                "hintText": "",
+                "ignoreBoundsFiltering": "false",
+                "resource-id": "com.android.systemui:id/container",
+                "clickable": "false",
+                "bounds": "[0,0][1080,66]",
+                "enabled": "true",
+                "focused": "false",
+                "checked": "false",
+                "selected": "false"
+              },
+              "children": [],
+              "clickable": false,
+              "enabled": true,
+              "focused": false,
+              "checked": false,
+              "selected": false
+            },
+            {
+              "attributes": {
+                "text": "",
+                "accessibilityText": "",
+                "className": "android.widget.FrameLayout",
+                "packageName": "com.android.systemui",
+                "hintText": "",
+                "ignoreBoundsFiltering": "false",
+                "resource-id": "com.android.systemui:id/status_bar_container",
+                "clickable": "false",
+                "bounds": "[0,0][1080,66]",
+                "enabled": "true",
+                "focused": "false",
+                "checked": "false",
+                "selected": "false"
+              },
+              "children": [
+                {
+                  "attributes": {
+                    "text": "",
+                    "accessibilityText": "",
+                    "className": "android.widget.FrameLayout",
+                    "packageName": "com.android.systemui",
+                    "hintText": "",
+                    "ignoreBoundsFiltering": "false",
+                    "resource-id": "com.android.systemui:id/status_bar",
+                    "clickable": "false",
+                    "bounds": "[0,0][1080,66]",
+                    "enabled": "true",
+                    "focused": "false",
+                    "checked": "false",
+                    "selected": "false"
+                  },
+                  "children": [
+                    {
+                      "attributes": {
+                        "text": "",
+                        "accessibilityText": "",
+                        "className": "android.widget.LinearLayout",
+                        "packageName": "com.android.systemui",
+                        "hintText": "",
+                        "ignoreBoundsFiltering": "false",
+                        "resource-id": "com.android.systemui:id/status_bar_contents",
+                        "clickable": "false",
+                        "bounds": "[28,0][1025,66]",
+                        "enabled": "true",
+                        "focused": "false",
+                        "checked": "false",
+                        "selected": "false"
+                      },
+                      "children": [
+                        {
+                          "attributes": {
+                            "text": "",
+                            "accessibilityText": "",
+                            "className": "android.widget.FrameLayout",
+                            "packageName": "com.android.systemui",
+                            "hintText": "",
+                            "ignoreBoundsFiltering": "false",
+                            "resource-id": "com.android.systemui:id/status_bar_start_side_container",
+                            "clickable": "false",
+                            "bounds": "[50,0][526,66]",
+                            "enabled": "true",
+                            "focused": "false",
+                            "checked": "false",
+                            "selected": "false"
+                          },
+                          "children": [
+                            {
+                              "attributes": {
+                                "text": "",
+                                "accessibilityText": "",
+                                "className": "android.widget.FrameLayout",
+                                "packageName": "com.android.systemui",
+                                "hintText": "",
+                                "ignoreBoundsFiltering": "false",
+                                "resource-id": "com.android.systemui:id/status_bar_start_side_content",
+                                "clickable": "false",
+                                "bounds": "[50,0][141,66]",
+                                "enabled": "true",
+                                "focused": "false",
+                                "checked": "false",
+                                "selected": "false"
+                              },
+                              "children": [
+                                {
+                                  "attributes": {
+                                    "text": "",
+                                    "accessibilityText": "",
+                                    "className": "android.widget.LinearLayout",
+                                    "packageName": "com.android.systemui",
+                                    "hintText": "",
+                                    "ignoreBoundsFiltering": "false",
+                                    "resource-id": "com.android.systemui:id/status_bar_start_side_except_heads_up",
+                                    "clickable": "false",
+                                    "bounds": "[50,0][141,66]",
+                                    "enabled": "true",
+                                    "focused": "false",
+                                    "checked": "false",
+                                    "selected": "false"
+                                  },
+                                  "children": [
+                                    {
+                                      "attributes": {
+                                        "text": "2:40 ",
+                                        "accessibilityText": "2:40 AM",
+                                        "className": "android.widget.TextView",
+                                        "packageName": "com.android.systemui",
+                                        "hintText": "",
+                                        "ignoreBoundsFiltering": "false",
+                                        "resource-id": "com.android.systemui:id/clock",
+                                        "clickable": "false",
+                                        "bounds": "[50,0][141,66]",
+                                        "enabled": "true",
+                                        "focused": "false",
+                                        "checked": "false",
+                                        "selected": "false"
+                                      },
+                                      "children": [],
+                                      "clickable": false,
+                                      "enabled": true,
+                                      "focused": false,
+                                      "checked": false,
+                                      "selected": false
+                                    }
+                                  ],
+                                  "clickable": false,
+                                  "enabled": true,
+                                  "focused": false,
+                                  "checked": false,
+                                  "selected": false
+                                }
+                              ],
+                              "clickable": false,
+                              "enabled": true,
+                              "focused": false,
+                              "checked": false,
+                              "selected": false
+                            }
+                          ],
+                          "clickable": false,
+                          "enabled": true,
+                          "focused": false,
+                          "checked": false,
+                          "selected": false
+                        },
+                        {
+                          "attributes": {
+                            "text": "",
+                            "accessibilityText": "",
+                            "className": "android.widget.FrameLayout",
+                            "packageName": "com.android.systemui",
+                            "hintText": "",
+                            "ignoreBoundsFiltering": "false",
+                            "resource-id": "com.android.systemui:id/status_bar_end_side_container",
+                            "clickable": "false",
+                            "bounds": "[526,0][1003,66]",
+                            "enabled": "true",
+                            "focused": "false",
+                            "checked": "false",
+                            "selected": "false"
+                          },
+                          "children": [
+                            {
+                              "attributes": {
+                                "text": "",
+                                "accessibilityText": "",
+                                "className": "android.widget.LinearLayout",
+                                "packageName": "com.android.systemui",
+                                "hintText": "",
+                                "ignoreBoundsFiltering": "false",
+                                "resource-id": "com.android.systemui:id/status_bar_end_side_content",
+                                "clickable": "false",
+                                "bounds": "[876,0][1003,66]",
+                                "enabled": "true",
+                                "focused": "false",
+                                "checked": "false",
+                                "selected": "false"
+                              },
+                              "children": [
+                                {
+                                  "attributes": {
+                                    "text": "",
+                                    "accessibilityText": "",
+                                    "className": "android.widget.LinearLayout",
+                                    "packageName": "com.android.systemui",
+                                    "hintText": "",
+                                    "ignoreBoundsFiltering": "false",
+                                    "resource-id": "com.android.systemui:id/system_icons",
+                                    "clickable": "false",
+                                    "bounds": "[876,0][1003,66]",
+                                    "enabled": "true",
+                                    "focused": "false",
+                                    "checked": "false",
+                                    "selected": "false"
+                                  },
+                                  "children": [
+                                    {
+                                      "attributes": {
+                                        "text": "",
+                                        "accessibilityText": "",
+                                        "className": "android.widget.LinearLayout",
+                                        "packageName": "com.android.systemui",
+                                        "hintText": "",
+                                        "ignoreBoundsFiltering": "false",
+                                        "resource-id": "com.android.systemui:id/statusIcons",
+                                        "clickable": "false",
+                                        "bounds": "[876,0][982,66]",
+                                        "enabled": "true",
+                                        "focused": "false",
+                                        "checked": "false",
+                                        "selected": "false"
+                                      },
+                                      "children": [
+                                        {
+                                          "attributes": {
+                                            "text": "",
+                                            "accessibilityText": "",
+                                            "className": "android.widget.FrameLayout",
+                                            "packageName": "com.android.systemui",
+                                            "hintText": "",
+                                            "ignoreBoundsFiltering": "false",
+                                            "resource-id": "com.android.systemui:id/wifi_combo",
+                                            "clickable": "false",
+                                            "bounds": "[876,2][924,63]",
+                                            "enabled": "true",
+                                            "focused": "false",
+                                            "checked": "false",
+                                            "selected": "false"
+                                          },
+                                          "children": [
+                                            {
+                                              "attributes": {
+                                                "text": "",
+                                                "accessibilityText": "",
+                                                "className": "android.widget.LinearLayout",
+                                                "packageName": "com.android.systemui",
+                                                "hintText": "",
+                                                "ignoreBoundsFiltering": "false",
+                                                "resource-id": "com.android.systemui:id/wifi_group",
+                                                "clickable": "false",
+                                                "bounds": "[883,2][924,63]",
+                                                "enabled": "true",
+                                                "focused": "false",
+                                                "checked": "false",
+                                                "selected": "false"
+                                              },
+                                              "children": [
+                                                {
+                                                  "attributes": {
+                                                    "text": "",
+                                                    "accessibilityText": "",
+                                                    "className": "android.widget.FrameLayout",
+                                                    "packageName": "com.android.systemui",
+                                                    "hintText": "",
+                                                    "ignoreBoundsFiltering": "false",
+                                                    "resource-id": "com.android.systemui:id/wifi_combo",
+                                                    "clickable": "false",
+                                                    "bounds": "[883,12][924,53]",
+                                                    "enabled": "true",
+                                                    "focused": "false",
+                                                    "checked": "false",
+                                                    "selected": "false"
+                                                  },
+                                                  "children": [
+                                                    {
+                                                      "attributes": {
+                                                        "text": "",
+                                                        "accessibilityText": "Wifi signal full.",
+                                                        "className": "android.widget.ImageView",
+                                                        "packageName": "com.android.systemui",
+                                                        "hintText": "",
+                                                        "ignoreBoundsFiltering": "false",
+                                                        "resource-id": "com.android.systemui:id/wifi_signal",
+                                                        "clickable": "false",
+                                                        "bounds": "[883,12][924,53]",
+                                                        "enabled": "true",
+                                                        "focused": "false",
+                                                        "checked": "false",
+                                                        "selected": "false"
+                                                      },
+                                                      "children": [],
+                                                      "clickable": false,
+                                                      "enabled": true,
+                                                      "focused": false,
+                                                      "checked": false,
+                                                      "selected": false
+                                                    }
+                                                  ],
+                                                  "clickable": false,
+                                                  "enabled": true,
+                                                  "focused": false,
+                                                  "checked": false,
+                                                  "selected": false
+                                                }
+                                              ],
+                                              "clickable": false,
+                                              "enabled": true,
+                                              "focused": false,
+                                              "checked": false,
+                                              "selected": false
+                                            }
+                                          ],
+                                          "clickable": false,
+                                          "enabled": true,
+                                          "focused": false,
+                                          "checked": false,
+                                          "selected": false
+                                        },
+                                        {
+                                          "attributes": {
+                                            "text": "",
+                                            "accessibilityText": "Phone three bars.",
+                                            "className": "android.widget.FrameLayout",
+                                            "packageName": "com.android.systemui",
+                                            "hintText": "",
+                                            "ignoreBoundsFiltering": "false",
+                                            "resource-id": "com.android.systemui:id/mobile_combo",
+                                            "clickable": "false",
+                                            "bounds": "[924,2][965,63]",
+                                            "enabled": "true",
+                                            "focused": "false",
+                                            "checked": "false",
+                                            "selected": "false"
+                                          },
+                                          "children": [
+                                            {
+                                              "attributes": {
+                                                "text": "",
+                                                "accessibilityText": "",
+                                                "className": "android.widget.LinearLayout",
+                                                "packageName": "com.android.systemui",
+                                                "hintText": "",
+                                                "ignoreBoundsFiltering": "false",
+                                                "resource-id": "com.android.systemui:id/mobile_group",
+                                                "clickable": "false",
+                                                "bounds": "[924,2][965,63]",
+                                                "enabled": "true",
+                                                "focused": "false",
+                                                "checked": "false",
+                                                "selected": "false"
+                                              },
+                                              "children": [
+                                                {
+                                                  "attributes": {
+                                                    "text": "",
+                                                    "accessibilityText": "",
+                                                    "className": "android.widget.FrameLayout",
+                                                    "packageName": "com.android.systemui",
+                                                    "hintText": "",
+                                                    "ignoreBoundsFiltering": "false",
+                                                    "resource-id": "",
+                                                    "clickable": "false",
+                                                    "bounds": "[924,12][965,53]",
+                                                    "enabled": "true",
+                                                    "focused": "false",
+                                                    "checked": "false",
+                                                    "selected": "false"
+                                                  },
+                                                  "children": [
+                                                    {
+                                                      "attributes": {
+                                                        "text": "",
+                                                        "accessibilityText": "",
+                                                        "className": "android.widget.ImageView",
+                                                        "packageName": "com.android.systemui",
+                                                        "hintText": "",
+                                                        "ignoreBoundsFiltering": "false",
+                                                        "resource-id": "com.android.systemui:id/mobile_signal",
+                                                        "clickable": "false",
+                                                        "bounds": "[924,12][965,53]",
+                                                        "enabled": "true",
+                                                        "focused": "false",
+                                                        "checked": "false",
+                                                        "selected": "false"
+                                                      },
+                                                      "children": [],
+                                                      "clickable": false,
+                                                      "enabled": true,
+                                                      "focused": false,
+                                                      "checked": false,
+                                                      "selected": false
+                                                    }
+                                                  ],
+                                                  "clickable": false,
+                                                  "enabled": true,
+                                                  "focused": false,
+                                                  "checked": false,
+                                                  "selected": false
+                                                }
+                                              ],
+                                              "clickable": false,
+                                              "enabled": true,
+                                              "focused": false,
+                                              "checked": false,
+                                              "selected": false
+                                            }
+                                          ],
+                                          "clickable": false,
+                                          "enabled": true,
+                                          "focused": false,
+                                          "checked": false,
+                                          "selected": false
+                                        }
+                                      ],
+                                      "clickable": false,
+                                      "enabled": true,
+                                      "focused": false,
+                                      "checked": false,
+                                      "selected": false
+                                    },
+                                    {
+                                      "attributes": {
+                                        "text": "",
+                                        "accessibilityText": "Battery 100 percent.",
+                                        "className": "android.widget.LinearLayout",
+                                        "packageName": "com.android.systemui",
+                                        "hintText": "",
+                                        "ignoreBoundsFiltering": "false",
+                                        "resource-id": "com.android.systemui:id/battery",
+                                        "clickable": "false",
+                                        "bounds": "[982,0][1003,66]",
+                                        "enabled": "true",
+                                        "focused": "false",
+                                        "checked": "false",
+                                        "selected": "false"
+                                      },
+                                      "children": [
+                                        {
+                                          "attributes": {
+                                            "text": "",
+                                            "accessibilityText": "",
+                                            "className": "android.widget.ImageView",
+                                            "packageName": "com.android.systemui",
+                                            "hintText": "",
+                                            "ignoreBoundsFiltering": "false",
+                                            "resource-id": "",
+                                            "clickable": "false",
+                                            "bounds": "[982,15][1003,51]",
+                                            "enabled": "true",
+                                            "focused": "false",
+                                            "checked": "false",
+                                            "selected": "false"
+                                          },
+                                          "children": [],
+                                          "clickable": false,
+                                          "enabled": true,
+                                          "focused": false,
+                                          "checked": false,
+                                          "selected": false
+                                        }
+                                      ],
+                                      "clickable": false,
+                                      "enabled": true,
+                                      "focused": false,
+                                      "checked": false,
+                                      "selected": false
+                                    }
+                                  ],
+                                  "clickable": false,
+                                  "enabled": true,
+                                  "focused": false,
+                                  "checked": false,
+                                  "selected": false
+                                }
+                              ],
+                              "clickable": false,
+                              "enabled": true,
+                              "focused": false,
+                              "checked": false,
+                              "selected": false
+                            }
+                          ],
+                          "clickable": false,
+                          "enabled": true,
+                          "focused": false,
+                          "checked": false,
+                          "selected": false
+                        }
+                      ],
+                      "clickable": false,
+                      "enabled": true,
+                      "focused": false,
+                      "checked": false,
+                      "selected": false
+                    }
+                  ],
+                  "clickable": false,
+                  "enabled": true,
+                  "focused": false,
+                  "checked": false,
+                  "selected": false
+                }
+              ],
+              "clickable": false,
+              "enabled": true,
+              "focused": false,
+              "checked": false,
+              "selected": false
+            }
+          ],
+          "clickable": false,
+          "enabled": true,
+          "focused": false,
+          "checked": false,
+          "selected": false
+        },
+        {
+          "attributes": {
+            "text": "",
+            "accessibilityText": "",
+            "className": "android.widget.FrameLayout",
+            "packageName": "com.google.android.deskclock",
+            "hintText": "",
+            "ignoreBoundsFiltering": "false",
+            "resource-id": "",
+            "clickable": "false",
+            "bounds": "[0,0][1080,2220]",
+            "enabled": "true",
+            "focused": "false",
+            "checked": "false",
+            "selected": "false"
+          },
+          "children": [
+            {
+              "attributes": {
+                "text": "",
+                "accessibilityText": "",
+                "className": "android.widget.LinearLayout",
+                "packageName": "com.google.android.deskclock",
+                "hintText": "",
+                "ignoreBoundsFiltering": "false",
+                "resource-id": "",
+                "clickable": "false",
+                "bounds": "[0,0][1080,2220]",
+                "enabled": "true",
+                "focused": "false",
+                "checked": "false",
+                "selected": "false"
+              },
+              "children": [
+                {
+                  "attributes": {
+                    "text": "",
+                    "accessibilityText": "",
+                    "className": "android.widget.FrameLayout",
+                    "packageName": "com.google.android.deskclock",
+                    "hintText": "",
+                    "ignoreBoundsFiltering": "false",
+                    "resource-id": "",
+                    "clickable": "false",
+                    "bounds": "[0,0][1080,2220]",
+                    "enabled": "true",
+                    "focused": "false",
+                    "checked": "false",
+                    "selected": "false"
+                  },
+                  "children": [
+                    {
+                      "attributes": {
+                        "text": "",
+                        "accessibilityText": "",
+                        "className": "android.widget.LinearLayout",
+                        "packageName": "com.google.android.deskclock",
+                        "hintText": "",
+                        "ignoreBoundsFiltering": "false",
+                        "resource-id": "com.google.android.deskclock:id/action_bar_root",
+                        "clickable": "false",
+                        "bounds": "[0,0][1080,2220]",
+                        "enabled": "true",
+                        "focused": "false",
+                        "checked": "false",
+                        "selected": "false"
+                      },
+                      "children": [
+                        {
+                          "attributes": {
+                            "text": "",
+                            "accessibilityText": "",
+                            "className": "android.widget.FrameLayout",
+                            "packageName": "com.google.android.deskclock",
+                            "hintText": "",
+                            "ignoreBoundsFiltering": "false",
+                            "resource-id": "android:id/content",
+                            "clickable": "false",
+                            "bounds": "[0,0][1080,2220]",
+                            "enabled": "true",
+                            "focused": "false",
+                            "checked": "false",
+                            "selected": "false"
+                          },
+                          "children": [
+                            {
+                              "attributes": {
+                                "text": "",
+                                "accessibilityText": "",
+                                "className": "android.view.ViewGroup",
+                                "packageName": "com.google.android.deskclock",
+                                "hintText": "",
+                                "ignoreBoundsFiltering": "false",
+                                "resource-id": "",
+                                "clickable": "false",
+                                "bounds": "[0,0][1080,2220]",
+                                "enabled": "true",
+                                "focused": "false",
+                                "checked": "false",
+                                "selected": "false"
+                              },
+                              "children": [
+                                {
+                                  "attributes": {
+                                    "text": "",
+                                    "accessibilityText": "",
+                                    "className": "android.view.ViewGroup",
+                                    "packageName": "com.google.android.deskclock",
+                                    "hintText": "",
+                                    "ignoreBoundsFiltering": "false",
+                                    "resource-id": "com.google.android.deskclock:id/content",
+                                    "clickable": "false",
+                                    "bounds": "[0,0][1080,2220]",
+                                    "enabled": "true",
+                                    "focused": "false",
+                                    "checked": "false",
+                                    "selected": "false"
+                                  },
+                                  "children": [
+                                    {
+                                      "attributes": {
+                                        "text": "",
+                                        "accessibilityText": "",
+                                        "className": "android.widget.LinearLayout",
+                                        "packageName": "com.google.android.deskclock",
+                                        "hintText": "",
+                                        "ignoreBoundsFiltering": "false",
+                                        "resource-id": "com.google.android.deskclock:id/app_bar_layout",
+                                        "clickable": "false",
+                                        "bounds": "[0,0][1080,242]",
+                                        "enabled": "true",
+                                        "focused": "false",
+                                        "checked": "false",
+                                        "selected": "false"
+                                      },
+                                      "children": [
+                                        {
+                                          "attributes": {
+                                            "text": "",
+                                            "accessibilityText": "",
+                                            "className": "android.view.ViewGroup",
+                                            "packageName": "com.google.android.deskclock",
+                                            "hintText": "",
+                                            "ignoreBoundsFiltering": "false",
+                                            "resource-id": "com.google.android.deskclock:id/toolbar",
+                                            "clickable": "false",
+                                            "bounds": "[0,66][1080,242]",
+                                            "enabled": "true",
+                                            "focused": "false",
+                                            "checked": "false",
+                                            "selected": "false"
+                                          },
+                                          "children": [
+                                            {
+                                              "attributes": {
+                                                "text": "Stopwatch",
+                                                "accessibilityText": "",
+                                                "className": "android.widget.TextView",
+                                                "packageName": "com.google.android.deskclock",
+                                                "hintText": "",
+                                                "ignoreBoundsFiltering": "false",
+                                                "resource-id": "com.google.android.deskclock:id/action_bar_title",
+                                                "clickable": "false",
+                                                "bounds": "[66,115][356,192]",
+                                                "enabled": "true",
+                                                "focused": "false",
+                                                "checked": "false",
+                                                "selected": "false"
+                                              },
+                                              "children": [],
+                                              "clickable": false,
+                                              "enabled": true,
+                                              "focused": false,
+                                              "checked": false,
+                                              "selected": false
+                                            },
+                                            {
+                                              "attributes": {
+                                                "text": "",
+                                                "accessibilityText": "",
+                                                "className": "android.support.v7.widget.LinearLayoutCompat",
+                                                "packageName": "com.google.android.deskclock",
+                                                "hintText": "",
+                                                "ignoreBoundsFiltering": "false",
+                                                "resource-id": "",
+                                                "clickable": "false",
+                                                "bounds": "[969,77][1080,231]",
+                                                "enabled": "true",
+                                                "focused": "false",
+                                                "checked": "false",
+                                                "selected": "false"
+                                              },
+                                              "children": [
+                                                {
+                                                  "attributes": {
+                                                    "text": "",
+                                                    "accessibilityText": "More options",
+                                                    "className": "android.widget.ImageView",
+                                                    "packageName": "com.google.android.deskclock",
+                                                    "hintText": "",
+                                                    "ignoreBoundsFiltering": "false",
+                                                    "resource-id": "com.google.android.deskclock:id/overflow_action_button",
+                                                    "clickable": "true",
+                                                    "bounds": "[969,88][1080,220]",
+                                                    "enabled": "true",
+                                                    "focused": "false",
+                                                    "checked": "false",
+                                                    "selected": "false"
+                                                  },
+                                                  "children": [],
+                                                  "clickable": true,
+                                                  "enabled": true,
+                                                  "focused": false,
+                                                  "checked": false,
+                                                  "selected": false
+                                                }
+                                              ],
+                                              "clickable": false,
+                                              "enabled": true,
+                                              "focused": false,
+                                              "checked": false,
+                                              "selected": false
+                                            }
+                                          ],
+                                          "clickable": false,
+                                          "enabled": true,
+                                          "focused": false,
+                                          "checked": false,
+                                          "selected": false
+                                        }
+                                      ],
+                                      "clickable": false,
+                                      "enabled": true,
+                                      "focused": false,
+                                      "checked": false,
+                                      "selected": false
+                                    },
+                                    {
+                                      "attributes": {
+                                        "text": "",
+                                        "accessibilityText": "",
+                                        "className": "android.view.ViewGroup",
+                                        "packageName": "com.google.android.deskclock",
+                                        "hintText": "",
+                                        "ignoreBoundsFiltering": "false",
+                                        "resource-id": "com.google.android.deskclock:id/desk_clock_pager_frame",
+                                        "clickable": "false",
+                                        "bounds": "[0,242][1080,1934]",
+                                        "enabled": "true",
+                                        "focused": "false",
+                                        "checked": "false",
+                                        "selected": "false"
+                                      },
+                                      "children": [
+                                        {
+                                          "attributes": {
+                                            "text": "",
+                                            "accessibilityText": "",
+                                            "className": "android.view.ViewGroup",
+                                            "packageName": "com.google.android.deskclock",
+                                            "hintText": "",
+                                            "ignoreBoundsFiltering": "false",
+                                            "resource-id": "com.google.android.deskclock:id/desk_clock_pager",
+                                            "clickable": "false",
+                                            "bounds": "[0,242][1080,1934]",
+                                            "enabled": "true",
+                                            "focused": "false",
+                                            "checked": "false",
+                                            "selected": "false"
+                                          },
+                                          "children": [
+                                            {
+                                              "attributes": {
+                                                "text": "",
+                                                "accessibilityText": "",
+                                                "className": "android.widget.FrameLayout",
+                                                "packageName": "com.google.android.deskclock",
+                                                "hintText": "",
+                                                "ignoreBoundsFiltering": "false",
+                                                "resource-id": "",
+                                                "clickable": "false",
+                                                "bounds": "[0,242][1080,1934]",
+                                                "enabled": "true",
+                                                "focused": "false",
+                                                "checked": "false",
+                                                "selected": "false"
+                                              },
+                                              "children": [
+                                                {
+                                                  "attributes": {
+                                                    "text": "",
+                                                    "accessibilityText": "",
+                                                    "className": "android.view.ViewGroup",
+                                                    "packageName": "com.google.android.deskclock",
+                                                    "hintText": "",
+                                                    "ignoreBoundsFiltering": "false",
+                                                    "resource-id": "",
+                                                    "clickable": "false",
+                                                    "bounds": "[0,242][1080,1934]",
+                                                    "enabled": "true",
+                                                    "focused": "false",
+                                                    "checked": "false",
+                                                    "selected": "false"
+                                                  },
+                                                  "children": [
+                                                    {
+                                                      "attributes": {
+                                                        "text": "",
+                                                        "accessibilityText": "",
+                                                        "className": "android.view.ViewGroup",
+                                                        "packageName": "com.google.android.deskclock",
+                                                        "hintText": "",
+                                                        "ignoreBoundsFiltering": "false",
+                                                        "resource-id": "com.google.android.deskclock:id/stopwatch_time_wrapper",
+                                                        "clickable": "true",
+                                                        "bounds": "[108,480][972,1344]",
+                                                        "enabled": "true",
+                                                        "focused": "false",
+                                                        "checked": "false",
+                                                        "selected": "false"
+                                                      },
+                                                      "children": [
+                                                        {
+                                                          "attributes": {
+                                                            "text": "",
+                                                            "accessibilityText": "",
+                                                            "className": "android.view.View",
+                                                            "packageName": "com.google.android.deskclock",
+                                                            "hintText": "",
+                                                            "ignoreBoundsFiltering": "false",
+                                                            "resource-id": "com.google.android.deskclock:id/stopwatch_circle",
+                                                            "clickable": "false",
+                                                            "bounds": "[108,480][972,1344]",
+                                                            "enabled": "true",
+                                                            "focused": "false",
+                                                            "checked": "false",
+                                                            "selected": "false"
+                                                          },
+                                                          "children": [],
+                                                          "clickable": false,
+                                                          "enabled": true,
+                                                          "focused": false,
+                                                          "checked": false,
+                                                          "selected": false
+                                                        },
+                                                        {
+                                                          "attributes": {
+                                                            "text": "",
+                                                            "accessibilityText": "",
+                                                            "className": "android.view.ViewGroup",
+                                                            "packageName": "com.google.android.deskclock",
+                                                            "hintText": "",
+                                                            "ignoreBoundsFiltering": "false",
+                                                            "resource-id": "",
+                                                            "clickable": "false",
+                                                            "bounds": "[219,739][861,1085]",
+                                                            "enabled": "true",
+                                                            "focused": "false",
+                                                            "checked": "false",
+                                                            "selected": "false"
+                                                          },
+                                                          "children": [
+                                                            {
+                                                              "attributes": {
+                                                                "text": "00",
+                                                                "accessibilityText": "",
+                                                                "className": "android.widget.TextView",
+                                                                "packageName": "com.google.android.deskclock",
+                                                                "hintText": "",
+                                                                "ignoreBoundsFiltering": "false",
+                                                                "resource-id": "com.google.android.deskclock:id/stopwatch_time_text",
+                                                                "clickable": "false",
+                                                                "bounds": "[411,739][669,984]",
+                                                                "enabled": "true",
+                                                                "focused": "false",
+                                                                "checked": "false",
+                                                                "selected": "false"
+                                                              },
+                                                              "children": [],
+                                                              "clickable": false,
+                                                              "enabled": true,
+                                                              "focused": false,
+                                                              "checked": false,
+                                                              "selected": false
+                                                            },
+                                                            {
+                                                              "attributes": {
+                                                                "text": "00",
+                                                                "accessibilityText": "",
+                                                                "className": "android.widget.TextView",
+                                                                "packageName": "com.google.android.deskclock",
+                                                                "hintText": "",
+                                                                "ignoreBoundsFiltering": "false",
+                                                                "resource-id": "com.google.android.deskclock:id/stopwatch_hundredths_text",
+                                                                "clickable": "false",
+                                                                "bounds": "[497,912][669,1085]",
+                                                                "enabled": "true",
+                                                                "focused": "false",
+                                                                "checked": "false",
+                                                                "selected": "false"
+                                                              },
+                                                              "children": [],
+                                                              "clickable": false,
+                                                              "enabled": true,
+                                                              "focused": false,
+                                                              "checked": false,
+                                                              "selected": false
+                                                            }
+                                                          ],
+                                                          "clickable": false,
+                                                          "enabled": true,
+                                                          "focused": false,
+                                                          "checked": false,
+                                                          "selected": false
+                                                        }
+                                                      ],
+                                                      "clickable": true,
+                                                      "enabled": true,
+                                                      "focused": false,
+                                                      "checked": false,
+                                                      "selected": false
+                                                    }
+                                                  ],
+                                                  "clickable": false,
+                                                  "enabled": true,
+                                                  "focused": false,
+                                                  "checked": false,
+                                                  "selected": false
+                                                }
+                                              ],
+                                              "clickable": false,
+                                              "enabled": true,
+                                              "focused": false,
+                                              "checked": false,
+                                              "selected": false
+                                            }
+                                          ],
+                                          "clickable": false,
+                                          "enabled": true,
+                                          "focused": false,
+                                          "checked": false,
+                                          "selected": false
+                                        },
+                                        {
+                                          "attributes": {
+                                            "text": "",
+                                            "accessibilityText": "",
+                                            "className": "android.view.ViewGroup",
+                                            "packageName": "com.google.android.deskclock",
+                                            "hintText": "",
+                                            "ignoreBoundsFiltering": "false",
+                                            "resource-id": "com.google.android.deskclock:id/fab_container",
+                                            "clickable": "false",
+                                            "bounds": "[0,1582][1080,1934]",
+                                            "enabled": "true",
+                                            "focused": "false",
+                                            "checked": "false",
+                                            "selected": "false"
+                                          },
+                                          "children": [
+                                            {
+                                              "attributes": {
+                                                "text": "",
+                                                "accessibilityText": "Start",
+                                                "className": "android.widget.Button",
+                                                "packageName": "com.google.android.deskclock",
+                                                "hintText": "",
+                                                "ignoreBoundsFiltering": "false",
+                                                "resource-id": "com.google.android.deskclock:id/fab",
+                                                "clickable": "true",
+                                                "bounds": "[408,1626][672,1890]",
+                                                "enabled": "true",
+                                                "focused": "false",
+                                                "checked": "false",
+                                                "selected": "false"
+                                              },
+                                              "children": [],
+                                              "clickable": true,
+                                              "enabled": true,
+                                              "focused": false,
+                                              "checked": false,
+                                              "selected": false
+                                            }
+                                          ],
+                                          "clickable": false,
+                                          "enabled": true,
+                                          "focused": false,
+                                          "checked": false,
+                                          "selected": false
+                                        }
+                                      ],
+                                      "clickable": false,
+                                      "enabled": true,
+                                      "focused": false,
+                                      "checked": false,
+                                      "selected": false
+                                    },
+                                    {
+                                      "attributes": {
+                                        "text": "",
+                                        "accessibilityText": "",
+                                        "className": "android.widget.FrameLayout",
+                                        "packageName": "com.google.android.deskclock",
+                                        "hintText": "",
+                                        "ignoreBoundsFiltering": "false",
+                                        "resource-id": "com.google.android.deskclock:id/navigation_bar",
+                                        "clickable": "false",
+                                        "bounds": "[0,1934][1080,2220]",
+                                        "enabled": "true",
+                                        "focused": "false",
+                                        "checked": "false",
+                                        "selected": "false"
+                                      },
+                                      "children": [
+                                        {
+                                          "attributes": {
+                                            "text": "",
+                                            "accessibilityText": "",
+                                            "className": "android.view.ViewGroup",
+                                            "packageName": "com.google.android.deskclock",
+                                            "hintText": "",
+                                            "ignoreBoundsFiltering": "false",
+                                            "resource-id": "",
+                                            "clickable": "false",
+                                            "bounds": "[0,1934][1080,2154]",
+                                            "enabled": "true",
+                                            "focused": "false",
+                                            "checked": "false",
+                                            "selected": "false"
+                                          },
+                                          "children": [
+                                            {
+                                              "attributes": {
+                                                "text": "",
+                                                "accessibilityText": "Alarm",
+                                                "className": "android.widget.FrameLayout",
+                                                "packageName": "com.google.android.deskclock",
+                                                "hintText": "",
+                                                "ignoreBoundsFiltering": "false",
+                                                "resource-id": "com.google.android.deskclock:id/tab_menu_alarm",
+                                                "clickable": "true",
+                                                "bounds": "[0,1934][216,2154]",
+                                                "enabled": "true",
+                                                "focused": "false",
+                                                "checked": "false",
+                                                "selected": "false"
+                                              },
+                                              "children": [
+                                                {
+                                                  "attributes": {
+                                                    "text": "",
+                                                    "accessibilityText": "",
+                                                    "className": "android.widget.FrameLayout",
+                                                    "packageName": "com.google.android.deskclock",
+                                                    "hintText": "",
+                                                    "ignoreBoundsFiltering": "false",
+                                                    "resource-id": "com.google.android.deskclock:id/navigation_bar_item_icon_container",
+                                                    "clickable": "false",
+                                                    "bounds": "[20,1967][196,2055]",
+                                                    "enabled": "true",
+                                                    "focused": "false",
+                                                    "checked": "false",
+                                                    "selected": "false"
+                                                  },
+                                                  "children": [
+                                                    {
+                                                      "attributes": {
+                                                        "text": "",
+                                                        "accessibilityText": "",
+                                                        "className": "android.widget.ImageView",
+                                                        "packageName": "com.google.android.deskclock",
+                                                        "hintText": "",
+                                                        "ignoreBoundsFiltering": "false",
+                                                        "resource-id": "com.google.android.deskclock:id/navigation_bar_item_icon_view",
+                                                        "clickable": "false",
+                                                        "bounds": "[75,1978][141,2044]",
+                                                        "enabled": "true",
+                                                        "focused": "false",
+                                                        "checked": "false",
+                                                        "selected": "false"
+                                                      },
+                                                      "children": [],
+                                                      "clickable": false,
+                                                      "enabled": true,
+                                                      "focused": false,
+                                                      "checked": false,
+                                                      "selected": false
+                                                    }
+                                                  ],
+                                                  "clickable": false,
+                                                  "enabled": true,
+                                                  "focused": false,
+                                                  "checked": false,
+                                                  "selected": false
+                                                },
+                                                {
+                                                  "attributes": {
+                                                    "text": "",
+                                                    "accessibilityText": "",
+                                                    "className": "android.view.ViewGroup",
+                                                    "packageName": "com.google.android.deskclock",
+                                                    "hintText": "",
+                                                    "ignoreBoundsFiltering": "false",
+                                                    "resource-id": "com.google.android.deskclock:id/navigation_bar_item_labels_group",
+                                                    "clickable": "false",
+                                                    "bounds": "[54,2066][162,2154]",
+                                                    "enabled": "true",
+                                                    "focused": "false",
+                                                    "checked": "false",
+                                                    "selected": "false"
+                                                  },
+                                                  "children": [
+                                                    {
+                                                      "attributes": {
+                                                        "text": "Alarm",
+                                                        "accessibilityText": "",
+                                                        "className": "android.widget.TextView",
+                                                        "packageName": "com.google.android.deskclock",
+                                                        "hintText": "",
+                                                        "ignoreBoundsFiltering": "false",
+                                                        "resource-id": "com.google.android.deskclock:id/navigation_bar_item_small_label_view",
+                                                        "clickable": "false",
+                                                        "bounds": "[54,2066][162,2122]",
+                                                        "enabled": "true",
+                                                        "focused": "false",
+                                                        "checked": "false",
+                                                        "selected": "false"
+                                                      },
+                                                      "children": [],
+                                                      "clickable": false,
+                                                      "enabled": true,
+                                                      "focused": false,
+                                                      "checked": false,
+                                                      "selected": false
+                                                    }
+                                                  ],
+                                                  "clickable": false,
+                                                  "enabled": true,
+                                                  "focused": false,
+                                                  "checked": false,
+                                                  "selected": false
+                                                }
+                                              ],
+                                              "clickable": true,
+                                              "enabled": true,
+                                              "focused": false,
+                                              "checked": false,
+                                              "selected": false
+                                            },
+                                            {
+                                              "attributes": {
+                                                "text": "",
+                                                "accessibilityText": "Clock",
+                                                "className": "android.widget.FrameLayout",
+                                                "packageName": "com.google.android.deskclock",
+                                                "hintText": "",
+                                                "ignoreBoundsFiltering": "false",
+                                                "resource-id": "com.google.android.deskclock:id/tab_menu_clock",
+                                                "clickable": "true",
+                                                "bounds": "[216,1934][432,2154]",
+                                                "enabled": "true",
+                                                "focused": "false",
+                                                "checked": "false",
+                                                "selected": "false"
+                                              },
+                                              "children": [
+                                                {
+                                                  "attributes": {
+                                                    "text": "",
+                                                    "accessibilityText": "",
+                                                    "className": "android.widget.FrameLayout",
+                                                    "packageName": "com.google.android.deskclock",
+                                                    "hintText": "",
+                                                    "ignoreBoundsFiltering": "false",
+                                                    "resource-id": "com.google.android.deskclock:id/navigation_bar_item_icon_container",
+                                                    "clickable": "false",
+                                                    "bounds": "[236,1967][412,2055]",
+                                                    "enabled": "true",
+                                                    "focused": "false",
+                                                    "checked": "false",
+                                                    "selected": "false"
+                                                  },
+                                                  "children": [
+                                                    {
+                                                      "attributes": {
+                                                        "text": "",
+                                                        "accessibilityText": "",
+                                                        "className": "android.widget.ImageView",
+                                                        "packageName": "com.google.android.deskclock",
+                                                        "hintText": "",
+                                                        "ignoreBoundsFiltering": "false",
+                                                        "resource-id": "com.google.android.deskclock:id/navigation_bar_item_icon_view",
+                                                        "clickable": "false",
+                                                        "bounds": "[291,1978][357,2044]",
+                                                        "enabled": "true",
+                                                        "focused": "false",
+                                                        "checked": "false",
+                                                        "selected": "false"
+                                                      },
+                                                      "children": [],
+                                                      "clickable": false,
+                                                      "enabled": true,
+                                                      "focused": false,
+                                                      "checked": false,
+                                                      "selected": false
+                                                    }
+                                                  ],
+                                                  "clickable": false,
+                                                  "enabled": true,
+                                                  "focused": false,
+                                                  "checked": false,
+                                                  "selected": false
+                                                },
+                                                {
+                                                  "attributes": {
+                                                    "text": "",
+                                                    "accessibilityText": "",
+                                                    "className": "android.view.ViewGroup",
+                                                    "packageName": "com.google.android.deskclock",
+                                                    "hintText": "",
+                                                    "ignoreBoundsFiltering": "false",
+                                                    "resource-id": "com.google.android.deskclock:id/navigation_bar_item_labels_group",
+                                                    "clickable": "false",
+                                                    "bounds": "[272,2066][376,2154]",
+                                                    "enabled": "true",
+                                                    "focused": "false",
+                                                    "checked": "false",
+                                                    "selected": "false"
+                                                  },
+                                                  "children": [
+                                                    {
+                                                      "attributes": {
+                                                        "text": "Clock",
+                                                        "accessibilityText": "",
+                                                        "className": "android.widget.TextView",
+                                                        "packageName": "com.google.android.deskclock",
+                                                        "hintText": "",
+                                                        "ignoreBoundsFiltering": "false",
+                                                        "resource-id": "com.google.android.deskclock:id/navigation_bar_item_small_label_view",
+                                                        "clickable": "false",
+                                                        "bounds": "[272,2066][376,2122]",
+                                                        "enabled": "true",
+                                                        "focused": "false",
+                                                        "checked": "false",
+                                                        "selected": "false"
+                                                      },
+                                                      "children": [],
+                                                      "clickable": false,
+                                                      "enabled": true,
+                                                      "focused": false,
+                                                      "checked": false,
+                                                      "selected": false
+                                                    }
+                                                  ],
+                                                  "clickable": false,
+                                                  "enabled": true,
+                                                  "focused": false,
+                                                  "checked": false,
+                                                  "selected": false
+                                                }
+                                              ],
+                                              "clickable": true,
+                                              "enabled": true,
+                                              "focused": false,
+                                              "checked": false,
+                                              "selected": false
+                                            },
+                                            {
+                                              "attributes": {
+                                                "text": "",
+                                                "accessibilityText": "Timer",
+                                                "className": "android.widget.FrameLayout",
+                                                "packageName": "com.google.android.deskclock",
+                                                "hintText": "",
+                                                "ignoreBoundsFiltering": "false",
+                                                "resource-id": "com.google.android.deskclock:id/tab_menu_timer",
+                                                "clickable": "true",
+                                                "bounds": "[432,1934][648,2154]",
+                                                "enabled": "true",
+                                                "focused": "false",
+                                                "checked": "false",
+                                                "selected": "false"
+                                              },
+                                              "children": [
+                                                {
+                                                  "attributes": {
+                                                    "text": "",
+                                                    "accessibilityText": "",
+                                                    "className": "android.widget.FrameLayout",
+                                                    "packageName": "com.google.android.deskclock",
+                                                    "hintText": "",
+                                                    "ignoreBoundsFiltering": "false",
+                                                    "resource-id": "com.google.android.deskclock:id/navigation_bar_item_icon_container",
+                                                    "clickable": "false",
+                                                    "bounds": "[452,1967][628,2055]",
+                                                    "enabled": "true",
+                                                    "focused": "false",
+                                                    "checked": "false",
+                                                    "selected": "false"
+                                                  },
+                                                  "children": [
+                                                    {
+                                                      "attributes": {
+                                                        "text": "",
+                                                        "accessibilityText": "",
+                                                        "className": "android.widget.ImageView",
+                                                        "packageName": "com.google.android.deskclock",
+                                                        "hintText": "",
+                                                        "ignoreBoundsFiltering": "false",
+                                                        "resource-id": "com.google.android.deskclock:id/navigation_bar_item_icon_view",
+                                                        "clickable": "false",
+                                                        "bounds": "[507,1978][573,2044]",
+                                                        "enabled": "true",
+                                                        "focused": "false",
+                                                        "checked": "false",
+                                                        "selected": "false"
+                                                      },
+                                                      "children": [],
+                                                      "clickable": false,
+                                                      "enabled": true,
+                                                      "focused": false,
+                                                      "checked": false,
+                                                      "selected": false
+                                                    }
+                                                  ],
+                                                  "clickable": false,
+                                                  "enabled": true,
+                                                  "focused": false,
+                                                  "checked": false,
+                                                  "selected": false
+                                                },
+                                                {
+                                                  "attributes": {
+                                                    "text": "",
+                                                    "accessibilityText": "",
+                                                    "className": "android.view.ViewGroup",
+                                                    "packageName": "com.google.android.deskclock",
+                                                    "hintText": "",
+                                                    "ignoreBoundsFiltering": "false",
+                                                    "resource-id": "com.google.android.deskclock:id/navigation_bar_item_labels_group",
+                                                    "clickable": "false",
+                                                    "bounds": "[487,2066][592,2154]",
+                                                    "enabled": "true",
+                                                    "focused": "false",
+                                                    "checked": "false",
+                                                    "selected": "false"
+                                                  },
+                                                  "children": [
+                                                    {
+                                                      "attributes": {
+                                                        "text": "Timer",
+                                                        "accessibilityText": "",
+                                                        "className": "android.widget.TextView",
+                                                        "packageName": "com.google.android.deskclock",
+                                                        "hintText": "",
+                                                        "ignoreBoundsFiltering": "false",
+                                                        "resource-id": "com.google.android.deskclock:id/navigation_bar_item_small_label_view",
+                                                        "clickable": "false",
+                                                        "bounds": "[487,2066][592,2122]",
+                                                        "enabled": "true",
+                                                        "focused": "false",
+                                                        "checked": "false",
+                                                        "selected": "false"
+                                                      },
+                                                      "children": [],
+                                                      "clickable": false,
+                                                      "enabled": true,
+                                                      "focused": false,
+                                                      "checked": false,
+                                                      "selected": false
+                                                    }
+                                                  ],
+                                                  "clickable": false,
+                                                  "enabled": true,
+                                                  "focused": false,
+                                                  "checked": false,
+                                                  "selected": false
+                                                }
+                                              ],
+                                              "clickable": true,
+                                              "enabled": true,
+                                              "focused": false,
+                                              "checked": false,
+                                              "selected": false
+                                            },
+                                            {
+                                              "attributes": {
+                                                "text": "",
+                                                "accessibilityText": "Stopwatch",
+                                                "className": "android.widget.FrameLayout",
+                                                "packageName": "com.google.android.deskclock",
+                                                "hintText": "",
+                                                "ignoreBoundsFiltering": "false",
+                                                "resource-id": "com.google.android.deskclock:id/tab_menu_stopwatch",
+                                                "clickable": "false",
+                                                "bounds": "[648,1934][864,2154]",
+                                                "enabled": "true",
+                                                "focused": "false",
+                                                "checked": "false",
+                                                "selected": "true"
+                                              },
+                                              "children": [
+                                                {
+                                                  "attributes": {
+                                                    "text": "",
+                                                    "accessibilityText": "",
+                                                    "className": "android.widget.FrameLayout",
+                                                    "packageName": "com.google.android.deskclock",
+                                                    "hintText": "",
+                                                    "ignoreBoundsFiltering": "false",
+                                                    "resource-id": "com.google.android.deskclock:id/navigation_bar_item_icon_container",
+                                                    "clickable": "false",
+                                                    "bounds": "[668,1967][844,2055]",
+                                                    "enabled": "true",
+                                                    "focused": "false",
+                                                    "checked": "false",
+                                                    "selected": "true"
+                                                  },
+                                                  "children": [
+                                                    {
+                                                      "attributes": {
+                                                        "text": "",
+                                                        "accessibilityText": "",
+                                                        "className": "android.view.View",
+                                                        "packageName": "com.google.android.deskclock",
+                                                        "hintText": "",
+                                                        "ignoreBoundsFiltering": "false",
+                                                        "resource-id": "com.google.android.deskclock:id/navigation_bar_item_active_indicator_view",
+                                                        "clickable": "false",
+                                                        "bounds": "[668,1967][844,2055]",
+                                                        "enabled": "true",
+                                                        "focused": "false",
+                                                        "checked": "false",
+                                                        "selected": "true"
+                                                      },
+                                                      "children": [],
+                                                      "clickable": false,
+                                                      "enabled": true,
+                                                      "focused": false,
+                                                      "checked": false,
+                                                      "selected": true
+                                                    },
+                                                    {
+                                                      "attributes": {
+                                                        "text": "",
+                                                        "accessibilityText": "",
+                                                        "className": "android.widget.ImageView",
+                                                        "packageName": "com.google.android.deskclock",
+                                                        "hintText": "",
+                                                        "ignoreBoundsFiltering": "false",
+                                                        "resource-id": "com.google.android.deskclock:id/navigation_bar_item_icon_view",
+                                                        "clickable": "false",
+                                                        "bounds": "[723,1978][789,2044]",
+                                                        "enabled": "true",
+                                                        "focused": "false",
+                                                        "checked": "false",
+                                                        "selected": "true"
+                                                      },
+                                                      "children": [],
+                                                      "clickable": false,
+                                                      "enabled": true,
+                                                      "focused": false,
+                                                      "checked": false,
+                                                      "selected": true
+                                                    }
+                                                  ],
+                                                  "clickable": false,
+                                                  "enabled": true,
+                                                  "focused": false,
+                                                  "checked": false,
+                                                  "selected": true
+                                                },
+                                                {
+                                                  "attributes": {
+                                                    "text": "",
+                                                    "accessibilityText": "",
+                                                    "className": "android.view.ViewGroup",
+                                                    "packageName": "com.google.android.deskclock",
+                                                    "hintText": "",
+                                                    "ignoreBoundsFiltering": "false",
+                                                    "resource-id": "com.google.android.deskclock:id/navigation_bar_item_labels_group",
+                                                    "clickable": "false",
+                                                    "bounds": "[658,2066][853,2154]",
+                                                    "enabled": "true",
+                                                    "focused": "false",
+                                                    "checked": "false",
+                                                    "selected": "true"
+                                                  },
+                                                  "children": [
+                                                    {
+                                                      "attributes": {
+                                                        "text": "Stopwatch",
+                                                        "accessibilityText": "",
+                                                        "className": "android.widget.TextView",
+                                                        "packageName": "com.google.android.deskclock",
+                                                        "hintText": "",
+                                                        "ignoreBoundsFiltering": "false",
+                                                        "resource-id": "com.google.android.deskclock:id/navigation_bar_item_large_label_view",
+                                                        "clickable": "false",
+                                                        "bounds": "[658,2066][853,2122]",
+                                                        "enabled": "true",
+                                                        "focused": "false",
+                                                        "checked": "false",
+                                                        "selected": "true"
+                                                      },
+                                                      "children": [],
+                                                      "clickable": false,
+                                                      "enabled": true,
+                                                      "focused": false,
+                                                      "checked": false,
+                                                      "selected": true
+                                                    }
+                                                  ],
+                                                  "clickable": false,
+                                                  "enabled": true,
+                                                  "focused": false,
+                                                  "checked": false,
+                                                  "selected": true
+                                                }
+                                              ],
+                                              "clickable": false,
+                                              "enabled": true,
+                                              "focused": false,
+                                              "checked": false,
+                                              "selected": true
+                                            },
+                                            {
+                                              "attributes": {
+                                                "text": "",
+                                                "accessibilityText": "Bedtime",
+                                                "className": "android.widget.FrameLayout",
+                                                "packageName": "com.google.android.deskclock",
+                                                "hintText": "",
+                                                "ignoreBoundsFiltering": "false",
+                                                "resource-id": "com.google.android.deskclock:id/tab_menu_bedtime",
+                                                "clickable": "true",
+                                                "bounds": "[864,1934][1080,2154]",
+                                                "enabled": "true",
+                                                "focused": "false",
+                                                "checked": "false",
+                                                "selected": "false"
+                                              },
+                                              "children": [
+                                                {
+                                                  "attributes": {
+                                                    "text": "",
+                                                    "accessibilityText": "",
+                                                    "className": "android.widget.FrameLayout",
+                                                    "packageName": "com.google.android.deskclock",
+                                                    "hintText": "",
+                                                    "ignoreBoundsFiltering": "false",
+                                                    "resource-id": "com.google.android.deskclock:id/navigation_bar_item_icon_container",
+                                                    "clickable": "false",
+                                                    "bounds": "[884,1967][1060,2055]",
+                                                    "enabled": "true",
+                                                    "focused": "false",
+                                                    "checked": "false",
+                                                    "selected": "false"
+                                                  },
+                                                  "children": [
+                                                    {
+                                                      "attributes": {
+                                                        "text": "",
+                                                        "accessibilityText": "",
+                                                        "className": "android.widget.ImageView",
+                                                        "packageName": "com.google.android.deskclock",
+                                                        "hintText": "",
+                                                        "ignoreBoundsFiltering": "false",
+                                                        "resource-id": "com.google.android.deskclock:id/navigation_bar_item_icon_view",
+                                                        "clickable": "false",
+                                                        "bounds": "[939,1978][1005,2044]",
+                                                        "enabled": "true",
+                                                        "focused": "false",
+                                                        "checked": "false",
+                                                        "selected": "false"
+                                                      },
+                                                      "children": [],
+                                                      "clickable": false,
+                                                      "enabled": true,
+                                                      "focused": false,
+                                                      "checked": false,
+                                                      "selected": false
+                                                    }
+                                                  ],
+                                                  "clickable": false,
+                                                  "enabled": true,
+                                                  "focused": false,
+                                                  "checked": false,
+                                                  "selected": false
+                                                },
+                                                {
+                                                  "attributes": {
+                                                    "text": "",
+                                                    "accessibilityText": "",
+                                                    "className": "android.view.ViewGroup",
+                                                    "packageName": "com.google.android.deskclock",
+                                                    "hintText": "",
+                                                    "ignoreBoundsFiltering": "false",
+                                                    "resource-id": "com.google.android.deskclock:id/navigation_bar_item_labels_group",
+                                                    "clickable": "false",
+                                                    "bounds": "[895,2066][1049,2154]",
+                                                    "enabled": "true",
+                                                    "focused": "false",
+                                                    "checked": "false",
+                                                    "selected": "false"
+                                                  },
+                                                  "children": [
+                                                    {
+                                                      "attributes": {
+                                                        "text": "Bedtime",
+                                                        "accessibilityText": "",
+                                                        "className": "android.widget.TextView",
+                                                        "packageName": "com.google.android.deskclock",
+                                                        "hintText": "",
+                                                        "ignoreBoundsFiltering": "false",
+                                                        "resource-id": "com.google.android.deskclock:id/navigation_bar_item_small_label_view",
+                                                        "clickable": "false",
+                                                        "bounds": "[895,2066][1049,2122]",
+                                                        "enabled": "true",
+                                                        "focused": "false",
+                                                        "checked": "false",
+                                                        "selected": "false"
+                                                      },
+                                                      "children": [],
+                                                      "clickable": false,
+                                                      "enabled": true,
+                                                      "focused": false,
+                                                      "checked": false,
+                                                      "selected": false
+                                                    }
+                                                  ],
+                                                  "clickable": false,
+                                                  "enabled": true,
+                                                  "focused": false,
+                                                  "checked": false,
+                                                  "selected": false
+                                                }
+                                              ],
+                                              "clickable": true,
+                                              "enabled": true,
+                                              "focused": false,
+                                              "checked": false,
+                                              "selected": false
+                                            }
+                                          ],
+                                          "clickable": false,
+                                          "enabled": true,
+                                          "focused": false,
+                                          "checked": false,
+                                          "selected": false
+                                        }
+                                      ],
+                                      "clickable": false,
+                                      "enabled": true,
+                                      "focused": false,
+                                      "checked": false,
+                                      "selected": false
+                                    }
+                                  ],
+                                  "clickable": false,
+                                  "enabled": true,
+                                  "focused": false,
+                                  "checked": false,
+                                  "selected": false
+                                }
+                              ],
+                              "clickable": false,
+                              "enabled": true,
+                              "focused": false,
+                              "checked": false,
+                              "selected": false
+                            }
+                          ],
+                          "clickable": false,
+                          "enabled": true,
+                          "focused": false,
+                          "checked": false,
+                          "selected": false
+                        }
+                      ],
+                      "clickable": false,
+                      "enabled": true,
+                      "focused": false,
+                      "checked": false,
+                      "selected": false
+                    }
+                  ],
+                  "clickable": false,
+                  "enabled": true,
+                  "focused": false,
+                  "checked": false,
+                  "selected": false
+                }
+              ],
+              "clickable": false,
+              "enabled": true,
+              "focused": false,
+              "checked": false,
+              "selected": false
+            }
+          ],
+          "clickable": false,
+          "enabled": true,
+          "focused": false,
+          "checked": false,
+          "selected": false
+        }
+      ],
+      "clickable": false,
+      "enabled": false,
+      "focused": false,
+      "checked": false,
+      "selected": false
+    }
+  ]
+}

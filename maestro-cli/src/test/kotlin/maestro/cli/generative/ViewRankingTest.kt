@@ -1,8 +1,8 @@
 package maestro.cli.generative
 
 import maestro.TreeNode
-import maestro.cli.runner.gen.viewranking.ViewRanking
-import maestro.cli.runner.gen.viewranking.actionhash.TreeDirectionHasher
+import maestro.cli.runner.gen.actionhash.TreeDirectionHasher
+import maestro.cli.runner.gen.commandselection.strategies.viewranking.ViewRanking
 import maestro.orchestra.BackPressCommand
 import maestro.orchestra.ElementSelector
 import maestro.orchestra.InputRandomCommand

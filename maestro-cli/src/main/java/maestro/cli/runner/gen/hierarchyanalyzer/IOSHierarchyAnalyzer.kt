@@ -5,9 +5,6 @@ import maestro.TreeNode
 import maestro.ViewHierarchy
 import maestro.cli.runner.gen.commandselection.strategies.CommandSelectionStrategy
 import maestro.cli.runner.gen.viewdisambiguator.DisambiguationRule
-import maestro.orchestra.Command
-import maestro.orchestra.ElementSelector
-import maestro.orchestra.TapOnElementCommand
 
 class IOSHierarchyAnalyzer(
     override val selectionStrategy: CommandSelectionStrategy,
@@ -16,15 +13,6 @@ class IOSHierarchyAnalyzer(
     disambiguationRule,
     selectionStrategy
 ) {
-    override fun extractClickableActions(selectors: List<Pair<TreeNode, ElementSelector>>): List<Pair<Command, TreeNode?>> {
-        val resultingCommands = mutableListOf<Pair<Command, TreeNode?>>()
-        selectors.forEach { (node, selector) ->
-            node.clickable?.let {
-                resultingCommands.add(TapOnElementCommand(selector) to node)
-            }
-        }
-        return resultingCommands.toList()
-    }
 
     override fun isScrollable(nodes: List<TreeNode>): Boolean = true
 
@@ -52,8 +40,8 @@ class IOSHierarchyAnalyzer(
             node.attributes["resource-id"] == "SystemInputAssistantView"
         }?.aggregate() ?: emptyList()
         return flattenNodes.filter {
-                it !in (topContainerNodes + predictiveInput + keyboardNodes)
-            }
+            it !in (topContainerNodes + predictiveInput + keyboardNodes)
+        }
     }
 
     companion object {

@@ -608,6 +608,9 @@ data class YamlFluentCommand(
                 is StopAppCommand -> YamlFluentCommand(
                     stopApp = YamlStopApp(maestroCommand.stopAppCommand?.appId)
                 )
+                is WaitForAnimationToEndCommand -> YamlFluentCommand(
+                    waitForAnimationToEnd = YamlWaitForAnimationToEndCommand(timeout = maestroCommand.waitForAnimationToEndCommand?.timeout ?: 2000)
+                )
                 else -> YamlFluentCommand()
             }
         }

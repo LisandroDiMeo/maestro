@@ -3,6 +3,8 @@ package maestro.cli.command
 import maestro.cli.App
 import maestro.cli.DisableAnsiMixin
 import maestro.cli.runner.TestSuiteGenerator
+import maestro.cli.runner.gen.TestSuiteGeneratorLogger
+import maestro.cli.runner.gen.presentation.flowfilegeneration.FlowFileWriterImpl
 import maestro.cli.session.MaestroSessionManager
 import picocli.CommandLine
 import java.util.concurrent.Callable
@@ -47,9 +49,11 @@ class GenerateCommand : Callable<Int> {
                 testSuiteSize = suiteSize,
                 testSize = testSize,
                 endTestIfOutsideApp = endTestIfOutsideApp,
-                strategy = strategy
-            ).generate()
-            1
+                strategy = strategy,
+                logger = TestSuiteGeneratorLogger.logger,
+                flowFileWriter = FlowFileWriterImpl(packageName, strategy)
+                ).generate()
+            0
         }
     }
 }

@@ -10,8 +10,9 @@ import maestro.FindElementResult
 import maestro.Maestro
 import maestro.MaestroException
 import maestro.ViewHierarchy
+import maestro.cli.runner.gen.actionhash.TreeIndexer
 import maestro.cli.runner.gen.hierarchyanalyzer.HierarchyAnalyzer
-import maestro.cli.runner.gen.viewranking.actionhash.TreeIndexer
+import maestro.cli.runner.gen.presentation.runcycle.RunCycle
 import maestro.js.GraalJsEngine
 import maestro.js.JsEngine
 import maestro.js.RhinoJsEngine
@@ -27,12 +28,13 @@ import maestro.orchestra.Orchestra
 import maestro.orchestra.ScrollCommand
 import maestro.orchestra.StopAppCommand
 import maestro.orchestra.TapOnElementCommand
+import maestro.orchestra.WaitForAnimationToEndCommand
 import maestro.orchestra.error.UnicodeNotSupportedError
 import maestro.orchestra.filter.FilterWithDescription
 import maestro.orchestra.filter.TraitFilters
-import maestro.orchestra.runcycle.RunCycle
 import maestro.utils.StringUtils.toRegexSafe
 import okhttp3.OkHttpClient
+import org.slf4j.Logger
 
 class TestGenerationOrchestra(
     private val maestro: Maestro,
@@ -43,6 +45,7 @@ class TestGenerationOrchestra(
     private val httpClient: OkHttpClient? = null,
     private val testSize: Int = 5,
     private val endTestIfOutsideApp: Boolean = false,
+    private val logger: Logger,
 ) {
 
     private var timeMsOfLastInteraction = System.currentTimeMillis()
@@ -74,10 +77,18 @@ class TestGenerationOrchestra(
             }
             var hierarchy = maestro.viewHierarchy().run { ViewHierarchy(root = TreeIndexer.addTypeAndIndex(this.root)) }
             if (endTestIfOutsideApp && isOutsideApp(hierarchy) && currentIteration > 1) {
+                logger.info("Previous action left the app. Perhaps a pop-up or something, attempting to go back with BackPress 🔙")
                 executeCommand(MaestroCommand(backPressCommand = BackPressCommand()))
                 runBlocking { delay(2000L) }
                 hierarchy = maestro.viewHierarchy().run { ViewHierarchy(root = TreeIndexer.addTypeAndIndex(this.root)) }
-                if(isOutsideApp(hierarchy)) return
+                if(isOutsideApp(hierarchy)) {
+                    logger.info("BackPress didn't recovered from leaving the app, ending case 🔚...")
+                    return
+                }
+                else {
+                    commandsGenerated.add(MaestroCommand(backPressCommand = BackPressCommand()))
+                    logger.info("Adding a BackPress to dismiss an exit of the app 🔙...")
+                }
             }
             val wasLastActionForTest = currentIteration == (testSize + 1)
             val command = hierarchyAnalyzer.fetchCommandFrom(
@@ -87,24 +98,41 @@ class TestGenerationOrchestra(
             )
             if (wasLastActionForTest) continue
             commandsGenerated.add(command)
-
             runCycle.onCommandStart(currentIteration, command)
-            try {
-                deviceInfo = maestro.deviceInfo()
-                executeCommand(command)
-                runCycle.onCommandComplete(currentIteration, command)
-            } catch (e: Throwable) {
-                when (runCycle.onCommandFailed(currentIteration, command, e)) {
-                    Orchestra.ErrorResolution.FAIL -> {
-                        commandsGenerated.removeLast()
-                    }
-                    Orchestra.ErrorResolution.CONTINUE -> {
-                        commandsGenerated.removeLast()
-                    }
+            tryExecuteCommand(
+                command,
+                currentIteration
+            )
+        }
+
+    }
+
+    private fun tryExecuteCommand(
+        command: MaestroCommand,
+        currentIteration: Int
+    ) {
+        try {
+            deviceInfo = maestro.deviceInfo()
+            executeCommand(command)
+            runCycle.onCommandComplete(
+                currentIteration,
+                command
+            )
+        } catch (e: Throwable) {
+            when (runCycle.onCommandFailed(
+                currentIteration,
+                command,
+                e
+            )) {
+                Orchestra.ErrorResolution.FAIL -> {
+                    commandsGenerated.removeLast()
+                }
+
+                Orchestra.ErrorResolution.CONTINUE -> {
+                    commandsGenerated.removeLast()
                 }
             }
         }
-
     }
 
     private fun isOutsideApp(hierarchy: ViewHierarchy) =
@@ -115,12 +143,14 @@ class TestGenerationOrchestra(
     private fun openApplication() {
         val launchAppCommand = LaunchAppCommand(
             appId = packageName,
-            clearState = false,
+            clearState = true,
             clearKeychain = null,
             stopApp = true,
         )
         val maestroCommand = MaestroCommand(launchAppCommand = launchAppCommand)
+        val waitStartAnimationCommand = MaestroCommand(WaitForAnimationToEndCommand(timeout = 2000))
         commandsGenerated.add(maestroCommand)
+        commandsGenerated.add(waitStartAnimationCommand)
         runCycle.onCommandStart(0, maestroCommand)
         launchAppCommand(launchAppCommand)
         runBlocking {

@@ -11,5 +11,10 @@ bin
 
 .idea
 
+.DS_Store
+*/.DS_Store
+/experiments
+/generated-flows/*
+
 # media assets
 maestro-orchestra/src/test/resources/media/assets/*

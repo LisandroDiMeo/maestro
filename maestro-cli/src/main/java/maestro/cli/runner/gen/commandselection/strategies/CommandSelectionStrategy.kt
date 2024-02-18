@@ -1,9 +1,10 @@
 package maestro.cli.runner.gen.commandselection.strategies
 
 import maestro.TreeNode
-import maestro.cli.runner.gen.model.ExecutedCommandsObservable
-import maestro.cli.runner.gen.viewranking.ViewRanking
-import maestro.cli.runner.gen.viewranking.actionhash.ActionHasher
+import maestro.cli.runner.gen.actionhash.ActionHasher
+import maestro.cli.runner.gen.commandselection.strategies.random.RandomCommandSelection
+import maestro.cli.runner.gen.commandselection.strategies.viewranking.ViewRanking
+import maestro.cli.runner.gen.presentation.model.ExecutedCommandsObservable
 import maestro.orchestra.LaunchAppCommand
 import maestro.orchestra.MaestroCommand
 

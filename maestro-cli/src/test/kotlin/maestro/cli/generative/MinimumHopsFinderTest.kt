@@ -1,7 +1,7 @@
 package maestro.cli.generative
 
-import maestro.cli.runner.gen.viewranking.ActionInformation
-import maestro.cli.runner.gen.viewranking.MinimumHopsFinder
+import maestro.cli.runner.gen.commandselection.strategies.viewranking.ActionInformation
+import maestro.cli.runner.gen.commandselection.strategies.viewranking.MinimumHopsFinder
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 

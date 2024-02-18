@@ -11,18 +11,34 @@ import maestro.orchestra.HideKeyboardCommand
 import maestro.orchestra.InputRandomCommand
 import maestro.orchestra.MaestroCommand
 import maestro.orchestra.ScrollCommand
+import maestro.orchestra.TapOnElementCommand
 
+/**
+ * This class is in charge of the mechanism of fetching a command using certain [selectionStrategy]
+ * and providing nodes/selectors that were disambiguated by a [disambiguationRule].
+ * Also, here we introduce a layer of device-specific abstraction, as both Android and iOS
+ * has specific nodes that we'd like to ignore, different criteria of when an AUT is not visible, and so on.
+ * As for our model, its the main collaborator for [maestro.cli.runner.gen.TestGenerationOrchestra].
+ */
 abstract class HierarchyAnalyzer(
     open val disambiguationRule: DisambiguationRule,
     open val selectionStrategy: CommandSelectionStrategy,
 ) {
 
-    private var previousAction: Pair<MaestroCommand,TreeNode>? = null
+    private var previousAction: Pair<MaestroCommand, TreeNode>? = null
 
-    fun fetchCommandFrom(hierarchy: ViewHierarchy,
-          newTest: Boolean,
-          wasLastActionForTest: Boolean): MaestroCommand {
-        val flattenNodes = removeIgnoredNodes(hierarchy.aggregate())
+    /**
+     * Fetch a command using provided strategy for given [hierarchy].
+     * @param hierarchy to be analyzed and from where the command will be generated
+     * @param newTest strategies needs to know if we are selecting a command for a new test or an ongoing one
+     * @param wasLastActionForTest strategies needs to know if the previous fetched command was the last action for that test
+     */
+    fun fetchCommandFrom(
+        hierarchy: ViewHierarchy,
+        newTest: Boolean,
+        wasLastActionForTest: Boolean
+    ): MaestroCommand {
+        val flattenNodes = hierarchy.aggregate()
         val availableWidgets = extractWidgets(
             hierarchy,
             flattenNodes
@@ -44,16 +60,36 @@ abstract class HierarchyAnalyzer(
         val nodeForCommand =
             availableWidgets.firstOrNull { (it.second == commandToExecute.tapOnElement?.selector) }?.first
                 ?: TreeNode()
-        if((previousAction != null && previousAction!!.first.inputRandomTextCommand == null) || previousAction == null) {
+        if ((previousAction != null && previousAction!!.first.inputRandomTextCommand == null) || previousAction == null) {
             previousAction = commandToExecute to nodeForCommand
         }
         return commandToExecute
     }
 
+    /**
+     * Filter out from [flattenNodes] which nodes are not useful for command generation
+     */
     open fun removeIgnoredNodes(flattenNodes: List<TreeNode>): List<TreeNode> = flattenNodes
 
-    abstract fun extractClickableActions(selectors: List<Pair<TreeNode, ElementSelector>>): List<Pair<Command, TreeNode?>>
+    /**
+     * Provides how clickable actions will be made based on [selectors]
+     */
+    open fun extractClickableActions(selectors: List<Pair<TreeNode, ElementSelector>>): List<Pair<Command, TreeNode?>> {
+        val resultingCommands = mutableListOf<Pair<Command, TreeNode?>>()
+        selectors.forEach { (node, selector) ->
+            node.clickable?.let {
+                if (it) {
+                    resultingCommands.add(TapOnElementCommand(selector) to node)
+                }
+            }
+        }
+        return resultingCommands.toList()
+    }
 
+    /**
+     * Provides how widget extraction will be made.
+     * This method is quite crucial since [TapOnElementCommand]'s relies mostly on useful [ElementSelector]'s.
+     */
     open fun extractWidgets(
         hierarchy: ViewHierarchy,
         flattenNodes: List<TreeNode>
@@ -63,9 +99,14 @@ abstract class HierarchyAnalyzer(
             ElementSelector(),
             ElementSelector(textRegex = ""),
             ElementSelector(idRegex = ""),
-            ElementSelector(idRegex = "", textRegex = "")
+            ElementSelector(
+                idRegex = "",
+                textRegex = ""
+            )
         )
-        val preSelectionOfWidgets = flattenNodes
+        // TODO: I made an important change here, so we will see if everything is ok...
+        val allowedNodes = removeIgnoredNodes(flattenNodes)
+        val preSelectionOfWidgets = allowedNodes
             .map {
                 it to disambiguationRule.disambiguate(
                     root,
@@ -86,7 +127,10 @@ abstract class HierarchyAnalyzer(
         return listOf(
             InputRandomCommand(origin = previousAction),
             HideKeyboardCommand(origin = previousAction),
-            EraseTextCommand(null, origin = previousAction)
+            EraseTextCommand(
+                null,
+                origin = previousAction
+            )
         )
     }
 
@@ -102,6 +146,12 @@ abstract class HierarchyAnalyzer(
 
     abstract fun isKeyboardOpen(nodes: List<TreeNode>): Boolean
 
-    abstract fun isOutsideApp(hierarchy: ViewHierarchy, packageName: String): Boolean
+    /**
+     * Determines if the [hierarchy] is outside the app identified by [packageName]
+     */
+    abstract fun isOutsideApp(
+        hierarchy: ViewHierarchy,
+        packageName: String
+    ): Boolean
 
 }

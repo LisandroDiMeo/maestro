@@ -1,0 +1,38 @@
+
+# config.yaml
+executionOrder:
+    continueOnFailure: true
+    flowsOrder:
+        - generated-flow-1
+        - generated-flow-2
+        - generated-flow-3
+        - generated-flow-4
+        - generated-flow-5
+        - generated-flow-6
+        - generated-flow-7
+        - generated-flow-8
+        - generated-flow-9
+        - generated-flow-10
+        - generated-flow-11
+        - generated-flow-12
+        - generated-flow-13
+        - generated-flow-14
+        - generated-flow-15
+        - generated-flow-16
+        - generated-flow-17
+        - generated-flow-18
+        - generated-flow-19
+        - generated-flow-20
+        - generated-flow-21
+        - generated-flow-22
+        - generated-flow-23
+        - generated-flow-24
+        - generated-flow-25
+        - generated-flow-26
+        - generated-flow-27
+        - generated-flow-28
+        - generated-flow-29
+        - generated-flow-30
+        - generated-flow-31
+        - generated-flow-32
+
