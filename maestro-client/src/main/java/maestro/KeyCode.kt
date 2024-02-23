@@ -24,7 +24,18 @@ enum class KeyCode(
     REMOTE_PREVIOUS("Remote Media Previous"),
     REMOTE_REWIND("Remote Media Rewind"),
     REMOTE_FAST_FORWARD("Remote Media Fast Forward"),
-    POWER("Power");
+    ESCAPE("Escape"),
+    POWER("Power"),
+    TAB("Tab"),
+    REMOTE_SYSTEM_NAVIGATION_UP("Remote System Navigation Up"),
+    REMOTE_SYSTEM_NAVIGATION_DOWN("Remote System Navigation Down"),
+    REMOTE_BUTTON_A("Remote Button A"),
+    REMOTE_BUTTON_B("Remote Button B"),
+    REMOTE_MENU("Remote Menu"),
+    TV_INPUT("TV Input"),
+    TV_INPUT_HDMI_1("TV Input HDMI 1"),
+    TV_INPUT_HDMI_2("TV Input HDMI 2"),
+    TV_INPUT_HDMI_3("TV Input HDMI 3");
 
     companion object {
         fun getByName(name: String): KeyCode? {

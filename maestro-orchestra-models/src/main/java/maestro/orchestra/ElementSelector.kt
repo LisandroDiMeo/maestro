@@ -40,7 +40,8 @@ data class ElementSelector(
     val checked: Boolean? = null,
     val focused: Boolean? = null,
     val classNameRegex: String? = null,
-    val packageNameRegex: String? = null
+    val packageNameRegex: String? = null,
+    val childOf: ElementSelector? = null
 ) {
 
     data class SizeSelector(
@@ -60,6 +61,7 @@ data class ElementSelector(
             containsChild = containsChild?.evaluateScripts(jsEngine),
             containsDescendants = containsDescendants?.map { it.evaluateScripts(jsEngine) },
             index = index?.evaluateScripts(jsEngine),
+            childOf = childOf?.evaluateScripts(jsEngine)
         )
     }
 
@@ -124,6 +126,10 @@ data class ElementSelector(
 
         packageNameRegex?.let {
             descriptions.add("Package Name: $it")
+        }
+
+        childOf?.let {
+            descriptions.add("Child of: ${it.description()}")
         }
 
         val combined = descriptions.joinToString(", ")

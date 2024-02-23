@@ -22,9 +22,12 @@ object ToastAccessibilityListener : UiAutomation.OnAccessibilityEventListener {
             accessibilityEvent.className.toString().contains(Toast::class.jvmName)
         ) {
             recentToastTimeMillis = System.currentTimeMillis()
-            val nodeInfo = if (Build.VERSION.SDK_INT < 30 ){
+            // Constructor for AccessibilityNodeInfo is only available on Android API 30+
+            val nodeInfo = if (Build.VERSION.SDK_INT < 30) {
                 AccessibilityNodeInfo.obtain()
-            } else AccessibilityNodeInfo()
+            } else {
+                AccessibilityNodeInfo()
+            }
             toastNode = nodeInfo.apply {
                 text = accessibilityEvent.text.first().toString()
                 className = Toast::class.jvmName
