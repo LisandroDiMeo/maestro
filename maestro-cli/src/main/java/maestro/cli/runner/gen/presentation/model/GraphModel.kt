@@ -83,7 +83,11 @@ class GraphModel<T>(
         }
         graphFile.add("}")
         writeDotFile(graphFile)
-        generateGraphInSVG()
+        // TODO: Uncomment this to actually generate the svg
+        //  For the experiment phase we are not using it
+        //  since it may take a lot of time to render a huge graph
+        //  and even sometimes it's impossible
+        // generateGraphInSVG()
     }
 
     private fun writeDotFile(graphFile: MutableList<String>) {
