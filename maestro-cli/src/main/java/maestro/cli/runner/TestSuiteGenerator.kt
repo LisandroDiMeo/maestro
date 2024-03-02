@@ -28,7 +28,8 @@ class TestSuiteGenerator(
     private val endTestIfOutsideApp: Boolean = false,
     private val strategy: String,
     private val logger: Logger,
-    private val flowFileWriter: FlowFileWriter
+    private val flowFileWriter: FlowFileWriter,
+    private val seed: Long,
 ) {
 
     fun generate() {
@@ -36,7 +37,8 @@ class TestSuiteGenerator(
         val executedCommandsObservable = ExecutedCommandsObservable()
         val strategy = CommandSelectionStrategy.strategyFor(
             strategy,
-            executedCommandsObservable
+            executedCommandsObservable,
+            seed
         )
         val modelBuildingJob = CoroutineScope(Dispatchers.IO).launch {
             executedCommandsObservable.commandInformationState.collect {

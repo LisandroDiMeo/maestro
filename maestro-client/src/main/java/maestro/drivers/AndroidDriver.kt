@@ -313,7 +313,8 @@ class AndroidDriver(
             .parse(response.hierarchy.byteInputStream())
 
         val treeNode = mapHierarchy(document)
-        return if (excludeKeyboardElements) {
+        // TODO: We need to implement a proper way to do this, instead of hardcoding it
+        return if (excludeKeyboardElements || true) {
             treeNode.excludeKeyboardElements() ?: treeNode
         } else {
             treeNode
@@ -325,8 +326,12 @@ class AndroidDriver(
             it.excludeKeyboardElements()
         }.toList()
 
-        val resourceId = attributes["resource-id"]
-        if (resourceId != null && resourceId.startsWith("com.google.android.inputmethod.latin:id/")) {
+//        val resourceId = attributes["resource-id"]
+//        if (resourceId != null && resourceId.startsWith("com.google.android.inputmethod.latin:id/")) {
+//            return null
+//        }
+        val packageName = attributes["packageName"]
+        if (packageName == "com.android.systemui") {
             return null
         }
         return TreeNode(

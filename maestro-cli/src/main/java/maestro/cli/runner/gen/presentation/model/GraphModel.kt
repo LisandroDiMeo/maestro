@@ -1,9 +1,17 @@
 package maestro.cli.runner.gen.presentation.model
 
+import com.google.gson.Gson
 import maestro.cli.runner.gen.TestSuiteGeneratorLogger
+import maestro.orchestra.ElementSelector
+import maestro.orchestra.MaestroCommand
+import maestro.orchestra.TapOnElementCommand
 import org.slf4j.Logger
 import java.io.File
 import java.io.FileOutputStream
+import java.io.FileWriter
+import java.io.Serializable
+import java.io.Writer
+import java.lang.Appendable
 
 /**
  * This class represents a graph where its vertices are of type [T].
@@ -16,14 +24,18 @@ class GraphModel<T>(
 ) {
 
     private val graph: MutableMap<String, Pair<T, List<Vertex<T>>>> = mutableMapOf()
+    private val discoveredVertices = mutableSetOf<String>()
+    private val executedNodes = mutableSetOf<String>()
+    private val snapshotSequence = mutableListOf<Pair<Int, ModelSnapshot<T>>>()
+    private var step = 1
 
     /**
      * Add to the graph a vertex with its given neighbors.
-     * Note that if the vertex existed before, it will override previous neighbors.
      */
     fun addNeighborsToVertex(
         vertex: Vertex<T>,
-        neighbors: List<Vertex<T>>
+        neighbors: List<Vertex<T>>,
+        addToSequence: Boolean = true
     ) {
         graph[vertex.id] = vertex.value to
                 if (vertex.id in graph.keys) {
@@ -32,8 +44,28 @@ class GraphModel<T>(
                 } else {
                     neighbors
                 }
-
+        if (addToSequence) {
+            discoveredVertices.add(vertex.id)
+            executedNodes.add(vertex.id)
+            neighbors.forEach { discoveredVertices.add(it.id) }
+            val snapshot = ModelSnapshot<T>(
+                step = this.step,
+                discoveredNodes = discoveredVertices.size,
+                executedNodes = executedNodes.size,
+                snapshot = null
+            )
+            snapshotSequence.add(step to snapshot)
+            step += 1
+        }
     }
+
+    private fun outputSequence() {
+        val fileWriter = FileWriter("$path/graphGenerationSequence.json")
+        fileWriter.use {
+            Gson().toJson(snapshotSequence, it)
+        }
+    }
+
 
     private fun completeGraphWithUnusedNodes() {
         val nodesToAdd = mutableListOf<Vertex<T>>()
@@ -47,7 +79,8 @@ class GraphModel<T>(
         nodesToAdd.forEach {
             addNeighborsToVertex(
                 it,
-                emptyList()
+                emptyList(),
+                false
             )
         }
     }
@@ -61,10 +94,7 @@ class GraphModel<T>(
         usagesCountProducer: (String) -> String
     ) {
         logger.info("Building visual graph model 🖼️")
-        //        val prunedGraph = graph.mapValues { (_, value) ->
-        //            val usedVertices = value.second.filter { it.id in graph.keys }
-        //            value.first to usedVertices
-        //        }
+        outputSequence()
         completeGraphWithUnusedNodes()
 
         val graphFile = mutableListOf<String>()
@@ -73,7 +103,11 @@ class GraphModel<T>(
         )
         graph.forEach { (node, edges) ->
             val label =
-                "${node.hashCode()} [style=filled, fillcolor=\"${colorProducer(node)}\", label=\"${labelProducer(edges.first)}\", usages=\"${usagesCountProducer(node)}\"]\n"
+                "${node.hashCode()} [style=filled, fillcolor=\"${colorProducer(node)}\", label=\"${
+                    labelProducer(
+                        edges.first
+                    )
+                }\", usages=\"${usagesCountProducer(node)}\"]\n"
             graphFile.add(label)
         }
         graph.forEach { (node, edges) ->
@@ -117,3 +151,9 @@ class GraphModel<T>(
     }
 }
 
+data class ModelSnapshot<T>(
+    val step: Int,
+    val executedNodes: Int,
+    val discoveredNodes: Int,
+    val snapshot: Map<String, Pair<T, List<Vertex<T>>>>?
+)

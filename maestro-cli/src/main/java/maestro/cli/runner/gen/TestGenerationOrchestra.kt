@@ -75,14 +75,15 @@ class TestGenerationOrchestra(
             runBlocking {
                 delay(2000L)
             }
-            var hierarchy = maestro.viewHierarchy().run { ViewHierarchy(root = TreeIndexer.addTypeAndIndex(this.root)) }
+            val hierarchyWithoutIndexes = maestro.viewHierarchy()
+            var hierarchy = hierarchyWithoutIndexes.run { ViewHierarchy(root = TreeIndexer.addTypeAndIndex(this.root)) }
             if (endTestIfOutsideApp && isOutsideApp(hierarchy) && currentIteration > 1) {
                 logger.info("Previous action left the app. Perhaps a pop-up or something, attempting to go back with BackPress 🔙")
                 executeCommand(MaestroCommand(backPressCommand = BackPressCommand()))
                 runBlocking { delay(2000L) }
                 hierarchy = maestro.viewHierarchy().run { ViewHierarchy(root = TreeIndexer.addTypeAndIndex(this.root)) }
                 if(isOutsideApp(hierarchy)) {
-                    logger.info("BackPress didn't recovered from leaving the app, ending case 🔚...")
+                    logger.info("BackPress didn't recover from leaving the app, ending case 🔚...")
                     return
                 }
                 else {

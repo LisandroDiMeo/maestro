@@ -7,6 +7,7 @@ import maestro.cli.runner.gen.commandselection.strategies.viewranking.ViewRankin
 import maestro.cli.runner.gen.presentation.model.ExecutedCommandsObservable
 import maestro.orchestra.LaunchAppCommand
 import maestro.orchestra.MaestroCommand
+import kotlin.random.Random
 
 /**
  * This abstraction is used to define strategies of how to pick
@@ -50,18 +51,23 @@ abstract class CommandSelectionStrategy(
         fun strategyFor(
             strategy: String,
             executedCommandsObservable: ExecutedCommandsObservable,
+            seed: Long,
         ): CommandSelectionStrategy {
+            val randomness = Random(seed)
             return when (strategy.lowercase()) {
                 "random" -> RandomCommandSelection(
                     executedCommandsObservable = executedCommandsObservable,
+                    random = randomness
                 )
 
                 "viewranking" -> ViewRanking(
                     executedCommandsObservable = executedCommandsObservable,
+                    random = randomness
                 )
 
                 else -> RandomCommandSelection(
                     executedCommandsObservable = executedCommandsObservable,
+                    random = randomness
                 )
             }
         }

@@ -8,6 +8,7 @@ import maestro.cli.runner.gen.presentation.flowfilegeneration.FlowFileWriterImpl
 import maestro.cli.session.MaestroSessionManager
 import picocli.CommandLine
 import java.util.concurrent.Callable
+import kotlin.random.Random
 
 @CommandLine.Command(
     name = "generate",
@@ -37,6 +38,9 @@ class GenerateCommand : Callable<Int> {
     @CommandLine.Option(names = ["--endIfAppLeft"], hidden = true)
     private var endTestIfOutsideApp: Boolean = false
 
+    @CommandLine.Option(names = ["--seed"], hidden = true)
+    private var seed: Long = Random.nextLong()
+
     override fun call(): Int {
         val deviceId = parent?.deviceId
         return MaestroSessionManager.newSession(parent?.host, parent?.port, deviceId) { session ->
@@ -51,7 +55,8 @@ class GenerateCommand : Callable<Int> {
                 endTestIfOutsideApp = endTestIfOutsideApp,
                 strategy = strategy,
                 logger = TestSuiteGeneratorLogger.logger,
-                flowFileWriter = FlowFileWriterImpl(packageName, strategy)
+                flowFileWriter = FlowFileWriterImpl(packageName, strategy),
+                seed = seed
                 ).generate()
             0
         }

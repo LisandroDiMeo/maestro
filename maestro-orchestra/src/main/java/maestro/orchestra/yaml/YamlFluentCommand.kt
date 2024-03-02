@@ -640,7 +640,7 @@ data class YamlFluentCommand(
                     )
                 }
                 is BackPressCommand -> { YamlFluentCommand(action = "back") }
-                is HideKeyboardCommand -> { YamlFluentCommand(action = "hide keyboard") }
+                is HideKeyboardCommand -> { YamlFluentCommand(action = "hideKeyboard") }
                 is ScrollCommand -> YamlFluentCommand(action = "scroll")
                 is PasteTextCommand -> YamlFluentCommand(action = "pasteText")
                 is ClearKeychainCommand -> YamlFluentCommand(action = "clearKeychain")
