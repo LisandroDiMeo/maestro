@@ -1,6 +1,7 @@
 package maestro.cli.runner.gen.actionhash
 
 import maestro.TreeNode
+import maestro.UiElement.Companion.toUiElement
 import maestro.orchestra.MaestroCommand
 
 /**
@@ -23,34 +24,40 @@ class TreeDirectionHasher : ActionHasher {
                 simpleTree,
                 view!!
             ).hashCode()
+            val uiElement = view.toUiElement()
+            val boundsHash = (uiElement.bounds.width to uiElement.bounds.height).hashCode()
+            val selectorHash = action.tapOnElement?.selector.hashCode()
             val typeHash = view.attributes["type"].hashCode()
+//            "$boundsHash-$typeHash-$selectorHash"
             "$directionHash-$typeHash"
         } else {
             // Remove structural attributes (such as text, resource id, etc)
             // and only keep a type attribute (elementType or className).
+            val actionNameHash = action.asCommand()?.javaClass?.name.hashCode().toString()
             when {
                 action.inputRandomTextCommand != null -> {
                     val origin = action.inputRandomTextCommand?.origin
-                    origin?.second?.run { TreeIndexer.removeVisualAttributes(this) }.hashCode()
-                        .toString() + origin?.first?.asCommand()?.javaClass.hashCode()
-                        .toString() + action.asCommand()?.javaClass.hashCode().toString()
+                    actionNameHash + origin
+                }
+
+                action.inputTextCommand != null -> {
+                    val origin = action.inputTextCommand?.origin
+                    actionNameHash + origin
                 }
 
                 action.hideKeyboardCommand != null -> {
                     val origin = action.hideKeyboardCommand?.origin
-                    origin?.second?.run { TreeIndexer.removeVisualAttributes(this) }.hashCode()
-                        .toString() + origin?.first?.asCommand()?.javaClass.hashCode()
-                        .toString() + action.asCommand()?.javaClass.hashCode().toString()
+                    actionNameHash + origin
                 }
 
                 action.eraseTextCommand != null -> {
                     val origin = action.eraseTextCommand?.origin
-                    origin?.second?.run { TreeIndexer.removeVisualAttributes(this) }.hashCode()
-                        .toString() + origin?.first?.asCommand()?.javaClass.hashCode()
-                        .toString() + action.asCommand()?.javaClass.hashCode().toString()
+                    actionNameHash + origin
                 }
 
-                else -> simpleTree.hashCode().toString() + action.hashCode().toString()
+                else -> {
+                    simpleTree.hashCode().toString() + actionNameHash
+                }
             }
         }
     }

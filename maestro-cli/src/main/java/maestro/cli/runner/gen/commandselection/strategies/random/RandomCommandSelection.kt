@@ -3,7 +3,6 @@ package maestro.cli.runner.gen.commandselection.strategies.random
 import maestro.TreeNode
 import maestro.cli.runner.gen.actionhash.ActionHasher
 import maestro.cli.runner.gen.actionhash.TreeDirectionHasher
-import maestro.cli.runner.gen.commandselection.CommandInformation
 import maestro.cli.runner.gen.commandselection.strategies.CommandSelectionStrategy
 import maestro.cli.runner.gen.presentation.model.ExecutedCommandsObservable
 import maestro.orchestra.MaestroCommand
@@ -15,7 +14,7 @@ import kotlin.random.Random
 class RandomCommandSelection(
     override val actionHasher: ActionHasher = TreeDirectionHasher(),
     private val random: Random = Random(1234),
-    val executedCommandsObservable: ExecutedCommandsObservable = ExecutedCommandsObservable()
+    override val executedCommandsObservable: ExecutedCommandsObservable = ExecutedCommandsObservable()
 ) : CommandSelectionStrategy(
     actionHasher,
     executedCommandsObservable
@@ -24,6 +23,7 @@ class RandomCommandSelection(
     private val usagesForAction: MutableMap<String, Int> = mutableMapOf()
 
     init {
+        previousAction = launchAppCommandHash
         usagesForAction[launchAppCommandHash] = 1
     }
 
@@ -34,35 +34,28 @@ class RandomCommandSelection(
         wasLastActionForTest: Boolean
     ): MaestroCommand {
         if (availableCommands.isEmpty()) throw UnableToPickCommand
-        val hashedActions = availableCommands.map { (command, node) ->
-            actionHasher.hashAction(
-                root,
-                command,
-                node
-            ) to command
-        }
-        if (newTest) {
-            previousAction = launchAppCommandHash
-            previousActionCommand = launchAppCommand
-        }
-        executedCommandsObservable.performUpdate(
-            CommandInformation(
-                previousActionCommand,
-                previousAction,
-                hashedActions,
-                usages = usagesForAction[previousAction] ?: 1
-            )
-        )
+        val hashedActions = hashActions(root, availableCommands)
+        performUpdateForObservable(newTest, hashedActions)
+
         if (wasLastActionForTest) return MaestroCommand()
+
         val actionToExecute = hashedActions.random(random)
         previousActionCommand = actionToExecute.second
         previousAction = actionToExecute.first
-        if (previousAction in usagesForAction.keys) {
-            usagesForAction[previousAction] = usagesForAction[previousAction]!! + 1
-        } else {
-            usagesForAction[previousAction] = 1
-        }
+        updateUsagesForActionToExecute(actionToExecute.first)
         return actionToExecute.second
+    }
+
+    override fun updateUsagesForActionToExecute(actionToPerform: String) {
+        if (actionToPerform in usagesForAction.keys) {
+            usagesForAction[actionToPerform] = usagesForAction[actionToPerform]!! + 1
+        } else {
+            usagesForAction[actionToPerform] = 1
+        }
+    }
+
+    override fun usagesForAction(actionHash: String): Int {
+        return usagesForAction[actionHash] ?: 1
     }
 
 

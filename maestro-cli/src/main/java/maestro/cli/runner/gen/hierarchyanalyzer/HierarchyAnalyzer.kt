@@ -8,10 +8,11 @@ import maestro.orchestra.Command
 import maestro.orchestra.ElementSelector
 import maestro.orchestra.EraseTextCommand
 import maestro.orchestra.HideKeyboardCommand
-import maestro.orchestra.InputRandomCommand
+import maestro.orchestra.InputTextCommand
 import maestro.orchestra.MaestroCommand
 import maestro.orchestra.ScrollCommand
 import maestro.orchestra.TapOnElementCommand
+import maestro.orchestra.util.InputRandomTextHelper
 
 /**
  * This class is in charge of the mechanism of fetching a command using certain [selectionStrategy]
@@ -25,7 +26,8 @@ abstract class HierarchyAnalyzer(
     open val selectionStrategy: CommandSelectionStrategy,
 ) {
 
-    private var previousAction: Pair<MaestroCommand, TreeNode>? = null
+    private var previousTapActionHash = ""
+    private var textsFilled = mutableListOf<String>()
 
     /**
      * Fetch a command using provided strategy for given [hierarchy].
@@ -38,6 +40,9 @@ abstract class HierarchyAnalyzer(
         newTest: Boolean,
         wasLastActionForTest: Boolean
     ): MaestroCommand {
+        if (newTest) {
+            textsFilled.clear()
+        }
         val flattenNodes = hierarchy.aggregate()
         val availableWidgets = extractWidgets(
             hierarchy,
@@ -49,7 +54,10 @@ abstract class HierarchyAnalyzer(
             commands.add(it to hierarchy.root)
         }
         scrollCommandIfScrollable(flattenNodes)?.let { commands.add(it to hierarchy.root) }
-        commands.addAll(extractClickableActions(availableWidgets))
+        val clickableActions = extractClickableActions(availableWidgets, flattenNodes).filter {
+            textsFilled.all { text -> text !in it.first.description() } || textsFilled.isEmpty()
+        }
+        commands.addAll(clickableActions)
 
         val commandToExecute = selectionStrategy.pickFrom(
             commands.map { (command, node) -> MaestroCommand(command) to node },
@@ -57,13 +65,31 @@ abstract class HierarchyAnalyzer(
             newTest,
             wasLastActionForTest
         )
-        val nodeForCommand =
-            availableWidgets.firstOrNull { (it.second == commandToExecute.tapOnElement?.selector) }?.first
-                ?: TreeNode()
-        if ((previousAction != null && previousAction!!.first.inputRandomTextCommand == null) || previousAction == null) {
-            previousAction = commandToExecute to nodeForCommand
+        commandToExecute.inputTextCommand?.let {
+            textsFilled.add(it.text)
+        }
+        commandToExecute.tapOnElement?.let {
+            previousTapActionHash = selectionStrategy.hashForPreviousAction()
         }
         return commandToExecute
+    }
+
+    fun commandsForHierarchy(
+        hierarchy: ViewHierarchy
+    ): List<Pair<MaestroCommand, TreeNode?>> {
+        val flattenNodes = hierarchy.aggregate()
+        val availableWidgets = extractWidgets(
+            hierarchy,
+            flattenNodes
+        )
+        val commands = mutableListOf<Pair<Command, TreeNode?>>()
+        commands.addAll(keyboardOpenCommandsIfOpen(flattenNodes).map { it to hierarchy.root })
+        backPressCommand()?.let {
+            commands.add(it to hierarchy.root)
+        }
+        scrollCommandIfScrollable(flattenNodes)?.let { commands.add(it to hierarchy.root) }
+        commands.addAll(extractClickableActions(availableWidgets, emptyList()))
+        return commands.map { (command, node) -> MaestroCommand(command) to node }
     }
 
     /**
@@ -74,17 +100,24 @@ abstract class HierarchyAnalyzer(
     /**
      * Provides how clickable actions will be made based on [selectors]
      */
-    open fun extractClickableActions(selectors: List<Pair<TreeNode, ElementSelector>>): List<Pair<Command, TreeNode?>> {
+    open fun extractClickableActions(selectors: List<Pair<TreeNode, ElementSelector>>, flattenNodes: List<TreeNode>): List<Pair<Command, TreeNode?>> {
         val resultingCommands = mutableListOf<Pair<Command, TreeNode?>>()
         selectors.forEach { (node, selector) ->
-            node.clickable?.let {
-                if (it) {
+            node.clickable?.let { isClickable ->
+                if (isClickable) {
                     resultingCommands.add(TapOnElementCommand(selector) to node)
+                } else {
+                    // Search parent
+                    val parent = flattenNodes.firstOrNull { otherNode -> node in otherNode.children }
+                    if (parent?.clickable == true) {
+                        resultingCommands.add(TapOnElementCommand(ElementSelector(containsChild = selector)) to node)
+                    }
                 }
             }
         }
         return resultingCommands.toList()
     }
+
 
     /**
      * Provides how widget extraction will be made.
@@ -104,7 +137,6 @@ abstract class HierarchyAnalyzer(
                 textRegex = ""
             )
         )
-        // TODO: I made an important change here, so we will see if everything is ok...
         val allowedNodes = removeIgnoredNodes(flattenNodes)
         val preSelectionOfWidgets = allowedNodes
             .map {
@@ -124,12 +156,13 @@ abstract class HierarchyAnalyzer(
     open fun backPressCommand(): Command? = null
 
     open fun keyboardOpenCommands(): List<Command> {
+        val randomText = InputRandomTextHelper.getRandomText(8)
         return listOf(
-            InputRandomCommand(origin = previousAction),
-            HideKeyboardCommand(origin = previousAction),
+            InputTextCommand(text = randomText, origin = previousTapActionHash),
+            HideKeyboardCommand(origin = previousTapActionHash),
             EraseTextCommand(
                 null,
-                origin = previousAction
+                origin = previousTapActionHash
             )
         )
     }

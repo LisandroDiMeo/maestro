@@ -37,6 +37,10 @@ class AndroidHierarchyAnalyzer(
         }
     }
 
+    override fun keyboardOpenCommands(): List<Command> {
+        return emptyList()
+    }
+
     override fun backPressCommand(): Command? {
         return BackPressCommand()
     }

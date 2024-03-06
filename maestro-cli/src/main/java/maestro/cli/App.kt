@@ -49,7 +49,8 @@ import kotlin.system.exitProcess
         BugReportCommand::class,
         StudioCommand::class,
         StartDeviceCommand::class,
-        GenerateCommand::class
+        GenerateCommand::class,
+        DebugHashingCommand::class
     ]
 )
 class App {

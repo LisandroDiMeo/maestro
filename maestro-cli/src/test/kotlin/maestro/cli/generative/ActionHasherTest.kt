@@ -377,16 +377,14 @@ class ActionHasherTest {
         ).run { TreeIndexer.addTypeAndIndex(this) }
         val hashA = actionHasher.hashAction(
             treeA,
-            MaestroCommand(InputRandomCommand(origin = MaestroCommand(BackPressCommand()) to TreeNode())),
+            MaestroCommand(InputRandomCommand(origin = "A")),
             null
         )
         val hashB = actionHasher.hashAction(
             treeA,
             MaestroCommand(
                 InputRandomCommand(
-                    origin = MaestroCommand(
-                        tapOnElement = TapOnElementCommand(ElementSelector(textRegex = "Hola"))
-                    ) to TreeNode()
+                    origin = "B"
                 )
             ),
             null
@@ -449,9 +447,7 @@ class ActionHasherTest {
             treeA,
             MaestroCommand(
                 InputRandomCommand(
-                    origin = MaestroCommand(
-                        tapOnElement = TapOnElementCommand(ElementSelector(textRegex = "Holaaa"))
-                    ) to treeA.aggregate().first { it.attributes["type"] == "ClassC" }
+                    origin = "A"
                 )
             ),
             null
@@ -460,9 +456,7 @@ class ActionHasherTest {
             treeB,
             MaestroCommand(
                 InputRandomCommand(
-                    origin = MaestroCommand(
-                        tapOnElement = TapOnElementCommand(ElementSelector(textRegex = "Hola"))
-                    ) to treeB.aggregate().first { it.attributes["type"] == "ClassC" }
+                    origin = "A"
                 )
             ),
             null
@@ -521,12 +515,12 @@ class ActionHasherTest {
             MaestroCommand(tapOnElement = TapOnElementCommand(ElementSelector(textRegex = "ButtonB")))
         val inputCommandA = MaestroCommand(
             inputRandomTextCommand = InputRandomCommand(
-                origin = tapCommandA to flattenNodes.random(random)
+                origin = "A"
             )
         )
         val inputCommandB = MaestroCommand(
             inputRandomTextCommand = InputRandomCommand(
-                origin = tapCommandB to flattenNodes.random(random)
+                origin = "B"
             )
         )
         val hashA = actionHasher.hashAction(
@@ -553,7 +547,7 @@ class ActionHasherTest {
             tapOnElement = TapOnElementCommand(ElementSelector(textRegex = "open"))
         )
         val inputRandomCommand =
-            InputRandomCommand(origin = actionThatOpenedTheField to TreeNode(mutableMapOf("text" to "open")))
+            InputRandomCommand(origin = "")
         val firstInput = MaestroCommand(inputRandomTextCommand = inputRandomCommand)
         val secondInput = MaestroCommand(inputRandomTextCommand = inputRandomCommand)
 

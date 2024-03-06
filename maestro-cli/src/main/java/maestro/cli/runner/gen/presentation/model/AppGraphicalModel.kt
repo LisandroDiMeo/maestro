@@ -20,7 +20,12 @@ class AppGraphicalModel(val path: String) {
             "\"",
             ""
         )
-        description.split(".").last().take(30)
+        val contentLabel =
+            if (description.split(".").size >= 3)
+                "Tap on ${description.split(".").last().take(30)}"
+            else
+                description.take(30)
+        if ("Tap" in description) description else contentLabel
     }
     private val usagesCount = mutableMapOf<String, Int>()
     private val usagesCountProducer: (String) -> String = { actionId ->

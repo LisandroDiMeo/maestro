@@ -153,9 +153,7 @@ class ViewRankingTest {
             children = listOf(TreeNode(attributes = mutableMapOf("text" to "Type text")))
         )
         val inputRandomTextCommand = InputRandomCommand(
-            origin = MaestroCommand(
-                tapOnElement = TapOnElementCommand(selector = ElementSelector(textRegex = "Press Me"))
-            ) to root.children[0]
+            origin = "A"
         )
         val commandsFetchedForTheFirstTime = listOf(
             MaestroCommand(

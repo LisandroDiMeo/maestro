@@ -99,6 +99,14 @@ class AndroidHierarchyAnalyzerTest {
             ): MaestroCommand {
                 TODO("Not yet implemented")
             }
+
+            override fun usagesForAction(actionHash: String): Int {
+                TODO("Not yet implemented")
+            }
+
+            override fun updateUsagesForActionToExecute(actionToPerform: String) {
+                TODO("Not yet implemented")
+            }
         },
         object : DisambiguationRule {
             override fun disambiguate(

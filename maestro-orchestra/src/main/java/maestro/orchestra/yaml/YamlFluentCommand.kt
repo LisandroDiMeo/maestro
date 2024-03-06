@@ -639,6 +639,12 @@ data class YamlFluentCommand(
                         eraseText = YamlEraseText(charactersToErase = 50)
                     )
                 }
+                is InputTextCommand -> {
+                    YamlFluentCommand(
+                        action = "inputText",
+                        inputText = YamlInputText(maestroCommand.inputTextCommand?.text ?: "")
+                    )
+                }
                 is BackPressCommand -> { YamlFluentCommand(action = "back") }
                 is HideKeyboardCommand -> { YamlFluentCommand(action = "hideKeyboard") }
                 is ScrollCommand -> YamlFluentCommand(action = "scroll")

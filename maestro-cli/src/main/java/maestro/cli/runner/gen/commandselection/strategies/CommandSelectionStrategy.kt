@@ -2,6 +2,7 @@ package maestro.cli.runner.gen.commandselection.strategies
 
 import maestro.TreeNode
 import maestro.cli.runner.gen.actionhash.ActionHasher
+import maestro.cli.runner.gen.commandselection.CommandInformation
 import maestro.cli.runner.gen.commandselection.strategies.random.RandomCommandSelection
 import maestro.cli.runner.gen.commandselection.strategies.viewranking.ViewRanking
 import maestro.cli.runner.gen.presentation.model.ExecutedCommandsObservable
@@ -16,7 +17,7 @@ import kotlin.random.Random
  */
 abstract class CommandSelectionStrategy(
     open val actionHasher: ActionHasher,
-    executedCommandsObservable: ExecutedCommandsObservable
+    open val executedCommandsObservable: ExecutedCommandsObservable
 ) {
 
     protected val launchAppCommand = MaestroCommand(launchAppCommand = LaunchAppCommand(""))
@@ -45,7 +46,70 @@ abstract class CommandSelectionStrategy(
         wasLastActionForTest: Boolean
     ): MaestroCommand
 
+    abstract fun usagesForAction(actionHash: String): Int
+
     object UnableToPickCommand : Exception()
+
+    protected fun hashActions(
+        root: TreeNode,
+        availableCommands: List<Pair<MaestroCommand, TreeNode?>>
+    ): List<Pair<String, MaestroCommand>> {
+        return availableCommands.map { (command, node) ->
+            actionHasher.hashAction(
+                root,
+                command,
+                node
+            ) to command
+        }
+    }
+
+    fun hashForPreviousAction() = previousAction
+
+    abstract fun updateUsagesForActionToExecute(actionToPerform: String)
+
+    protected fun performUpdateForObservable(
+        newTest: Boolean,
+        hashedActions: List<Pair<String, MaestroCommand>>
+    ) {
+        when {
+            newTest && previousAction != launchAppCommandHash -> {
+                executedCommandsObservable.performUpdate(
+                    CommandInformation(
+                        previousActionCommand,
+                        previousAction,
+                        emptyList(),
+                        usages = usagesForAction(previousAction)
+                    )
+                )
+                previousAction = launchAppCommandHash
+                previousActionCommand = launchAppCommand
+            }
+
+            newTest && previousAction == launchAppCommandHash -> {
+                previousAction = launchAppCommandHash
+                previousActionCommand = launchAppCommand
+                executedCommandsObservable.performUpdate(
+                    CommandInformation(
+                        previousActionCommand,
+                        previousAction,
+                        hashedActions,
+                        usages = usagesForAction(previousAction)
+                    )
+                )
+            }
+
+            else -> {
+                executedCommandsObservable.performUpdate(
+                    CommandInformation(
+                        previousActionCommand,
+                        previousAction,
+                        hashedActions,
+                        usages = usagesForAction(previousAction)
+                    )
+                )
+            }
+        }
+    }
 
     companion object {
         fun strategyFor(

@@ -211,7 +211,7 @@ class AbstractHierarchyAnalyzerTest {
             )
         )
         val widgets = hierarchyAnalyzer.extractWidgets(fakeHierarchy, fakeHierarchy.aggregate())
-        val clickableActions = hierarchyAnalyzer.extractClickableActions(widgets)
+        val clickableActions = hierarchyAnalyzer.extractClickableActions(widgets, emptyList())
         Assertions.assertEquals(2, clickableActions.size)
         Assertions.assertTrue(
             TreeNode(

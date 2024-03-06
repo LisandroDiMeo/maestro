@@ -129,6 +129,7 @@ data class ScrollUntilVisibleCommand(
 
 class ScrollCommand(
     val label: String? = null,
+    val origin: String? = null
 ) : Command {
 
     override fun equals(other: Any?): Boolean {
@@ -156,6 +157,7 @@ class ScrollCommand(
 
 class BackPressCommand(
     val label: String? = null,
+    val origin: String? = null
 ) : Command {
 
     override fun equals(other: Any?): Boolean {
@@ -181,7 +183,7 @@ class BackPressCommand(
     }
 }
 
-class HideKeyboardCommand(val label: String? = null, val origin: Pair<MaestroCommand, TreeNode>? = null) : Command {
+class HideKeyboardCommand(val label: String? = null, val origin: String? = null) : Command {
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -370,6 +372,7 @@ data class AssertConditionCommand(
 data class InputTextCommand(
     val text: String,
     val label: String? = null,
+    val origin: String? = null
 ) : Command {
 
     override fun description(): String {
@@ -491,7 +494,7 @@ data class PressKeyCommand(
 
 data class EraseTextCommand(
     val charactersToErase: Int?,
-    val origin: Pair<MaestroCommand, TreeNode>? = null,
+    val origin: String? = null,
     val label: String? = null,
 ) : Command {
 
@@ -590,7 +593,7 @@ enum class InputRandomType {
 data class InputRandomCommand(
     val inputType: InputRandomType? = InputRandomType.TEXT,
     val length: Int? = 8,
-    val origin: Pair<MaestroCommand, TreeNode>? = null,
+    val origin: String? = null,
     val label: String? = null,
 ) : Command {
 
